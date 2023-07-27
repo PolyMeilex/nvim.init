@@ -27,5 +27,17 @@ require("nvim-tree").setup({
 			open = true,
 			close = true,
 		}
+	},
+	diagnostics = {
+		enable = true,
+	},
+	renderer = {
+		icons = {
+			glyphs = {
+				git = {
+					unstaged = "✓",
+				}
+			}
+		}
 	}
 })

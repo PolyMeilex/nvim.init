@@ -22,6 +22,22 @@ return require('packer').startup(function(use)
 	}
 
 	use {
+		'f-person/git-blame.nvim',
+		cond = IsNotVsCode,
+		config = function()
+			vim.cmd "GitBlameDisable"
+		end
+	}
+
+	use {
+		'lewis6991/gitsigns.nvim',
+		cond = IsNotVsCode,
+		config = function()
+			require('gitsigns').setup()
+		end
+	}
+
+	use {
 		'nvim-telescope/telescope.nvim', tag = '0.1.2',
 		requires = {
 			'nvim-lua/plenary.nvim',
