@@ -14,13 +14,25 @@ return require('packer').startup(function(use)
 	}
 
 	use {
+		'numToStr/Comment.nvim',
+		cond = IsNotVsCode,
+		config = function()
+			require('Comment').setup()
+		end
+	}
+
+	use {
 		'nvim-telescope/telescope.nvim', tag = '0.1.0',
-		requires = { { 'nvim-lua/plenary.nvim' } },
+		requires = {
+			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope-file-browser.nvim',
+		},
 		cond = IsNotVsCode,
 		config = function()
 			require("config.telescope")
 		end,
 	}
+
 
 	use {
 		'nvim-tree/nvim-tree.lua',
@@ -28,14 +40,6 @@ return require('packer').startup(function(use)
 		cond = IsNotVsCode,
 		config = function()
 			require("config.tree")
-		end,
-	}
-
-	use {
-		'morhetz/gruvbox',
-		cond = IsNotVsCode,
-		config = function()
-			require("config.colorscheme")
 		end,
 	}
 
@@ -77,6 +81,14 @@ return require('packer').startup(function(use)
 		},
 		config = function()
 			require("config.lsp")
+		end,
+	}
+
+	use {
+		'morhetz/gruvbox',
+		cond = IsNotVsCode,
+		config = function()
+			require("config.colorscheme")
 		end,
 	}
 end)

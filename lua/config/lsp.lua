@@ -1,10 +1,14 @@
-local lsp = require("lsp-zero").preset("recommended")
+local lsp = require('lsp-zero').preset('recommended')
 
 lsp.ensure_installed({
 	'rust_analyzer',
 })
 
 lsp.on_attach(function(client, bufnr)
+	if client.server_capabilities.inlayHintProvider then
+		vim.lsp.inlay_hint(bufnr, true)
+	end
+
 	lsp.default_keymaps({ buffer = bufnr })
 end)
 
@@ -25,7 +29,8 @@ lsp.set_server_config({
 			foldingRange = {
 				dynamicRegistration = false,
 				lineFoldingOnly = true
-			}
+			},
+			inlayHints = true,
 		}
 	}
 })
