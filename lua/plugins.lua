@@ -40,7 +40,11 @@ return require('packer').startup(function(use)
 	use {
 		'nvim-lualine/lualine.nvim',
 		cond = IsNotVsCode,
-		requires = { 'nvim-tree/nvim-web-devicons', 'SmiteshP/nvim-navic' },
+		requires = {
+			'nvim-tree/nvim-web-devicons',
+			'SmiteshP/nvim-navic',
+			'linrongbin16/lsp-progress.nvim',
+		},
 		config = function()
 			require('config.lualine')
 		end,
