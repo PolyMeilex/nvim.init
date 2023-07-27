@@ -9,6 +9,10 @@ lsp.on_attach(function(client, bufnr)
 		vim.lsp.inlay_hint(bufnr, true)
 	end
 
+	if client.server_capabilities.documentSymbolProvider then
+		require('nvim-navic').attach(client, bufnr)
+	end
+
 	lsp.default_keymaps({ buffer = bufnr })
 end)
 
@@ -36,5 +40,6 @@ lsp.set_server_config({
 })
 
 require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
+-- vim.o.statusline = "%f %= %{%v:lua.require'nvim-navic'.get_location()%}"
 
 lsp.setup()

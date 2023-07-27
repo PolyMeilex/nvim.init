@@ -34,7 +34,16 @@ return require('packer').startup(function(use)
 		cond = IsNotVsCode,
 		config = function()
 			require('gitsigns').setup()
-		end
+		end,
+	}
+
+	use {
+		'nvim-lualine/lualine.nvim',
+		cond = IsNotVsCode,
+		requires = { 'nvim-tree/nvim-web-devicons', 'SmiteshP/nvim-navic' },
+		config = function()
+			require('config.lualine')
+		end,
 	}
 
 	use {
@@ -94,6 +103,7 @@ return require('packer').startup(function(use)
 			{ 'hrsh7th/nvim-cmp' },
 			{ 'hrsh7th/cmp-nvim-lsp' },
 			{ 'L3MON4D3/LuaSnip' },
+			{ 'SmiteshP/nvim-navic' },
 		},
 		config = function()
 			require("config.lsp")
