@@ -40,6 +40,5 @@ lsp.set_server_config({
 })
 
 require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
--- vim.o.statusline = "%f %= %{%v:lua.require'nvim-navic'.get_location()%}"
 
 lsp.setup()
