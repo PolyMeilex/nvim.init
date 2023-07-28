@@ -109,6 +109,7 @@ return require('packer').startup(function(use)
 			{ 'hrsh7th/cmp-nvim-lsp' },
 			{ 'L3MON4D3/LuaSnip' },
 			{ 'SmiteshP/nvim-navic' },
+			"ray-x/lsp_signature.nvim",
 		},
 		config = function()
 			require("config.lsp")

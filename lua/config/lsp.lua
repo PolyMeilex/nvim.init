@@ -13,6 +13,7 @@ lsp.on_attach(function(client, bufnr)
 		require('nvim-navic').attach(client, bufnr)
 	end
 
+	require('lsp_signature').on_attach({}, bufnr)
 	lsp.default_keymaps({ buffer = bufnr })
 end)
 
