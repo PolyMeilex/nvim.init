@@ -34,6 +34,9 @@ require("nvim-tree").setup({
 	update_focused_file = {
 		enable = true,
 	},
+	modified = {
+		enable = true,
+	},
 	renderer = {
 		icons = {
 			glyphs = {
