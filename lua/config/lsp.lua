@@ -47,3 +47,15 @@ require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 require('lspconfig').blueprint_ls.setup({})
 
 lsp.setup()
+
+local cmp = require('cmp')
+cmp.setup {
+  completion = {
+    completeopt = "menu,menuone",
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
+    { name = 'async_path' },
+  },
+}
