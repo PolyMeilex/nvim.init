@@ -2,18 +2,18 @@ local telescope = require("telescope")
 local builtin = require('telescope.builtin')
 local actions = require('telescope.actions')
 
-vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
+vim.keymap.set('n', 'tpf', builtin.find_files, {})
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
-vim.keymap.set('n', 'gtc', builtin.commands, {})
-vim.keymap.set('n', 'gtf', builtin.current_buffer_fuzzy_find, {})
+vim.keymap.set('n', 'tc', builtin.commands, {})
+vim.keymap.set('n', 'tf', builtin.current_buffer_fuzzy_find, {})
 vim.keymap.set('n', '<S-f>', builtin.live_grep, {})
-vim.keymap.set('n', 'gtu', function()
+vim.keymap.set('n', 'tu', function()
   builtin.oldfiles({ only_cwd = true })
 end, {})
-vim.keymap.set('n', 'gtb', builtin.buffers, {})
+vim.keymap.set('n', 'tb', builtin.buffers, {})
 
-vim.keymap.set('n', 'gtt', builtin.lsp_document_symbols, {})
-vim.keymap.set('n', 'gtd', builtin.diagnostics, {})
+vim.keymap.set('n', 'tt', builtin.lsp_document_symbols, {})
+vim.keymap.set('n', 'td', builtin.diagnostics, {})
 
 telescope.setup({
   pickers = {
