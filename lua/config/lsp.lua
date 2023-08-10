@@ -59,3 +59,7 @@ cmp.setup {
     { name = 'async_path' },
   },
 }
+
+require('illuminate').configure({
+  min_count_to_highlight = 2,
+})

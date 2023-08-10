@@ -116,6 +116,7 @@ return require('packer').startup(function(use)
       { 'L3MON4D3/LuaSnip' },
       { 'SmiteshP/nvim-navic' },
       "ray-x/lsp_signature.nvim",
+      "RRethy/vim-illuminate",
     },
     config = function()
       require("config.lsp")
