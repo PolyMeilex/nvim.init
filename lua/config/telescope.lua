@@ -13,7 +13,9 @@ end, {})
 vim.keymap.set('n', 'tb', builtin.buffers, {})
 
 vim.keymap.set('n', 'tt', builtin.lsp_document_symbols, {})
-vim.keymap.set('n', 'td', builtin.diagnostics, {})
+vim.keymap.set('n', 'td', function()
+  builtin.diagnostics({ severity_bound = "ERROR" })
+end, {})
 
 telescope.setup({
   pickers = {
