@@ -114,6 +114,12 @@ return require('packer').startup(function(use)
       { 'hrsh7th/cmp-nvim-lsp' },
       { 'L3MON4D3/LuaSnip' },
       { 'SmiteshP/nvim-navic' },
+      {
+        "folke/neodev.nvim",
+        config = function()
+          require("neodev").setup()
+        end
+      },
       "ray-x/lsp_signature.nvim",
       "RRethy/vim-illuminate",
     },
