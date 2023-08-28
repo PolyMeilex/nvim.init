@@ -43,7 +43,6 @@ return require('packer').startup(function(use)
     requires = {
       'nvim-tree/nvim-web-devicons',
       'SmiteshP/nvim-navic',
-      'linrongbin16/lsp-progress.nvim',
     },
     config = function()
       require('config.lualine')
@@ -120,6 +119,16 @@ return require('packer').startup(function(use)
     },
     config = function()
       require("config.lsp")
+    end,
+  }
+
+  use {
+    'j-hui/fidget.nvim',
+    tag = 'legacy',
+    config = function()
+      require("fidget").setup({
+        window = { blend = 0 },
+      })
     end,
   }
 
