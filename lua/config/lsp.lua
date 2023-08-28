@@ -25,7 +25,7 @@ lsp.format_on_save({
   servers = {
     ['lua_ls'] = { 'lua' },
     ['rust_analyzer'] = { 'rust' },
-    ['taplo'] = { 'toml' },
+    -- ['taplo'] = { 'toml' },
     ['blueprint_ls'] = { 'blueprint' },
     -- ['lemminx'] = { 'xml' },
   }
@@ -43,6 +43,16 @@ lsp.set_server_config({
   }
 })
 
+require('lspconfig').rust_analyzer.setup({
+  settings = {
+    ['rust-analyzer'] = {
+      checkOnSave = {
+        command = "clippy",
+      },
+    },
+  },
+
+})
 require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 require('lspconfig').blueprint_ls.setup({})
 
