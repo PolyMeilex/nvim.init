@@ -15,6 +15,13 @@ lsp.on_attach(function(client, bufnr)
 
   require('lsp_signature').on_attach({}, bufnr)
   lsp.default_keymaps({ buffer = bufnr })
+
+  vim.keymap.set('n', '[d', function()
+    vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+  end, { buffer = bufnr })
+  vim.keymap.set('n', ']d', function()
+    vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+  end, { buffer = bufnr })
 end)
 
 lsp.format_on_save({
