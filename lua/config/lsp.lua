@@ -6,7 +6,9 @@ lsp.ensure_installed({
 
 lsp.on_attach(function(client, bufnr)
   if client.server_capabilities.inlayHintProvider then
-    vim.lsp.inlay_hint(bufnr, true)
+    if vim.lsp.inlay_hint ~= nil then
+      vim.lsp.inlay_hint(bufnr, true)
+    end
   end
 
   if client.server_capabilities.documentSymbolProvider then
