@@ -75,6 +75,7 @@ cmp.setup {
     { name = 'nvim_lsp' },
     { name = 'buffer' },
     { name = 'async_path' },
+    { name = 'crates' },
   },
 }
 

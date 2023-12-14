@@ -14,6 +14,30 @@ return require('packer').startup(function(use)
   }
 
   use {
+    'saecki/crates.nvim',
+    cond = IsNotVsCode,
+    config = function()
+      local crates = require('crates')
+      crates.setup({
+        src = {
+          cmp = {
+            enabled = true,
+          }
+        }
+      })
+
+      vim.keymap.set('n', '<leader>cv', function()
+        crates.show_versions_popup()
+        crates.focus_popup()
+      end, {})
+      vim.keymap.set('n', '<leader>cf', function()
+        crates.show_features_popup()
+        crates.focus_popup()
+      end, {})
+    end
+  }
+
+  use {
     'numToStr/Comment.nvim',
     cond = IsNotVsCode,
     config = function()
