@@ -42,6 +42,8 @@ return require('packer').startup(function(use)
     cond = IsNotVsCode,
     config = function()
       require('Comment').setup()
+      local ft = require('Comment.ft')
+      ft.vala = { '//%s', '/*%s*/' }
     end
   }
 
