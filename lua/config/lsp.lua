@@ -32,6 +32,7 @@ lsp_zero.format_on_save({
     ['rust_analyzer'] = { 'rust' },
     -- ['taplo'] = { 'toml' },
     ['blueprint_ls'] = { 'blueprint' },
+    ['html'] = { 'html' },
     -- ['lemminx'] = { 'xml' },
   }
 })
