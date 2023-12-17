@@ -1,53 +1,41 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-local function on_attach(bufnr)
-  local api = require('nvim-tree.api')
+vim.fn.sign_define("DiagnosticSignError",
+  { text = " ", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DiagnosticSignWarn",
+  { text = " ", texthl = "DiagnosticSignWarn" })
+vim.fn.sign_define("DiagnosticSignInfo",
+  { text = " ", texthl = "DiagnosticSignInfo" })
+vim.fn.sign_define("DiagnosticSignHint",
+  { text = "󰌵", texthl = "DiagnosticSignHint" })
 
-  api.config.mappings.default_on_attach(bufnr)
-
-  vim.keymap.set('n', '<C-e>', api.tree.close, { buffer = bufnr })
-
-  vim.keymap.set('n', '<S-f>', function()
-    local node = api.tree.get_node_under_cursor()
-    if node.nodes == nil then return end
-
-    local builtin = require('telescope.builtin')
-    builtin.live_grep({ cwd = node.absolute_path })
-  end, { buffer = bufnr })
-end
-
-local api = require("nvim-tree.api")
-vim.keymap.set('n', '<C-e>', api.tree.focus, {})
-
-require("nvim-tree").setup({
-  on_attach = on_attach,
-  tab = {
-    sync = {
-      open = true,
-      close = true,
-    }
-  },
-  diagnostics = {
-    enable = true,
-    show_on_dirs = true,
-  },
-  update_focused_file = {
-    enable = true,
-  },
-  modified = {
-    enable = true,
-  },
-  renderer = {
-    icons = {
-      glyphs = {
-        git = {
-          unstaged = "✓",
-        }
-      }
-    }
-  },
-  filters = {
-    git_ignored = false,
+require("neo-tree").setup({
+  filesystem = {
+    follow_current_file = {
+      enabled = true,
+      leave_dirs_open = false,
+    },
+    window = {
+      mappings = {
+        ["<C-e>"] = "close_window",
+        ["<S-f>"] = function(state)
+          local node = state.tree:get_node();
+          if node.type == "directory" then
+            require('telescope.builtin').live_grep({ cwd = node.path })
+          end
+        end,
+        ["<C-f>"] = function(state)
+          local node = state.tree:get_node();
+          if node.type == "directory" then
+            require('telescope.builtin').find_files({ cwd = node.path })
+          end
+        end,
+      },
+    },
   },
 })
+
+vim.keymap.set('n', '<C-e>', function()
+  vim.cmd("Neotree")
+end, {})

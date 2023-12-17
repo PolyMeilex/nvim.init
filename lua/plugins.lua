@@ -111,9 +111,14 @@ require("lazy").setup {
     end,
   },
   {
-    'nvim-tree/nvim-tree.lua',
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
     enabled = IsNotVsCode,
-    dependencies = 'nvim-tree/nvim-web-devicons',
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
     config = function()
       require("config.tree")
     end,
