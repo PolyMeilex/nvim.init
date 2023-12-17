@@ -3,6 +3,9 @@ require('nvim-navic').setup({
 })
 
 require("lualine").setup({
+  options = {
+    disabled_filetypes = { 'neo-tree' },
+  },
   winbar = {
     lualine_c = {
       'navic',
