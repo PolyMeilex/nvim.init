@@ -16,6 +16,7 @@ require("neo-tree").setup({
     "buffers",
     "git_status",
     "document_symbols",
+    "diagnostics",
   },
   source_selector = {
     winbar = true,
@@ -23,7 +24,9 @@ require("neo-tree").setup({
       { source = "filesystem" },
       { source = "buffers" },
       { source = "document_symbols" },
+      { source = "diagnostics" },
     },
+    truncation_character = "",
   },
   window = {
     mappings = {
@@ -56,7 +59,7 @@ require("neo-tree").setup({
   },
   document_symbols = {
     follow_cursor = true,
-  }
+  },
 })
 
 vim.keymap.set('n', '<C-e>', function()
