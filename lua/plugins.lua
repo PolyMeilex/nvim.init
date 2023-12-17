@@ -2,20 +2,33 @@ function IsNotVsCode()
   return vim.g.vscode == nil
 end
 
-return require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
-  use 'bkad/CamelCaseMotion'
-  use 'tpope/vim-surround'
-  use {
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup {
+  'bkad/CamelCaseMotion',
+  'tpope/vim-surround',
+  {
     'svermeulen/vim-cutlass',
     config = function()
       require("config.cutlass")
     end,
-  }
-
-  use {
+  },
+  {
     'saecki/crates.nvim',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
+    -- tag = 'stable',
+    dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       local crates = require('crates')
       crates.setup({
@@ -35,30 +48,27 @@ return require('packer').startup(function(use)
         crates.focus_popup()
       end, {})
     end
-  }
-
-  use {
+  },
+  {
     'numToStr/Comment.nvim',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
     config = function()
       require('Comment').setup()
       local ft = require('Comment.ft')
       ft.vala = { '//%s', '/*%s*/' }
       ft.wgsl = { '//%s', '/*%s*/' }
     end
-  }
-
-  use {
+  },
+  {
     'f-person/git-blame.nvim',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
     config = function()
       vim.cmd "GitBlameDisable"
     end
-  }
-
-  use {
+  },
+  {
     'lewis6991/gitsigns.nvim',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
     config = function()
       require('gitsigns').setup()
 
@@ -70,71 +80,65 @@ return require('packer').startup(function(use)
         require('gitsigns').prev_hunk()
       end, {})
     end,
-  }
-
-  use {
+  },
+  {
     'nvim-lualine/lualine.nvim',
-    cond = IsNotVsCode,
-    requires = {
+    enabled = IsNotVsCode,
+    dependencies = {
       'nvim-tree/nvim-web-devicons',
       'SmiteshP/nvim-navic',
     },
     config = function()
       require('config.lualine')
     end,
-  }
-
-  use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.2',
-    requires = {
+  },
+  {
+    'nvim-telescope/telescope.nvim',
+    tag = '0.1.2',
+    enabled = IsNotVsCode,
+    dependencies = {
       'nvim-lua/plenary.nvim',
       'nvim-telescope/telescope-file-browser.nvim',
       'nvim-telescope/telescope-ui-select.nvim',
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        run =
-        'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
+        build =
+        'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
       },
     },
-    cond = IsNotVsCode,
     config = function()
       require("config.telescope")
     end,
-  }
-
-
-  use {
+  },
+  {
     'nvim-tree/nvim-tree.lua',
-    requires = 'nvim-tree/nvim-web-devicons',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
+    dependencies = 'nvim-tree/nvim-web-devicons',
     config = function()
       require("config.tree")
     end,
-  }
-
-  use {
+  },
+  {
     'nvim-treesitter/nvim-treesitter',
+    enabled = IsNotVsCode,
     run = ':TSUpdate',
-    cond = IsNotVsCode,
     config = function()
       require("config.treesitter")
     end,
-  }
-
-  use {
+  },
+  {
     'kevinhwang91/nvim-ufo',
-    requires = 'kevinhwang91/promise-async',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
+    dependencies = 'kevinhwang91/promise-async',
     config = function()
       require("config.ufo")
     end,
-  }
-
-  use {
+  },
+  {
     'VonHeikemen/lsp-zero.nvim',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
     branch = 'v2.x',
-    requires = {
+    dependencies = {
       { 'neovim/nvim-lspconfig' },
       {
         'williamboman/mason.nvim',
@@ -161,23 +165,22 @@ return require('packer').startup(function(use)
     config = function()
       require("config.lsp")
     end,
-  }
-
-  use {
+  },
+  {
     'j-hui/fidget.nvim',
+    enabled = IsNotVsCode,
     tag = 'legacy',
     config = function()
       require("fidget").setup({
         window = { blend = 0 },
       })
     end,
-  }
-
-  use {
+  },
+  {
     'morhetz/gruvbox',
-    cond = IsNotVsCode,
+    enabled = IsNotVsCode,
     config = function()
       require("config.colorscheme")
     end,
-  }
-end)
+  },
+}
