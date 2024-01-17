@@ -78,7 +78,7 @@ require('mason-lspconfig').setup({
 })
 
 require('lspconfig').blueprint_ls.setup({})
-
+require('lspconfig').dartls.setup({})
 
 lsp_zero.setup()
 
