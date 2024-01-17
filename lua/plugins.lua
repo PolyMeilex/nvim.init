@@ -94,7 +94,8 @@ require("lazy").setup {
   },
   {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.2',
+    commit = '4367e05c06d19f28c514e1498bcd9410f4bc65b2',
+    -- tag = '0.1.5',
     enabled = IsNotVsCode,
     dependencies = {
       'nvim-lua/plenary.nvim',
