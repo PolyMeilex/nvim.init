@@ -111,6 +111,23 @@ require("lazy").setup {
     end,
   },
   {
+    'tomasky/bookmarks.nvim',
+    enabled = IsNotVsCode,
+    config = function()
+      local bm = require("bookmarks")
+      bm.setup()
+
+      vim.api.nvim_create_user_command("BookmarkToogle", bm.bookmark_toggle,
+        { desc = "Add or remove bookmark at current line" })
+      vim.api.nvim_create_user_command("BookmarkAnnotate", bm.bookmark_ann,
+        { desc = "Add or edit mark annotation at current line" })
+
+      vim.keymap.set('n', 'tm', function()
+        require('telescope').extensions.bookmarks.list()
+      end, {})
+    end,
+  },
+  {
     'nvim-telescope/telescope.nvim',
     commit = '4367e05c06d19f28c514e1498bcd9410f4bc65b2',
     -- tag = '0.1.5',

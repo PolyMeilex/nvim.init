@@ -41,6 +41,7 @@ telescope.setup({
 telescope.load_extension("file_browser")
 telescope.load_extension("ui-select")
 telescope.load_extension('fzf')
+telescope.load_extension('bookmarks')
 
 -- open file_browser with the path of the current buffer
 vim.api.nvim_set_keymap(
