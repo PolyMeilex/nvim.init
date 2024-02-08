@@ -209,6 +209,13 @@ require("lazy").setup {
     end,
   },
   {
+    'vxpm/ferris.nvim',
+    enabled = IsNotVsCode,
+    opts = {
+      create_commands = true,
+    },
+  },
+  {
     'j-hui/fidget.nvim',
     enabled = IsNotVsCode,
     tag = 'legacy',
