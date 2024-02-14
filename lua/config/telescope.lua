@@ -1,6 +1,7 @@
 local telescope = require("telescope")
 local builtin = require('telescope.builtin')
 local actions = require('telescope.actions')
+local action_state = require("telescope.actions.state")
 
 vim.keymap.set('n', 'tpf', builtin.find_files, {})
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
@@ -49,4 +50,33 @@ vim.api.nvim_set_keymap(
   "<leader>fb",
   ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
   { noremap = true }
+)
+
+local select_dir_for_search = function()
+  telescope.extensions.file_browser.file_browser({
+    files = false,
+    depth = false,
+    attach_mappings = function()
+      actions.select_default:replace(function()
+        local entry_path = action_state.get_selected_entry().Path
+        local dir = entry_path:is_dir() and entry_path or entry_path:parent()
+        local relative = dir:make_relative(vim.fn.getcwd())
+        local absolute = dir:absolute()
+
+        builtin.find_files({
+          prompt_title = relative .. "/",
+          search_dirs = { absolute },
+        })
+      end)
+
+      return true
+    end,
+  })
+end
+
+vim.keymap.set(
+  "n",
+  "<leader>fs",
+  select_dir_for_search,
+  {}
 )
