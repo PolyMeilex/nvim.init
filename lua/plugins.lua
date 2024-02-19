@@ -209,6 +209,10 @@ require("lazy").setup {
     end,
   },
   {
+    'poljar/typos.nvim',
+    enabled = IsNotVsCode,
+  },
+  {
     'vxpm/ferris.nvim',
     enabled = IsNotVsCode,
     opts = {
