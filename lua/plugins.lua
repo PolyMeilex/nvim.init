@@ -129,7 +129,7 @@ require("lazy").setup {
   },
   {
     'nvim-telescope/telescope.nvim',
-    commit = '4367e05c06d19f28c514e1498bcd9410f4bc65b2',
+    commit = 'b744cf59752aaa01561afb4223006de26f3836fd',
     -- tag = '0.1.5',
     enabled = IsNotVsCode,
     dependencies = {
