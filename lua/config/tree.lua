@@ -12,19 +12,17 @@ vim.fn.sign_define("DiagnosticSignHint",
 
 require("neo-tree").setup({
   sources = {
-    "filesystem",
     "buffers",
-    "git_status",
     "document_symbols",
+    "filesystem",
     "diagnostics",
+    "harpoon",
   },
   source_selector = {
     winbar = true,
     sources = {
       { source = "filesystem" },
-      { source = "buffers" },
-      { source = "document_symbols" },
-      { source = "diagnostics" },
+      { source = "harpoon" },
     },
     truncation_character = "",
   },
