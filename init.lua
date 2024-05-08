@@ -15,4 +15,6 @@ vim.opt.clipboard = vim.opt.clipboard + "unnamedplus";
 
 vim.cmd(':tnoremap <Esc> <C-\\><C-n>')
 vim.cmd(':tnoremap <C-\\><C-n> <Esc>')
+
 require("plugins")
+require("yaml_utils")
