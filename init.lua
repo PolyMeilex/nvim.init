@@ -18,3 +18,4 @@ vim.cmd(':tnoremap <C-\\><C-n> <Esc>')
 
 require("plugins")
 require("yaml_utils")
+require("rs-derive-menu")
