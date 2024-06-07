@@ -1,12 +1,14 @@
-local lsp_zero = require('lsp-zero').preset('recommended')
+local lsp_zero = require('lsp-zero')
+
+vim.api.nvim_create_user_command(
+  "LspToggleInlayHints",
+  function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
+  end,
+  {}
+)
 
 lsp_zero.on_attach(function(client, bufnr)
-  if client.server_capabilities.inlayHintProvider then
-    if vim.lsp.inlay_hint ~= nil then
-      vim.lsp.inlay_hint(bufnr, true)
-    end
-  end
-
   if client.server_capabilities.documentSymbolProvider then
     require('nvim-navic').attach(client, bufnr)
   end
