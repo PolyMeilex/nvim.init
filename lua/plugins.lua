@@ -50,7 +50,7 @@ require("lazy").setup {
     config = function()
       local crates = require('crates')
       crates.setup({
-        src = {
+        completion = {
           cmp = {
             enabled = true,
           }
