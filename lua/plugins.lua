@@ -117,7 +117,7 @@ require("lazy").setup {
       local bm = require("bookmarks")
       bm.setup()
 
-      vim.api.nvim_create_user_command("BookmarkToogle", bm.bookmark_toggle,
+      vim.api.nvim_create_user_command("BookmarkToggle", bm.bookmark_toggle,
         { desc = "Add or remove bookmark at current line" })
       vim.api.nvim_create_user_command("BookmarkAnnotate", bm.bookmark_ann,
         { desc = "Add or edit mark annotation at current line" })
