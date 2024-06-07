@@ -1,41 +1,15 @@
+require("gruvbox").setup({
+  transparent_mode = true,
+  terminal_colors = false,
+})
+
 vim.cmd.colorscheme("gruvbox")
 -- vim.cmd.colorscheme("retrobox")
 
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
--- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "LspInlayHint", { bg = "#36302c", fg = "#878787" })
 
-vim.api.nvim_set_hl(0, "TelescopeSelection", { bg = "black" })
-vim.api.nvim_set_hl(0, "NvimTreeGitDirty", { fg = "green" })
-
--- Navic
-vim.api.nvim_set_hl(0, "NavicIconsFile", { link = "GruvboxBlue" })
-vim.api.nvim_set_hl(0, "NavicIconsModule", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsNamespace", { link = "GruvboxBlue" })
-vim.api.nvim_set_hl(0, "NavicIconsPackage", { link = "GruvboxAqua" })
-vim.api.nvim_set_hl(0, "NavicIconsClass", { link = "GruvboxYellow" })
-vim.api.nvim_set_hl(0, "NavicIconsMethod", { link = "GruvboxBlue" })
-vim.api.nvim_set_hl(0, "NavicIconsProperty", { link = "GruvboxAqua" })
-vim.api.nvim_set_hl(0, "NavicIconsField", { link = "GruvboxPurple" })
-vim.api.nvim_set_hl(0, "NavicIconsConstructor", { link = "GruvboxBlue" })
-vim.api.nvim_set_hl(0, "NavicIconsEnum", { link = "GruvboxPurple" })
-vim.api.nvim_set_hl(0, "NavicIconsInterface", { link = "GruvboxGreen" })
-vim.api.nvim_set_hl(0, "NavicIconsFunction", { link = "GruvboxBlue" })
-vim.api.nvim_set_hl(0, "NavicIconsVariable", { link = "GruvboxPurple" })
-vim.api.nvim_set_hl(0, "NavicIconsConstant", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsString", { link = "GruvboxGreen" })
-vim.api.nvim_set_hl(0, "NavicIconsNumber", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsBoolean", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsArray", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsObject", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsKey", { link = "GruvboxAqua" })
-vim.api.nvim_set_hl(0, "NavicIconsNull", { link = "GruvboxOrange" })
-vim.api.nvim_set_hl(0, "NavicIconsEnumMember", { link = "GruvboxYellow" })
-vim.api.nvim_set_hl(0, "NavicIconsStruct", { link = "GruvboxPurple" })
-vim.api.nvim_set_hl(0, "NavicIconsEvent", { link = "GruvboxYellow" })
-vim.api.nvim_set_hl(0, "NavicIconsOperator", { link = "GruvboxRed" })
-vim.api.nvim_set_hl(0, "NavicIconsTypeParameter", { link = "GruvboxRed" })
-vim.api.nvim_set_hl(0, "NavicText", { link = "GruvboxWhite" })
-vim.api.nvim_set_hl(0, "NavicSeparator", { link = "GruvboxWhite" })
+vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { link = "GruvboxGreenBold" })
+vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { link = "GruvboxGreenBold" })
 
 vim.api.nvim_set_hl(0, "IlluminatedWordText", { bold = true })
 vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bold = true })

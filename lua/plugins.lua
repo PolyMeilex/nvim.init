@@ -233,8 +233,9 @@ require("lazy").setup {
     end,
   },
   {
-    'morhetz/gruvbox',
+    'ellisonleao/gruvbox.nvim',
     enabled = IsNotVsCode,
+    priority = 1000,
     config = function()
       require("config.colorscheme")
     end,
