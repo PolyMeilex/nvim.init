@@ -11,6 +11,7 @@ vim.fn.sign_define("DiagnosticSignHint",
   { text = "󰌵", texthl = "DiagnosticSignHint" })
 
 require("neo-tree").setup({
+  close_if_last_window = true,
   sources = {
     "buffers",
     "document_symbols",
@@ -58,6 +59,14 @@ require("neo-tree").setup({
   document_symbols = {
     follow_cursor = true,
   },
+  event_handlers = {
+    {
+      event = "neo_tree_buffer_leave",
+      handler = function()
+        vim.cmd 'Neotree close'
+      end
+    },
+  }
 })
 
 vim.keymap.set('n', '<C-e>', function()
