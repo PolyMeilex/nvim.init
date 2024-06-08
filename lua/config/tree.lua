@@ -19,14 +19,13 @@ require("neo-tree").setup({
     "diagnostics",
     "harpoon",
   },
-  source_selector = {
-    winbar = true,
-    sources = {
-      { source = "filesystem" },
-      { source = "harpoon" },
-    },
-    truncation_character = "",
-  },
+  -- source_selector = {
+  --   winbar = true,
+  --   sources = {
+  --     { source = "filesystem" },
+  --   },
+  --   truncation_character = "",
+  -- },
   window = {
     mappings = {
       ["<Tab>"] = "next_source",
