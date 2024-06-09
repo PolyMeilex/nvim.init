@@ -149,11 +149,9 @@ return {
   {
     'j-hui/fidget.nvim',
     enabled = IsNotVsCode,
-    tag = 'legacy',
+    tag = 'v1.4.5',
     config = function()
-      require("fidget").setup({
-        window = { blend = 0 },
-      })
+      require("fidget").setup({})
     end,
   },
 }

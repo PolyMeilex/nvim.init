@@ -23,7 +23,5 @@ return {
     vim.api.nvim_set_hl(0, "IlluminatedWordText", { bold = true })
     vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bold = true })
     vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bold = true })
-
-    vim.api.nvim_set_hl(0, "FidgetTask", { link = "GruvboxBlue" })
   end,
 }
