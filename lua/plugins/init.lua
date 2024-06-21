@@ -58,4 +58,9 @@ return {
       require('typos').setup()
     end,
   },
+  {
+    'wakatime/vim-wakatime',
+    enabled = IsNotVsCode,
+    lazy = false,
+  }
 }
