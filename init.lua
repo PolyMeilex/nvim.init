@@ -18,4 +18,5 @@ vim.cmd(':tnoremap <C-\\><C-n> <Esc>')
 
 require("lazy_init")
 require("yaml_utils")
+require("json_utils")
 require("rs-derive-menu")
