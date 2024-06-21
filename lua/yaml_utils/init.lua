@@ -5,7 +5,7 @@ local function is_yaml() return vim.bo.filetype == "yaml" end
 
 -- Public API
 
-M = {}
+local M = {}
 
 M.setup = function() end
 
