@@ -14,6 +14,17 @@ return {
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
 
+    require('nvim-web-devicons').setup({
+      override = {
+        rs = {
+          icon = "",
+          color = "#f46623",
+          cterm_color = "216",
+          name = "Rs",
+        },
+      }
+    })
+
     vim.fn.sign_define("DiagnosticSignError",
       { text = " ", texthl = "DiagnosticSignError" })
     vim.fn.sign_define("DiagnosticSignWarn",
