@@ -2,7 +2,7 @@ local IsNotVsCode = require('vscode').IsNotVsCode()
 
 return {
   'nvim-telescope/telescope.nvim',
-  commit = 'fac83a556e7b710dc31433dec727361ca062dbe9',
+  commit = '3b1600d0fd5172ad9fae00987362ca0ef3d8895d',
   -- tag = '0.1.6',
   enabled = IsNotVsCode,
   dependencies = {
