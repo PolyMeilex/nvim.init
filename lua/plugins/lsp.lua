@@ -11,7 +11,7 @@ local function config()
     {}
   )
 
-  lsp_zero.on_attach(function(client, bufnr)
+  local lsp_attach = function(client, bufnr)
     if client.server_capabilities.documentSymbolProvider then
       require('nvim-navic').attach(client, bufnr)
     end
@@ -31,7 +31,14 @@ local function config()
     vim.keymap.set('n', ']d', function()
       vim.diagnostic.goto_next()
     end, { buffer = bufnr })
-  end)
+  end
+
+  lsp_zero.extend_lspconfig({
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+    lsp_attach = lsp_attach,
+    float_border = 'rounded',
+    sign_text = true,
+  })
 
   lsp_zero.format_on_save({
     format_opts = {
@@ -94,6 +101,7 @@ local function config()
   lsp_zero.setup()
 
   local cmp = require('cmp')
+
   cmp.setup {
     completion = {
       completeopt = "menu,menuone",
@@ -104,6 +112,12 @@ local function config()
       { name = 'async_path' },
       { name = 'crates' },
     },
+    snippet = {
+      expand = function(args)
+        require('luasnip').lsp_expand(args.body)
+      end,
+    },
+    mapping = cmp.mapping.preset.insert({}),
   }
 end
 
@@ -111,7 +125,7 @@ return {
   {
     'VonHeikemen/lsp-zero.nvim',
     enabled = IsNotVsCode,
-    branch = 'v3.x',
+    branch = 'v4.x',
     dependencies = {
       { 'neovim/nvim-lspconfig' },
       {
