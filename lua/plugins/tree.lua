@@ -41,7 +41,6 @@ return {
         "document_symbols",
         "filesystem",
         "diagnostics",
-        "harpoon",
       },
       -- source_selector = {
       --   winbar = true,
