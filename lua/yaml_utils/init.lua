@@ -44,19 +44,19 @@ M.seq_ids = function()
 
 
       local line, col = block_sequence:start()
-      local virt_text = {}
       local key = tostring(id)
-      table.insert(virt_text, { key, "Comment" })
+      local virt_text = {
+        { key, "Comment" },
+        { " ", "Comment" },
+      }
 
       vim.api.nvim_buf_set_extmark(
         bufnr,
         namespace_id,
         line,
-        col - 2,
+        col,
         {
-          virt_text_pos = "overlay",
-          -- TODO: once nvim 10 is done
-          -- virt_text_pos = "inline",
+          virt_text_pos = "inline",
           virt_text = virt_text,
         }
       )
