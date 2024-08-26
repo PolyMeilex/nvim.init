@@ -176,6 +176,7 @@ end
 
 _G.my_git_blame_button = function()
   require("gitblame").toggle()
+  vim.api.nvim_command('redrawstatus!')
 end
 
 _G.my_statusline       = function()
