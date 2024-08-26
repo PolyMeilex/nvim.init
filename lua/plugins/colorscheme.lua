@@ -13,6 +13,10 @@ return {
     vim.cmd.colorscheme("gruvbox")
     -- vim.cmd.colorscheme("retrobox")
 
+    vim.api.nvim_set_hl(0, "WinBar", { bg = "#303030" })
+    vim.api.nvim_set_hl(0, "StatusLine", { bg = "#303030" })
+    vim.api.nvim_set_hl(0, "WinBarTerminator", { fg = "#1f1f1f", bg = "#303030" })
+
     vim.api.nvim_set_hl(0, "Normal", { bg = "#1f1f1f" })
 
     vim.api.nvim_set_hl(0, "LspInlayHint", { bg = "#36302c", fg = "#878787" })
