@@ -17,6 +17,8 @@ return {
 
       vim.keymap.set('n', 'mm', 'dd')
       vim.keymap.set('n', 'M', 'D')
+      vim.keymap.set('v', 'P', 'p')
+      vim.keymap.set('v', 'p', 'P')
     end,
   },
   {
