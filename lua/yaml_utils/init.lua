@@ -75,4 +75,12 @@ end
 vim.api.nvim_create_user_command("YAMLClear", M.clear, { desc = "Clear marks" })
 vim.api.nvim_create_user_command("YAMLSeqIds", M.seq_ids, { desc = "Mark seq ids" })
 
+vim.api.nvim_create_augroup("yaml_utils", { clear = true })
+vim.api.nvim_create_autocmd({ 'BufEnter', 'TextChanged' }, {
+  group = "yaml_utils",
+  callback = function()
+    M.seq_ids()
+  end,
+})
+
 return M
