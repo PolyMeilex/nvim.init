@@ -9,18 +9,22 @@ return {
     end
   },
   {
-    'lewis6991/gitsigns.nvim',
-    enabled = IsNotVsCode,
+    'echasnovski/mini.diff',
+    version = '*',
     config = function()
-      require('gitsigns').setup()
-
-      vim.keymap.set('n', 'tg', function()
-        require('gitsigns').next_hunk()
-      end, {})
-
-      vim.keymap.set('n', 'tG', function()
-        require('gitsigns').prev_hunk()
-      end, {})
-    end,
+      require('mini.diff').setup({
+        view = {
+          style = 'sign',
+          priority = 0,
+        },
+        mappings = {
+          goto_next = 'tg',
+          goto_prev = 'tG',
+        },
+        options = {
+          wrap_goto = true,
+        }
+      })
+    end
   },
 }
