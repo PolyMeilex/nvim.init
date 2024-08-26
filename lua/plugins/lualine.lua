@@ -4,6 +4,14 @@ local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
 end
 
+local function add_on_click(level, fn, component)
+  return "%"
+      .. level
+      .. "@v:lua." .. fn .. "@"
+      .. component
+      .. "%X"
+end
+
 local flame_right = add_hl("WinBarTerminator", "")
 local flame_left = add_hl("WinBarTerminator", " ")
 
@@ -56,11 +64,11 @@ local function hjkl_harpoon()
   end
 
   local function add_click(level, component)
-    return "%"
-        .. level
-        .. "@v:lua.my_harpoon_click_handler@"
-        .. component
-        .. "%X"
+    return add_on_click(
+      level,
+      "my_harpoon_click_handler",
+      component
+    )
   end
 
   local list = filter_empty_string(harpoon:list().items)
@@ -158,7 +166,7 @@ local function diagnostics_status()
   return ""
 end
 
-_G.my_winbar     = function()
+_G.my_winbar           = function()
   if vim.bo.filetype == "neo-tree" then
     return ""
   end
@@ -166,7 +174,11 @@ _G.my_winbar     = function()
   return my_navic() .. "%=" .. hjkl_harpoon()
 end
 
-_G.my_statusline = function()
+_G.my_git_blame_button = function()
+  require("gitblame").toggle()
+end
+
+_G.my_statusline       = function()
   if vim.bo.filetype == "neo-tree" then
     return ""
   end
@@ -176,8 +188,16 @@ _G.my_statusline = function()
     file_status = "[+] "
   end
 
+  local git_icon = add_on_click(1, "my_git_blame_button", "")
+
+  if vim.g.gitblame_enabled then
+    git_icon = add_hl("GruvboxOrange", git_icon)
+  else
+    git_icon = add_hl("GruvboxFg0", git_icon)
+  end
+
   return add_hl("GruvboxFg0", "%f " .. file_status) ..
-      flame_right .. "%=" .. flame_left .. diagnostics_status()
+      flame_right .. "%=" .. flame_left .. diagnostics_status() .. git_icon
 end
 
 return {
