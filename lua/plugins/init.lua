@@ -2,7 +2,13 @@ local IsNotVsCode = require('vscode').IsNotVsCode()
 
 return {
   'bkad/CamelCaseMotion',
-  'tpope/vim-surround',
+  {
+    'echasnovski/mini.surround',
+    version = '*',
+    config = function()
+      require('mini.surround').setup()
+    end
+  },
   {
     'svermeulen/vim-cutlass',
     config = function()
