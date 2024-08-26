@@ -14,7 +14,7 @@ M.clear = function()
   vim.api.nvim_buf_clear_namespace(bufnr, namespace_id, 0, -1)
 end
 
-M.seq_ids = function()
+M.seq_ids = function(key_filter)
   if not is_yaml() then return end
 
   M.clear()
@@ -22,7 +22,12 @@ M.seq_ids = function()
   local bufnr = vim.api.nvim_get_current_buf()
 
   for _, node in pairs(document.all_keys()) do
-    -- local key_as_string = vim.treesitter.get_node_text(node, bufnr)
+    if key_filter ~= nil then
+      local key_as_string = vim.treesitter.get_node_text(node, bufnr)
+      if key_as_string ~= key_filter then
+        goto continue
+      end
+    end
 
     local parent = node:parent()
     local value = parent:field("value")[1]
@@ -73,13 +78,15 @@ end
 -- Commands
 
 vim.api.nvim_create_user_command("YAMLClear", M.clear, { desc = "Clear marks" })
-vim.api.nvim_create_user_command("YAMLSeqIds", M.seq_ids, { desc = "Mark seq ids" })
+vim.api.nvim_create_user_command("YAMLSeqIds", function()
+  M.seq_ids(nil)
+end, { desc = "Mark seq ids" })
 
 vim.api.nvim_create_augroup("yaml_utils", { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'TextChanged' }, {
   group = "yaml_utils",
   callback = function()
-    M.seq_ids()
+    M.seq_ids("messages")
   end,
 })
 
