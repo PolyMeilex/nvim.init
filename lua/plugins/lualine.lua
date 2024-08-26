@@ -159,10 +159,18 @@ local function diagnostics_status()
 end
 
 _G.my_winbar     = function()
+  if vim.bo.filetype == "neo-tree" then
+    return ""
+  end
+
   return my_navic() .. "%=" .. hjkl_harpoon()
 end
 
 _G.my_statusline = function()
+  if vim.bo.filetype == "neo-tree" then
+    return ""
+  end
+
   local file_status = ""
   if vim.bo.modified then
     file_status = "[+] "
