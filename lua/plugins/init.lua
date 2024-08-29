@@ -56,9 +56,8 @@ return {
 
         highlight = {
           enable = true,
-          disable = function(_, buf)
-            local line_count = vim.api.nvim_buf_line_count(buf)
-            return line_count >= 10000
+          disable = function(lang, buf)
+            return lang == "rust" and vim.api.nvim_buf_line_count(buf) >= 10000
           end,
         },
       }
