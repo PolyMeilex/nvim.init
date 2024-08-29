@@ -3,6 +3,14 @@ local IsNotVsCode = require('vscode').IsNotVsCode()
 return {
   'bkad/CamelCaseMotion',
   {
+    dir = '~/.config/nvim/yaml_utils',
+    enabled = IsNotVsCode,
+  },
+  {
+    dir = '~/.config/nvim/json_utils',
+    enabled = IsNotVsCode,
+  },
+  {
     'echasnovski/mini.surround',
     version = '*',
     config = function()

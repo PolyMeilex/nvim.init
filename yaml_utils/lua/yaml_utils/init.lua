@@ -1,11 +1,34 @@
-local document = require("yaml_utils.document")
 local namespace_id = vim.api.nvim_create_namespace("yaml_utils")
 
-local function is_yaml() return vim.bo.filetype == "yaml" end
+local function get_keys(root)
+  local keys = {}
+  for node, name in root:iter_children() do
+    if name == "key" then
+      table.insert(keys, node)
+    end
+
+    if node:child_count() > 0 then
+      for _, child in pairs(get_keys(node)) do
+        table.insert(keys, child)
+      end
+    end
+  end
+  return keys
+end
 
 -- Public API
 
 local M = {}
+
+M.is_yaml = function() return vim.bo.filetype == "yaml" end
+
+M.all_keys = function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local ft = vim.api.nvim_buf_get_option(bufnr, "ft")
+  local tree = vim.treesitter.get_parser(bufnr, ft):parse()[1]
+  local root = tree:root()
+  return get_keys(root)
+end
 
 M.setup = function() end
 
@@ -15,13 +38,13 @@ M.clear = function()
 end
 
 M.seq_ids = function(key_filter, count_nested_flow_seq)
-  if not is_yaml() then return end
+  if not M.is_yaml() then return end
 
   M.clear()
 
   local bufnr = vim.api.nvim_get_current_buf()
 
-  for _, node in pairs(document.all_keys()) do
+  for _, node in pairs(M.all_keys()) do
     if key_filter ~= nil then
       local key_as_string = vim.treesitter.get_node_text(node, bufnr)
       if key_as_string ~= key_filter then
