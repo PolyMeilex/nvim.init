@@ -6,7 +6,9 @@ return {
     'echasnovski/mini.surround',
     version = '*',
     config = function()
-      require('mini.surround').setup()
+      require('mini.surround').setup({
+        n_lines = 1000
+      })
     end
   },
   {
