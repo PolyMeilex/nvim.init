@@ -146,9 +146,7 @@ return {
       { 'SmiteshP/nvim-navic' },
       {
         "folke/neodev.nvim",
-        config = function()
-          require("neodev").setup()
-        end
+        opts = {}
       },
       "ray-x/lsp_signature.nvim",
       "RRethy/vim-illuminate",
@@ -167,8 +165,6 @@ return {
     'j-hui/fidget.nvim',
     enabled = IsNotVsCode,
     tag = 'v1.4.5',
-    config = function()
-      require("fidget").setup({})
-    end,
+    opts = {}
   },
 }

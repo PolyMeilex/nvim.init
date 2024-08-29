@@ -13,11 +13,9 @@ return {
   {
     'echasnovski/mini.surround',
     version = '*',
-    config = function()
-      require('mini.surround').setup({
-        n_lines = 1000
-      })
-    end
+    opts = {
+      n_lines = 1000
+    },
   },
   {
     'svermeulen/vim-cutlass',
@@ -52,31 +50,26 @@ return {
     'nvim-treesitter/nvim-treesitter',
     enabled = IsNotVsCode,
     run = ':TSUpdate',
-    config = function()
-      vim.filetype.add({ extension = { wgsl = "wgsl" } })
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = { "lua", "rust" },
+      ignore_install = {},
+      modules = {},
+      sync_install = false,
+      auto_install = true,
 
-      require 'nvim-treesitter.configs'.setup {
-        ensure_installed = { "lua", "rust" },
-        ignore_install = {},
-        modules = {},
-        sync_install = false,
-        auto_install = true,
-
-        highlight = {
-          enable = true,
-          disable = function(lang, buf)
-            return lang == "rust" and vim.api.nvim_buf_line_count(buf) >= 10000
-          end,
-        },
-      }
-    end,
+      highlight = {
+        enable = true,
+        disable = function(lang, buf)
+          return lang == "rust" and vim.api.nvim_buf_line_count(buf) >= 10000
+        end,
+      },
+    }
   },
   {
     'poljar/typos.nvim',
     enabled = IsNotVsCode,
-    config = function()
-      require('typos').setup()
-    end,
+    opts = {}
   },
   {
     'wakatime/vim-wakatime',
