@@ -14,7 +14,7 @@ M.clear = function()
   vim.api.nvim_buf_clear_namespace(bufnr, namespace_id, 0, -1)
 end
 
-M.seq_ids = function(key_filter)
+M.seq_ids = function(key_filter, count_nested_flow_seq)
   if not is_yaml() then return end
 
   M.clear()
@@ -47,9 +47,25 @@ M.seq_ids = function(key_filter)
         goto continue
       end
 
+      local current_id = id
+
+      -- Count nested flow seq as root elements
+      if count_nested_flow_seq then
+        local block_child = block_sequence:named_child(0)
+        if block_child ~= nil and block_child:type() == "flow_node" then
+          block_child = block_child:child()
+
+          if block_child ~= nil and block_child:type() == "flow_sequence" then
+            local count = block_child:named_child_count()
+            if count > 1 then
+              id = id + count - 1
+            end
+          end
+        end
+      end
 
       local line, col = block_sequence:start()
-      local key = tostring(id)
+      local key = tostring(current_id)
       local virt_text = {
         { key, "Comment" },
         { " ", "Comment" },
@@ -79,14 +95,14 @@ end
 
 vim.api.nvim_create_user_command("YAMLClear", M.clear, { desc = "Clear marks" })
 vim.api.nvim_create_user_command("YAMLSeqIds", function()
-  M.seq_ids(nil)
+  M.seq_ids(nil, true)
 end, { desc = "Mark seq ids" })
 
 vim.api.nvim_create_augroup("yaml_utils", { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'TextChanged', 'TextChangedI' }, {
   group = "yaml_utils",
   callback = function()
-    M.seq_ids("messages")
+    M.seq_ids("messages", true)
   end,
 })
 
