@@ -56,7 +56,10 @@ return {
 
         highlight = {
           enable = true,
-          additional_vim_regex_highlighting = true,
+          disable = function(_, buf)
+            local line_count = vim.api.nvim_buf_line_count(buf)
+            return line_count >= 10000
+          end,
         },
       }
     end,
