@@ -63,6 +63,7 @@ return {
         disable = function(lang, buf)
           return lang == "rust" and vim.api.nvim_buf_line_count(buf) >= 10000
         end,
+        additional_vim_regex_highlighting = { "yaml" },
       },
     }
   },
