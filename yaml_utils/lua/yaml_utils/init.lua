@@ -1,27 +1,22 @@
 local namespace_id = vim.api.nvim_create_namespace("yaml_utils")
 
-local function get_keys(bufnr, root, key_filter)
-  local keys = {}
+local function get_keys(out, bufnr, root, key_filter)
   for node, name in root:iter_children() do
     if name == "key" then
       if key_filter ~= nil then
         local key_as_string = vim.treesitter.get_node_text(node, bufnr)
         if key_as_string == key_filter then
-          table.insert(keys, node)
+          table.insert(out, node)
         end
       else
-        table.insert(keys, node)
+        table.insert(out, node)
       end
     end
 
     if node:child_count() > 0 then
-      -- TODO: Pass keys table as a mutable reference, rather than allocating a new table per nest level
-      for _, child in pairs(get_keys(bufnr, node, key_filter)) do
-        table.insert(keys, child)
-      end
+      get_keys(out, bufnr, node, key_filter)
     end
   end
-  return keys
 end
 
 -- Public API
@@ -35,7 +30,9 @@ M.all_keys = function(key_filter)
   local ft = vim.api.nvim_buf_get_option(bufnr, "ft")
   local tree = vim.treesitter.get_parser(bufnr, ft):parse()[1]
   local root = tree:root()
-  return get_keys(bufnr, root, key_filter)
+  local keys = {}
+  get_keys(keys, bufnr, root, key_filter)
+  return keys
 end
 
 M.setup = function() end
