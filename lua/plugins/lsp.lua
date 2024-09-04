@@ -149,14 +149,22 @@ return {
         opts = {}
       },
       "ray-x/lsp_signature.nvim",
-      "RRethy/vim-illuminate",
     },
     config = config,
   },
   {
     "RRethy/vim-illuminate",
     config = function()
-      require('illuminate').configure({
+      local illuminate = require('illuminate')
+
+      vim.keymap.set('n', 'gn', function()
+        illuminate.goto_next_reference(true)
+      end, {})
+      vim.keymap.set('n', 'gN', function()
+        illuminate.goto_prev_reference(true)
+      end, {})
+
+      illuminate.configure({
         min_count_to_highlight = 2,
       })
     end,
