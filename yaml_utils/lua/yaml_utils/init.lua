@@ -135,7 +135,7 @@ vim.api.nvim_create_user_command("YAMLSeqIds", function()
 end, { desc = "Mark seq ids" })
 
 vim.api.nvim_create_augroup("yaml_utils", { clear = true })
-vim.api.nvim_create_autocmd({ 'BufEnter', 'TextChanged', 'TextChangedI' }, {
+vim.api.nvim_create_autocmd({ 'BufReadPost', 'TextChanged', 'TextChangedI' }, {
   group = "yaml_utils",
   callback = function()
     M.seq_ids("messages", true)
