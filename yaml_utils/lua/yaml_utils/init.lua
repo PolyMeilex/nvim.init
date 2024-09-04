@@ -1,23 +1,36 @@
 local namespace_id = vim.api.nvim_create_namespace("yaml_utils")
 
-local function get_keys(out, bufnr, root, key_filter)
-  for node, name in root:iter_children() do
-    if name == "key" then
-      if key_filter ~= nil then
-        local key_as_string = vim.treesitter.get_node_text(node, bufnr)
-        if key_as_string == key_filter then
-          table.insert(out, node)
-        end
-      else
-        table.insert(out, node)
-      end
-    end
-
-    if node:child_count() > 0 then
-      get_keys(out, bufnr, node, key_filter)
-    end
-  end
+local function keys_quary()
+  return vim.treesitter.query.parse("yaml",
+    [[
+      ;; query
+      ((block_mapping_pair
+         value: (block_node
+          (block_sequence (block_sequence_item)) @root
+         )
+      ))
+    ]]
+  )
 end
+
+local function filtered_keys_quary(key_filter)
+  local query_string = [[
+    ;; query
+    ((block_mapping_pair
+       key: (flow_node (plain_scalar (string_scalar) @_key (#eq? @_key %s)))
+       value: (block_node
+        (block_sequence (block_sequence_item)) @root
+       )
+    ))
+  ]]
+
+  query_string = string.format(query_string, key_filter)
+
+  return vim.treesitter.query.parse("yaml", query_string)
+end
+
+local seq_query = keys_quary()
+local filtered_seq_query = filtered_keys_quary("messages")
 
 -- Public API
 
@@ -25,14 +38,27 @@ local M = {}
 
 M.is_yaml = function() return vim.bo.filetype == "yaml" end
 
-M.all_keys = function(key_filter)
-  local bufnr = vim.api.nvim_get_current_buf()
-  local ft = vim.api.nvim_buf_get_option(bufnr, "ft")
-  local tree = vim.treesitter.get_parser(bufnr, ft):parse()[1]
+M.all_keys = function(bufnr, key_filter)
+  local tree = vim.treesitter.get_parser(bufnr, "yaml"):parse()[1]
   local root = tree:root()
-  local keys = {}
-  get_keys(keys, bufnr, root, key_filter)
-  return keys
+
+  local q
+  if key_filter == nil then
+    q = seq_query
+  else
+    q = filtered_seq_query
+  end
+
+  local iter = q:iter_captures(root, bufnr)
+  return function()
+    for id, node in iter do
+      if q.captures[id] == "root" then
+        return node
+      end
+    end
+
+    return nil
+  end
 end
 
 M.setup = function() end
@@ -49,40 +75,9 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
 
   local bufnr = vim.api.nvim_get_current_buf()
 
-  -- TODO: Optimise M.all_keys(), or simply remove it all together
-  for _, node in pairs(M.all_keys(key_filter)) do
-    local parent = node:parent()
-
-    if parent == nil then
-      goto continue
-    end
-
-    local value = parent:field("value")[1]
-
-    if value == nil then
-      goto continue
-    end
-
-    if value:type() ~= "block_node" then
-      goto continue
-    end
-
-    local child = value:child()
-
-    if child == nil then
-      goto continue
-    end
-
-    if child:type() ~= "block_sequence" then
-      goto continue
-    end
-
+  for node in M.all_keys(bufnr, key_filter) do
     local id = 0
-    for block_sequence, _ in child:iter_children() do
-      if block_sequence:type() ~= "block_sequence_item" then
-        goto continue
-      end
-
+    for block_sequence, _ in node:iter_children() do
       local current_id = id
 
       -- Count nested flow seq as root elements
