@@ -8,6 +8,10 @@ return {
     require("gruvbox").setup({
       -- transparent_mode = true,
       terminal_colors = false,
+      overrides = {
+        PmenuSel = { fg = "NONE", bg = "#4d4d4d" },
+        Pmenu = { fg = "NONE", bg = "#2e2e2e" }
+      }
     })
 
     vim.cmd.colorscheme("gruvbox")
