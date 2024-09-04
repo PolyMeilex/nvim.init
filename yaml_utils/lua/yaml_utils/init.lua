@@ -44,6 +44,7 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
 
   local bufnr = vim.api.nvim_get_current_buf()
 
+  -- TODO: Optimise M.all_keys(), or simply remove it all together
   for _, node in pairs(M.all_keys()) do
     if key_filter ~= nil then
       local key_as_string = vim.treesitter.get_node_text(node, bufnr)
@@ -53,13 +54,27 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
     end
 
     local parent = node:parent()
+
+    if parent == nil then
+      goto continue
+    end
+
     local value = parent:field("value")[1]
+
+    if value == nil then
+      goto continue
+    end
 
     if value:type() ~= "block_node" then
       goto continue
     end
 
     local child = value:child()
+
+    if child == nil then
+      goto continue
+    end
+
     if child:type() ~= "block_sequence" then
       goto continue
     end
