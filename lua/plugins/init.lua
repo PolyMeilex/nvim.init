@@ -5,10 +5,12 @@ return {
   {
     dir = '~/.config/nvim/yaml_utils',
     enabled = IsNotVsCode,
+    opts = {},
   },
   {
     dir = '~/.config/nvim/json_utils',
     enabled = IsNotVsCode,
+    opts = {},
   },
   {
     'echasnovski/mini.surround',
