@@ -61,6 +61,9 @@ return {
           enabled = true,
           leave_dirs_open = false,
         },
+        filtered_items = {
+          hide_dotfiles = false,
+        },
         window = {
           mappings = {
             ["<S-f>"] = function(state)
