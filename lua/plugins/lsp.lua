@@ -18,6 +18,12 @@ end
 
 return {
   {
+    "folke/lazydev.nvim",
+    enabled = IsNotVsCode,
+    ft = "lua",
+    opts = {},
+  },
+  {
     'neovim/nvim-lspconfig',
     enabled = IsNotVsCode,
     config = function()
@@ -217,9 +223,5 @@ return {
         override_vim_notify = true,
       }
     }
-  },
-  {
-    "folke/neodev.nvim",
-    opts = {}
   },
 }
