@@ -2,6 +2,7 @@ vim.o.guifont                         = "Source Code Pro:h11"
 vim.o.ignorecase                      = true
 vim.o.smartcase                       = true
 vim.o.undofile                        = true
+vim.o.signcolumn                      = 'yes'
 
 vim.g.neovide_cursor_animation_length = 0.1
 vim.g.neovide_cursor_trail_size       = 0.1
