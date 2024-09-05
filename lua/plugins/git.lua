@@ -17,7 +17,7 @@ return {
     'echasnovski/mini.diff',
     version = '*',
     enabled = IsNotVsCode,
-    config = {
+    opts = {
       view = {
         style = 'sign',
         priority = 0,
