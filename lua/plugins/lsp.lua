@@ -160,23 +160,6 @@ return {
     end,
   },
   {
-    "RRethy/vim-illuminate",
-    config = function()
-      local illuminate = require('illuminate')
-
-      vim.keymap.set('n', 'gn', function()
-        illuminate.goto_next_reference(true)
-      end, {})
-      vim.keymap.set('n', 'gN', function()
-        illuminate.goto_prev_reference(true)
-      end, {})
-
-      illuminate.configure({
-        min_count_to_highlight = 2,
-      })
-    end,
-  },
-  {
     'williamboman/mason-lspconfig.nvim',
     dependencies = {
       {

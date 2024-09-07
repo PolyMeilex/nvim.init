@@ -10,7 +10,10 @@ return {
       terminal_colors = false,
       overrides = {
         PmenuSel = { fg = "NONE", bg = "#4d4d4d" },
-        Pmenu = { fg = "NONE", bg = "#2e2e2e" }
+        Pmenu = { fg = "NONE", bg = "#2e2e2e" },
+        LspReferenceText = { bold = true },
+        LspReferenceRead = { bold = true },
+        LspReferenceWrite = { bold = true },
       }
     })
 
@@ -27,9 +30,5 @@ return {
 
     vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { link = "GruvboxGreenBold" })
     vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { link = "GruvboxGreenBold" })
-
-    vim.api.nvim_set_hl(0, "IlluminatedWordText", { bold = true })
-    vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bold = true })
-    vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bold = true })
   end,
 }
