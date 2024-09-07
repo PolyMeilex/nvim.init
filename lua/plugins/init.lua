@@ -13,6 +13,12 @@ return {
     opts = {},
   },
   {
+    dir = '~/.config/nvim/rs-derive-menu',
+    enabled = IsNotVsCode,
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {},
+  },
+  {
     'echasnovski/mini.surround',
     version = '*',
     opts = {

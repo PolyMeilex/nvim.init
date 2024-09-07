@@ -22,4 +22,3 @@ vim.cmd(':tnoremap <Esc> <C-\\><C-n>')
 vim.cmd(':tnoremap <C-\\><C-n> <Esc>')
 
 require("lazy_init")
-require("rs-derive-menu")

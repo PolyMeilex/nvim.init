@@ -294,4 +294,8 @@ local function open()
   end)
 end
 
-vim.keymap.set('n', '<leader>cd', open, {})
+local M = {}
+M.setup = function()
+  vim.keymap.set('n', '<leader>cd', open, {})
+end
+return M
