@@ -1,7 +1,5 @@
-local Popup      = require("nui.popup")
 local Line       = require("nui.line")
 local Text       = require("nui.text")
-local event      = require("nui.utils.autocmd").event
 local NuiTree    = require("nui.tree")
 local DeriveList = require("rs-derive-menu.derive_list")
 local RustTree   = require("rs-derive-menu.treesitter")
@@ -44,26 +42,56 @@ end
 
 local M = {}
 
-local function build_popup()
-  local popup = Popup({
-    enter = true,
-    relative = "cursor",
-    position = {
-      row = 1,
-      col = 0,
-    },
-    size = {
-      width = 30,
-      height = 5,
-    },
-    win_options = {
-      cursorline = true,
-      scrolloff = 1,
-      sidescrolloff = 0,
-      winhighlight = "Normal:Pmenu",
-    },
-  })
+local function init_window()
+  local P = {
+    bufnr = vim.api.nvim_create_buf(false, true)
+  }
 
+  ---@param height intager
+  P.open = function(height)
+    local opts = {
+      relative = 'cursor',
+      row = 1, -- 1 line below the cursor
+      col = 0, -- Same column as the cursor
+      width = 30,
+      height = height,
+      style = 'minimal', -- no line numbers, etc.
+    }
+
+    P.winid = vim.api.nvim_open_win(P.bufnr, true, opts)
+    vim.api.nvim_set_option_value('cursorline', true, { win = P.winid })
+    vim.api.nvim_set_option_value('scrolloff', 1, { win = P.winid })
+    vim.api.nvim_set_option_value('sidescrolloff', 0, { win = P.winid })
+    vim.api.nvim_set_option_value('winhighlight', "Normal:Pmenu", { win = P.winid })
+
+    vim.api.nvim_create_autocmd('BufLeave', {
+      buffer = P.bufnr,
+      callback = function()
+        P.close()
+      end,
+    })
+  end
+
+  P.close = function()
+    if vim.api.nvim_win_is_valid(P.winid) then
+      vim.api.nvim_win_close(P.winid, true)
+    end
+    if vim.api.nvim_buf_is_valid(P.bufnr) then
+      vim.api.nvim_buf_delete(P.bufnr, { force = true })
+    end
+  end
+
+  P.set_size = function(width, height)
+    vim.api.nvim_win_set_config(P.winid, {
+      width = width,
+      height = height,
+    })
+  end
+
+  return P
+end
+
+local function build_popup()
   local items = DeriveList:new({
     NuiTree.Node({ name = "Default", on = false, keybind = "df" }),
     NuiTree.Node({ name = "Debug", on = false, keybind = "db" }),
@@ -82,21 +110,36 @@ local function build_popup()
     items:insert(NuiTree.Node({ name = v, on = true }))
   end
 
-  local nodes = {}
+  local P = {
+    popup = init_window()
+  }
 
-  for _, node in pairs(items.list) do
-    table.insert(nodes, node)
+  P.bufnr = function()
+    return P.popup.bufnr
   end
 
-  local tree = NuiTree({
-    bufnr = popup.bufnr,
-    nodes = nodes,
+  P.winid = function()
+    if P.popup.winid == nil then
+      return error("Window not oppened yet")
+    end
+    return P.popup.winid
+  end
+
+  P.open = function()
+    P.popup.open(P.height)
+  end
+
+  P.close = function()
+    P.popup.close()
+  end
+
+  P.tree = NuiTree({
+    bufnr = P.bufnr(),
+    nodes = items.list,
     prepare_node = function(node, _)
       if not node.name then
         error("missing node.name")
       end
-
-      local lines = {}
 
       local line = Line()
 
@@ -118,83 +161,63 @@ local function build_popup()
       end
 
       if node.keybind ~= nil then
-        vim.print(line:content(), #line:content())
         local len = #line:content() + #node.keybind
 
-        local pad = string.rep(" ", popup.win_config.width - len)
+        local pad = string.rep(" ", 30 - len)
 
         line:append(pad)
         line:append(Text("[" .. node.keybind .. "]", "Comment"))
       end
 
-      table.insert(lines, line)
-
-
-      return lines
+      return { line }
     end
   })
 
-  popup:update_layout({
-    size = {
-      height = calculate_height(tree),
-      width = 30,
-    }
-  })
+  P.calculate_height = function()
+    return calculate_height(P.tree)
+  end
 
-  local height = calculate_height(tree)
-
-  local P = {
-    tree = tree,
-    popup = popup,
-  }
+  P.height = P.calculate_height()
 
   P.collapse = function()
-    local node = tree:get_node()
+    local node = P.tree:get_node()
     if node ~= nil then
       node:collapse()
-      height = calculate_height(tree)
-      popup:update_layout({
-        size = {
-          height = height,
-          width = 30,
-        }
-      })
+
+      P.height = P.calculate_height()
+      P.popup.set_size(30, P.height)
+      P.tree:render()
 
       vim.cmd('normal! zb')
-      tree:render()
     end
   end
 
   P.expand = function()
-    local node = tree:get_node()
+    local node = P.tree:get_node()
     if node ~= nil then
       node:expand()
-      height = calculate_height(tree)
-      popup:update_layout({
-        size = {
-          height = height,
-          width = 30,
-        }
-      })
-      tree:render()
+
+      P.height = P.calculate_height()
+      P.popup.set_size(30, P.height)
+      P.tree:render()
     end
   end
 
   P.focus_next = function()
-    local linenr = unpack(vim.api.nvim_win_get_cursor(popup.winid))
-    if linenr == height then
-      vim.api.nvim_win_set_cursor(popup.winid, { 1, 0 })
+    local linenr = unpack(vim.api.nvim_win_get_cursor(P.winid()))
+    if linenr == P.height then
+      vim.api.nvim_win_set_cursor(P.winid(), { 1, 0 })
     else
-      vim.api.nvim_win_set_cursor(popup.winid, { linenr + 1, 0 })
+      vim.api.nvim_win_set_cursor(P.winid(), { linenr + 1, 0 })
     end
   end
 
   P.focus_prev = function()
-    local linenr = unpack(vim.api.nvim_win_get_cursor(popup.winid))
+    local linenr = unpack(vim.api.nvim_win_get_cursor(P.winid()))
     if linenr == 1 then
-      vim.api.nvim_win_set_cursor(popup.winid, { height, 0 })
+      vim.api.nvim_win_set_cursor(P.winid(), { P.height, 0 })
     else
-      vim.api.nvim_win_set_cursor(popup.winid, { linenr - 1, 0 })
+      vim.api.nvim_win_set_cursor(P.winid(), { linenr - 1, 0 })
     end
   end
 
@@ -212,13 +235,13 @@ local function build_popup()
       items:get("PartialOrd").on = item.on
     end
 
-    tree:render()
+    P.tree:render()
 
     RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
   end
 
   P.toggle = function()
-    local node = tree:get_node()
+    local node = P.tree:get_node()
 
     if node == nil then return end
 
@@ -230,7 +253,7 @@ local function build_popup()
       items:get("PartialOrd").on = node.on
     end
 
-    tree:render()
+    P.tree:render()
 
     RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
   end
@@ -240,55 +263,36 @@ end
 
 M.open = function()
   local derive_popup = build_popup()
+  local ops = { buffer = derive_popup.bufnr(), nowait = true }
 
-  derive_popup.popup:map("n", "h", function()
-    derive_popup.collapse()
-  end)
+  vim.keymap.set("n", "h", derive_popup.collapse, ops)
+  vim.keymap.set("n", "l", derive_popup.expand, ops)
+  vim.keymap.set("n", "j", derive_popup.focus_next, ops)
+  vim.keymap.set("n", "k", derive_popup.focus_prev, ops)
 
-  derive_popup.popup:map("n", "l", function()
-    derive_popup.expand()
-  end)
-
-  derive_popup.popup:map("n", "j", function()
-    derive_popup.focus_next()
-  end)
-
-  derive_popup.popup:map("n", "k", function()
-    derive_popup.focus_prev()
-  end)
-
-  derive_popup.popup:map("n", { "<CR>", "<Space>" }, function()
-    derive_popup.toggle()
-  end, { nowait = true })
-
-  derive_popup.popup:map("n", { "gd", "dg", "<S-v>" }, "<Nop>")
-
-  local toggles = {
-    { "db", "Debug" },
-    { "df", "Default" },
-    { "e",  "Eq" },
-    { "o",  "Ord" },
-    { "h",  "Hash" },
-    { "cl", "Clone" },
-    { "cp", "Copy" },
-  }
-
-  for _, toggle in pairs(toggles) do
-    derive_popup.popup:map("n", toggle[1], function()
-      derive_popup.toggle_by_name(toggle[2])
-    end, { noremap = true, nowait = true })
+  for _, lhs in pairs({ "<CR>", "<Space>" }) do
+    vim.keymap.set("n", lhs, derive_popup.toggle, ops)
   end
 
-  derive_popup.popup:map("n", { "<esc>", "q" }, function()
-    derive_popup.popup:unmount()
-  end, { noremap = true })
+  for _, lhs in pairs({ "gd", "dg", "<S-v>" }) do
+    vim.keymap.set("n", lhs, "<Nop>", ops)
+  end
 
-  derive_popup.popup:on(event.BufLeave, function()
-    derive_popup.popup:unmount()
-  end)
+  -- TODO: Nested nodes
+  for _, node in pairs(derive_popup.tree:get_nodes()) do
+    if node.keybind ~= nil then
+      vim.keymap.set("n", node.keybind, function()
+        derive_popup.toggle_by_name(node.name)
+      end, ops)
+    end
+  end
 
-  derive_popup.popup:mount()
+  for _, lhs in pairs({ "<esc>", "q" }) do
+    vim.keymap.set("n", lhs, derive_popup.close, ops)
+  end
+
   derive_popup.tree:render()
+  derive_popup.open()
 end
 
 M.setup = function()
