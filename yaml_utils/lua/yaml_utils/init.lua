@@ -29,8 +29,36 @@ local function filtered_keys_quary(key_filter)
   return vim.treesitter.query.parse("yaml", query_string)
 end
 
-local seq_query = keys_quary()
-local filtered_seq_query = filtered_keys_quary("messages")
+local function cached_keys_quary()
+  local cache = nil;
+  return function()
+    if cache == nil then
+      local ok, quary = pcall(keys_quary)
+      if ok then
+        cache = quary
+      end
+    end
+
+    return cache
+  end
+end
+
+local function cached_filtered_seq_query()
+  local cache = nil;
+  return function()
+    if cache == nil then
+      local ok, quary = pcall(filtered_keys_quary, "messages")
+      if ok then
+        cache = quary
+      end
+    end
+
+    return cache
+  end
+end
+
+local seq_query = cached_keys_quary()
+local filtered_seq_query = cached_filtered_seq_query()
 
 -- Public API
 
@@ -42,12 +70,14 @@ M.all_keys = function(bufnr, key_filter)
   local tree = vim.treesitter.get_parser(bufnr, "yaml"):parse()[1]
   local root = tree:root()
 
-  local q
+  local q = nil
   if key_filter == nil then
-    q = seq_query
+    q = seq_query()
   else
-    q = filtered_seq_query
+    q = filtered_seq_query()
   end
+
+  if q == nil then return end
 
   local iter = q:iter_captures(root, bufnr)
   return function()
@@ -136,6 +166,7 @@ end, { desc = "Mark seq ids" })
 vim.api.nvim_create_augroup("yaml_utils", { clear = true })
 vim.api.nvim_create_autocmd({ 'BufReadPost', 'TextChanged', 'TextChangedI' }, {
   group = "yaml_utils",
+  pattern = "*.yaml,*.yml",
   callback = function()
     M.seq_ids("messages", true)
   end,
