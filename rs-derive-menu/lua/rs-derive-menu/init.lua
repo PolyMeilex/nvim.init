@@ -97,8 +97,8 @@ local function build_popup()
     NuiTree.Node({ name = "Debug", on = false, keybind = "db" }),
     NuiTree.Node({ name = "Clone", on = false, keybind = "cl" }),
     NuiTree.Node({ name = "Copy", on = false, keybind = "cp" }),
-    NuiTree.Node({ name = "Eq", on = false, keybind = "e" }),
-    NuiTree.Node({ name = "Ord", on = false, keybind = "o" }),
+    NuiTree.Node({ name = "Eq", on = false, keybind = "e", link = "PartialEq" }),
+    NuiTree.Node({ name = "Ord", on = false, keybind = "o", link = "PartialOrd" }),
     NuiTree.Node({ name = "Hash", on = false, keybind = "h" }),
     NuiTree.Node({ name = "PartialEq", on = false, }),
     NuiTree.Node({ name = "PartialOrd", on = false, }),
@@ -229,10 +229,8 @@ local function build_popup()
 
     item.on = not item.on
 
-    if item.name == "Eq" then
-      items:get("PartialEq").on = item.on
-    elseif item.name == "Ord" then
-      items:get("PartialOrd").on = item.on
+    if item.link ~= nil then
+      items:get(item.link).on = item.on
     end
 
     P.tree:render()
@@ -247,10 +245,8 @@ local function build_popup()
 
     node.on = not node.on
 
-    if node.name == "Eq" then
-      items:get("PartialEq").on = node.on
-    elseif node.name == "Ord" then
-      items:get("PartialOrd").on = node.on
+    if node.link ~= nil then
+      items:get(node.link).on = node.on
     end
 
     P.tree:render()
