@@ -80,6 +80,10 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
     for block_sequence, _ in node:iter_children() do
       local current_id = id
 
+      if block_sequence:type() ~= "block_sequence_item" then
+        goto continue
+      end
+
       -- Count nested flow seq as root elements
       if count_nested_flow_seq then
         local block_child = block_sequence:named_child(0)
