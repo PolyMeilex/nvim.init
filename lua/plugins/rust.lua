@@ -9,11 +9,12 @@ return {
     config = function()
       local crates = require('crates')
       crates.setup({
-        completion = {
-          cmp = {
-            enabled = true,
-          }
-        }
+        lsp = {
+          enabled = true,
+          completion = true,
+          hover = true,
+          actions = true,
+        },
       })
 
       vim.keymap.set('n', '<leader>cv', function()

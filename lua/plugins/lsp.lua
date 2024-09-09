@@ -153,7 +153,6 @@ return {
           { name = 'nvim_lsp' },
           { name = 'buffer' },
           { name = 'path' },
-          { name = 'crates' },
         },
         mapping = cmp.mapping.preset.insert({}),
       }
