@@ -4,6 +4,7 @@ return {
   'bkad/CamelCaseMotion',
   {
     dir = '~/.config/nvim/yaml_utils',
+    ft = "yaml",
     enabled = IsNotVsCode,
     opts = {},
   },
