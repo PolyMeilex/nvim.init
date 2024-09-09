@@ -1,301 +1,298 @@
-local Menu = require("rs-derive-menu.menu")
-local event = require("nui.utils.autocmd").event
+local Popup      = require("nui.popup")
+local Line       = require("nui.line")
+local Text       = require("nui.text")
+local event      = require("nui.utils.autocmd").event
+local NuiTree    = require("nui.tree")
+local DeriveList = require("rs-derive-menu.derive_list")
+local RustTree   = require("rs-derive-menu.treesitter")
 
-local popup_options = {
-  relative = "cursor",
-  position = {
-    row = 2,
-    col = 0,
-  },
-  border = {
-    style = "single",
-    text = {
-      top = "Derive",
-      top_align = "center",
-    },
-  },
-  win_options = {
-    winhighlight = "Normal:Normal",
-  }
-}
+---@param tree NuiTree
+---@param parent? string
+---@return integer
+local function calculate_height(tree, parent)
+  local nodes = tree:get_nodes(parent)
+  local count = 0
 
-local function new_menu_options(derive_list, on_submit)
-  local items = {}
-  for k, v in pairs(derive_list.list) do
-    table.insert(items, v:to_menu_item())
-  end
+  for _, node in pairs(nodes) do
+    count = count + 1
 
-  return {
-    lines = items,
-    min_width = 30,
-    keymap = {
-      focus_next = { "j", "<Down>", "<Tab>" },
-      focus_prev = { "k", "<Up>", "<S-Tab>" },
-      close = { "<Esc>", "<C-c>" },
-      submit = { "<CR>", "<Space>" },
-    },
-    on_close = function()
-      print("CLOSED")
-    end,
-    on_submit = function(item)
-      on_submit(item)
-    end,
-  }
-end
-
-local function new_menu(derive_list, on_submit)
-  return Menu(popup_options, new_menu_options(derive_list, on_submit))
-end
-
-local parsers = require "nvim-treesitter.parsers"
-
-local function node_contains(node, range)
-  local start_row, start_col, end_row, end_col = node:range()
-  local start_fits = start_row < range[1] or (start_row == range[1] and start_col <= range[2])
-  local end_fits = end_row > range[3] or (end_row == range[3] and end_col >= range[4])
-
-  return start_fits and end_fits
-end
-
-local function get_node_at_cursor(options)
-  options = options or {}
-
-  local include_anonymous = options.include_anonymous
-  local lnum, col = unpack(vim.api.nvim_win_get_cursor(0))
-  local root_lang_tree = parsers.get_parser()
-
-  -- This can happen in some scenarios... best not assume.
-  if not root_lang_tree then
-    return
-  end
-
-  local owning_lang_tree = root_lang_tree:language_for_range { lnum - 1, col, lnum - 1, col }
-  local result
-
-  for _, tree in ipairs(owning_lang_tree:trees()) do
-    local range = { lnum - 1, col, lnum - 1, col }
-
-    if node_contains(tree:root(), range) then
-      if include_anonymous then
-        result = tree:root():descendant_for_range(unpack(range))
-      else
-        result = tree:root():named_descendant_for_range(unpack(range))
-      end
-
-      if result then
-        return result
-      end
-    end
-  end
-end
-
-local function search_for_struct(node)
-  while node:type() ~= "struct_item" do
-    node = node:parent()
-    if not node then return nil end
-  end
-
-  return node
-end
-
-local function attribute_ident(bufnr, attribute)
-  local ident = attribute:child(0)
-  if not ident then return nil end
-  return vim.treesitter.get_node_text(ident, bufnr)
-end
-
-local function attribute_item_ident(bufnr, attribute_item)
-  local attribute = attribute_item:child(2)
-  if not attribute then return nil end
-  return attribute_ident(bufnr, attribute)
-end
-
-local function search_for_attribute_item(bufnr, node)
-  while node:type() ~= "attribute_item" do
-    node = node:parent()
-    if not node then return nil end
-  end
-
-  if attribute_item_ident(bufnr, node) ~= "derive" then return nil end
-
-  return node
-end
-
-local DeriveItem = {}
-DeriveItem.__index = DeriveItem
-
-function DeriveItem.new(name, on)
-  local self = {}
-  setmetatable(self, DeriveItem)
-  self.name = name
-  self.on = on
-  return self
-end
-
-function DeriveItem:to_menu_item()
-  local checkbox = "   "
-  if self.on then
-    checkbox = "  "
-  end
-  return Menu.item(checkbox .. self.name, { name = self.name })
-end
-
-local DeriveList = {}
-DeriveList.__index = DeriveList
-
-function DeriveList.new()
-  local self = {}
-  setmetatable(self, DeriveList)
-  self.list = {}
-  return self
-end
-
-function DeriveList:get(name)
-  for k, v in pairs(self.list) do
-    if v.name == name then
-      return v
+    if node:is_expanded() then
+      count = count + calculate_height(tree, node:get_id())
     end
   end
 
-  return nil
+  return count
 end
 
-function DeriveList:insert(name, on)
-  for _k, v in pairs(self.list) do
-    if v.name == name then
-      if on ~= nil then
-        v.on = on
-      end
-      return
+---@param tree NuiTree
+---@param parent? string
+---@return integer
+local function calculate_max_height(tree, parent)
+  local nodes = tree:get_nodes(parent)
+  local count = 0
+
+  for _, node in pairs(nodes) do
+    count = count + 1
+
+    if node:has_children() then
+      count = count + calculate_height(tree, node:get_id())
     end
   end
 
-  if on == nil then
-    on = false
-  end
-
-  table.insert(self.list, DeriveItem.new(name, on))
-end
-
-local function replace_derive(bufnr, start_line, start_col, end_line, end_col, derive_list)
-  local derives = {}
-
-  for _k, v in pairs(derive_list.list) do
-    if v.on == true then
-      table.insert(derives, v.name)
-    end
-  end
-
-  local out = "#[derive(" .. table.concat(derives, ", ") .. ")]"
-  vim.api.nvim_buf_set_lines(bufnr, start_line, end_line + 1, false, { out })
-end
-
-local function open()
-  local bufnr = vim.api.nvim_get_current_buf()
-
-  local cursor_node = get_node_at_cursor();
-  if not cursor_node then return end
-
-  local node = search_for_attribute_item(bufnr, cursor_node)
-
-  if not node then
-    node = search_for_struct(cursor_node)
-    local sibling = node:prev_sibling()
-    -- node =
-    vim.print(sibling:type())
-    node = sibling
-  end
-
-  local attribute = node:child(2)
-
-  local body_node = attribute:child(1)
-  local body_start_line, body_start_col = body_node:start()
-  local body_end_line, body_end_col = body_node:end_()
-
-
-  local body = vim.treesitter.get_node_text(body_node, bufnr)
-
-  body = string.sub(body, 2, string.len(body) - 1)
-
-  local derives = {}
-  for i in string.gmatch(body, "([^,]+)") do
-    table.insert(derives, i:match("^%s*(.-)%s*$"))
-  end
-
-  local items = DeriveList.new()
-
-  for _k, v in pairs(derives) do
-    items:insert(v, true)
-  end
-
-  items:insert("Default")
-  items:insert("Debug")
-  items:insert("Clone")
-  items:insert("Copy")
-  items:insert("PartialEq")
-  items:insert("Eq")
-  items:insert("PartialOrd")
-  items:insert("Ord")
-  items:insert("Hash")
-
-  local menu
-  local function on_submit(item)
-    vim.print(menu.winid)
-    local lnum, col = unpack(vim.api.nvim_win_get_cursor(menu.winid))
-
-    print("SUBMITTED", item.text)
-    local derive_item = items:get(item.name)
-    derive_item.on = not derive_item.on
-    replace_derive(bufnr, body_start_line, body_start_col, body_end_line, body_end_col, items)
-
-    menu:unmount()
-    menu:init(popup_options, new_menu_options(items, on_submit))
-    menu:mount()
-
-    vim.api.nvim_win_set_cursor(menu.winid, { lnum, 0 })
-  end
-
-  menu = new_menu(items, on_submit)
-
-  -- local raw_items = {}
-  -- for k, v in pairs(items.list) do
-  --   table.insert(raw_items, v:to_menu_item())
-  -- end
-  -- table.insert(raw_items, DeriveItem.new("thiserror::Error", false):to_menu_item())
-  -- table.insert(raw_items, DeriveItem.new("serde::Serialize", false):to_menu_item())
-  -- table.insert(raw_items, DeriveItem.new("serde::Deserialize", false):to_menu_item())
-
-  -- local menu = Menu(popup_options, {
-  --   lines = raw_items,
-  --   min_width = 30,
-  --   keymap = {
-  --     focus_next = { "j", "<Down>", "<Tab>" },
-  --     focus_prev = { "k", "<Up>", "<S-Tab>" },
-  --     close = { "<Esc>", "<C-c>" },
-  --     submit = { "<CR>", "<Space>" },
-  --   },
-  --   on_close = function()
-  --     print("CLOSED")
-  --   end,
-  --   on_submit = function(item)
-  --     -- print("SUBMITTED", vim.inspect(item.text))
-  --     print("SUBMITTED", item.text)
-  --     local derive_item = items:get(item.name)
-  --     derive_item.on = not derive_item.on
-  --     replace_derive(bufnr, body_start_line, body_start_col, body_end_line, body_end_col, items)
-  --     -- menu:unmount()
-  --   end,
-  -- })
-
-  menu:mount()
-
-  menu:on(event.BufLeave, function()
-    menu:unmount()
-  end)
+  return count
 end
 
 local M = {}
-M.setup = function()
-  vim.keymap.set('n', '<leader>cd', open, {})
+
+local function build_popup()
+  local popup = Popup({
+    enter = true,
+    relative = "cursor",
+    position = {
+      row = 1,
+      col = 0,
+    },
+    size = {
+      width = 30,
+      height = 5,
+    },
+    win_options = {
+      cursorline = true,
+      scrolloff = 1,
+      sidescrolloff = 0,
+      winhighlight = "Normal:Pmenu",
+    },
+  })
+
+  local items = DeriveList:new({
+    NuiTree.Node({ name = "Default", on = false, keybind = "df" }),
+    NuiTree.Node({ name = "Debug", on = false, keybind = "db" }),
+    NuiTree.Node({ name = "Clone", on = false, keybind = "cl" }),
+    NuiTree.Node({ name = "Copy", on = false, keybind = "cp" }),
+    NuiTree.Node({ name = "Eq", on = false, keybind = "e" }),
+    NuiTree.Node({ name = "Ord", on = false, keybind = "o" }),
+    NuiTree.Node({ name = "Hash", on = false, keybind = "h" }),
+    NuiTree.Node({ name = "PartialEq", on = false, }),
+    NuiTree.Node({ name = "PartialOrd", on = false, }),
+  })
+
+  local rs_tree = RustTree.get_derives_at_cursor() or {}
+
+  for _, v in pairs(rs_tree.derives or {}) do
+    items:insert(NuiTree.Node({ name = v, on = true }))
+  end
+
+  local nodes = {}
+
+  for _, node in pairs(items.list) do
+    table.insert(nodes, node)
+  end
+
+  local tree = NuiTree({
+    bufnr = popup.bufnr,
+    nodes = nodes,
+    prepare_node = function(node, _)
+      if not node.name then
+        error("missing node.name")
+      end
+
+      local lines = {}
+
+      local line = Line()
+
+      local indent = string.rep("  ", node._depth - 1)
+      line:append(indent)
+
+      if node.on then
+        local checkbox = Text(" ")
+        line:append(checkbox)
+      else
+        local checkbox = Text(" ", "GruvboxGray")
+        line:append(checkbox)
+      end
+
+      line:append(node.name)
+
+      if node:has_children() then
+        line:append(node:is_expanded() and " " or " ")
+      end
+
+      if node.keybind ~= nil then
+        vim.print(line:content(), #line:content())
+        local len = #line:content() + #node.keybind
+
+        local pad = string.rep(" ", popup.win_config.width - len)
+
+        line:append(pad)
+        line:append(Text("[" .. node.keybind .. "]", "Comment"))
+      end
+
+      table.insert(lines, line)
+
+
+      return lines
+    end
+  })
+
+  popup:update_layout({
+    size = {
+      height = calculate_height(tree),
+      width = 30,
+    }
+  })
+
+  local height = calculate_height(tree)
+
+  local P = {
+    tree = tree,
+    popup = popup,
+  }
+
+  P.collapse = function()
+    local node = tree:get_node()
+    if node ~= nil then
+      node:collapse()
+      height = calculate_height(tree)
+      popup:update_layout({
+        size = {
+          height = height,
+          width = 30,
+        }
+      })
+
+      vim.cmd('normal! zb')
+      tree:render()
+    end
+  end
+
+  P.expand = function()
+    local node = tree:get_node()
+    if node ~= nil then
+      node:expand()
+      height = calculate_height(tree)
+      popup:update_layout({
+        size = {
+          height = height,
+          width = 30,
+        }
+      })
+      tree:render()
+    end
+  end
+
+  P.focus_next = function()
+    local linenr = unpack(vim.api.nvim_win_get_cursor(popup.winid))
+    if linenr == height then
+      vim.api.nvim_win_set_cursor(popup.winid, { 1, 0 })
+    else
+      vim.api.nvim_win_set_cursor(popup.winid, { linenr + 1, 0 })
+    end
+  end
+
+  P.focus_prev = function()
+    local linenr = unpack(vim.api.nvim_win_get_cursor(popup.winid))
+    if linenr == 1 then
+      vim.api.nvim_win_set_cursor(popup.winid, { height, 0 })
+    else
+      vim.api.nvim_win_set_cursor(popup.winid, { linenr - 1, 0 })
+    end
+  end
+
+  ---@param name string
+  P.toggle_by_name = function(name)
+    local item = items:get(name)
+
+    if item == nil then return end
+
+    item.on = not item.on
+
+    if item.name == "Eq" then
+      items:get("PartialEq").on = item.on
+    elseif item.name == "Ord" then
+      items:get("PartialOrd").on = item.on
+    end
+
+    tree:render()
+
+    RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
+  end
+
+  P.toggle = function()
+    local node = tree:get_node()
+
+    if node == nil then return end
+
+    node.on = not node.on
+
+    if node.name == "Eq" then
+      items:get("PartialEq").on = node.on
+    elseif node.name == "Ord" then
+      items:get("PartialOrd").on = node.on
+    end
+
+    tree:render()
+
+    RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
+  end
+
+  return P
 end
+
+M.open = function()
+  local derive_popup = build_popup()
+
+  derive_popup.popup:map("n", "h", function()
+    derive_popup.collapse()
+  end)
+
+  derive_popup.popup:map("n", "l", function()
+    derive_popup.expand()
+  end)
+
+  derive_popup.popup:map("n", "j", function()
+    derive_popup.focus_next()
+  end)
+
+  derive_popup.popup:map("n", "k", function()
+    derive_popup.focus_prev()
+  end)
+
+  derive_popup.popup:map("n", { "<CR>", "<Space>" }, function()
+    derive_popup.toggle()
+  end, { nowait = true })
+
+  derive_popup.popup:map("n", { "gd", "dg", "<S-v>" }, "<Nop>")
+
+  local toggles = {
+    { "db", "Debug" },
+    { "df", "Default" },
+    { "e",  "Eq" },
+    { "o",  "Ord" },
+    { "h",  "Hash" },
+    { "cl", "Clone" },
+    { "cp", "Copy" },
+  }
+
+  for _, toggle in pairs(toggles) do
+    derive_popup.popup:map("n", toggle[1], function()
+      derive_popup.toggle_by_name(toggle[2])
+    end, { noremap = true, nowait = true })
+  end
+
+  derive_popup.popup:map("n", { "<esc>", "q" }, function()
+    derive_popup.popup:unmount()
+  end, { noremap = true })
+
+  derive_popup.popup:on(event.BufLeave, function()
+    derive_popup.popup:unmount()
+  end)
+
+  derive_popup.popup:mount()
+  derive_popup.tree:render()
+end
+
+M.setup = function()
+  vim.keymap.set('n', '<leader>cd', M.open, {})
+end
+
 return M
