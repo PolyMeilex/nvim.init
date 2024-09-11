@@ -24,7 +24,9 @@ local M = {}
 
 M.is_json = function() return vim.bo.filetype == "json" end
 
-M.setup = function() end
+M.setup = function()
+  require("json_utils.lsp").register_bendec_lsp_autocmd()
+end
 
 -- Get all values from keys called `name`
 M.values_for_key = function(name)
@@ -34,22 +36,47 @@ M.values_for_key = function(name)
 
   local out = {}
   for _, node in pairs(all_keys(bufnr)) do
-    local key_as_string = vim.treesitter.get_node_text(node, bufnr)
-    -- Strip quotes
-    key_as_string = string.sub(key_as_string, 2, #key_as_string - 1)
+    local key_as_string = vim.treesitter.get_node_text(node:child(1), bufnr)
 
     if key_as_string == name then
       local line, _col = node:start()
 
       local parent = node:parent()
-      local value = parent:field("value")[1]
+      local value = parent:field("value")[1]:child(1)
       local value_as_string = vim.treesitter.get_node_text(value, bufnr)
-      value_as_string = string.sub(value_as_string, 2, #value_as_string - 1)
       table.insert(out, { line = line + 1, name = value_as_string });
     end
   end
 
   return out
+end
+
+M.find_key_value = function(bufnr, key, value)
+  for _, node in pairs(all_keys(bufnr)) do
+    local key_as_string = vim.treesitter.get_node_text(node:child(1), bufnr)
+
+    if key_as_string == key then
+      local line, col = node:start()
+
+      local parent = node:parent()
+      local v = parent:field("value")[1]:child(1)
+      local value_as_string = vim.treesitter.get_node_text(v, bufnr)
+
+      if value_as_string == value then
+        return { line = line, col = col }
+      end
+    end
+  end
+
+  return nil
+end
+
+M.get_node_at = function(buf, line, col)
+  local root_lang_tree = vim.treesitter.get_parser(buf, "json")
+  if not root_lang_tree then return end
+
+  local root = root_lang_tree:trees()[1]:root()
+  return root:named_descendant_for_range(line, col, line, col)
 end
 
 return M
