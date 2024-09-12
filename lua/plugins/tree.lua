@@ -42,19 +42,21 @@ return {
         "filesystem",
         "diagnostics",
       },
-      -- source_selector = {
-      --   winbar = true,
-      --   sources = {
-      --     { source = "filesystem" },
-      --   },
-      --   truncation_character = "",
-      -- },
+      source_selector = {
+        winbar = true,
+        sources = {
+          { source = "filesystem" },
+          { source = "diagnostics" },
+        },
+        truncation_character = "",
+      },
       window = {
         mappings = {
           ["<Tab>"] = "next_source",
           ["<S-Tab>"] = "prev_source",
           ["<C-e>"] = "close_window",
         },
+        width = 60,
       },
       filesystem = {
         follow_current_file = {
@@ -86,9 +88,21 @@ return {
       },
       event_handlers = {
         {
-          event = "neo_tree_buffer_leave",
-          handler = function()
-            vim.cmd 'Neotree close'
+          event = "neo_tree_window_after_open",
+          handler = function(args)
+            local winid = args.winid
+
+            vim.wo[winid].signcolumn = 'no'
+
+            local autocmd_id
+            autocmd_id = vim.api.nvim_create_autocmd("WinLeave", {
+              callback = function()
+                if vim.api.nvim_get_current_win() == winid then
+                  vim.api.nvim_del_autocmd(autocmd_id)
+                  vim.cmd 'Neotree close'
+                end
+              end
+            })
           end
         },
       }
