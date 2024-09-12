@@ -197,8 +197,8 @@ _G.my_statusline       = function()
     git_icon = add_hl("GruvboxFg0", git_icon)
   end
 
-  return add_hl("GruvboxFg0", "%f " .. file_status) ..
-      flame_right .. "%=" .. flame_left .. diagnostics_status() .. git_icon
+  return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) ..
+      flame_right .. "%=" .. flame_left .. git_icon
 end
 
 return {
