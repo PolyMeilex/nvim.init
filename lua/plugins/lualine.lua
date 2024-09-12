@@ -171,6 +171,10 @@ _G.my_winbar           = function()
     return ""
   end
 
+  if vim.bo.filetype == "DiffviewFiles" then
+    return ""
+  end
+
   return my_navic() .. "%=" .. hjkl_harpoon()
 end
 
@@ -181,6 +185,10 @@ end
 
 _G.my_statusline       = function()
   if vim.bo.filetype == "neo-tree" then
+    return ""
+  end
+
+  if vim.bo.filetype == "DiffviewFiles" then
     return ""
   end
 
