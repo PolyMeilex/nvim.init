@@ -14,6 +14,7 @@ return {
         LspReferenceText = { bold = true },
         LspReferenceRead = { bold = true },
         LspReferenceWrite = { bold = true },
+        FloatBorder = { link = "GruvboxFg1" },
       }
     })
 
