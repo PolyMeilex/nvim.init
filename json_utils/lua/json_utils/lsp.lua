@@ -61,7 +61,7 @@ local function handle_goto_definition(method, params)
 
   local bufnr = vim.uri_to_bufnr(params.textDocument.uri)
 
-  local node_at = json_utils.get_node_at(bufnr, lnum, col)
+  local node_at = vim.treesitter.get_node({ bufnr = bufnr, pos = { lnum, col } })
   if node_at == nil then return nil end
 
   local node_type = node_at:type()

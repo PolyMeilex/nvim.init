@@ -71,12 +71,4 @@ M.find_key_value = function(bufnr, key, value)
   return nil
 end
 
-M.get_node_at = function(buf, line, col)
-  local root_lang_tree = vim.treesitter.get_parser(buf, "json")
-  if not root_lang_tree then return end
-
-  local root = root_lang_tree:trees()[1]:root()
-  return root:named_descendant_for_range(line, col, line, col)
-end
-
 return M

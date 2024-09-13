@@ -6,45 +6,6 @@ local function trim(s)
   return s:match("^%s*(.-)%s*$")
 end
 
---- @return boolean
-local function node_contains(node, range)
-  local start_row, start_col, end_row, end_col = node:range()
-  local start_fits = start_row < range[1] or (start_row == range[1] and start_col <= range[2])
-  local end_fits = end_row > range[3] or (end_row == range[3] and end_col >= range[4])
-
-  return start_fits and end_fits
-end
-
---- @return TSNode | nil
-local function get_node_at_cursor(options)
-  options = options or {}
-
-  local include_anonymous = options.include_anonymous
-  local lnum, col = unpack(vim.api.nvim_win_get_cursor(0))
-  local root_tree = parsers.get_parser()
-
-  if not root_tree then return end
-
-  local owning_lang_tree = root_tree:language_for_range { lnum - 1, col, lnum - 1, col }
-  local result
-
-  for _, tree in ipairs(owning_lang_tree:trees()) do
-    local range = { lnum - 1, col, lnum - 1, col }
-
-    if node_contains(tree:root(), range) then
-      if include_anonymous then
-        result = tree:root():descendant_for_range(unpack(range))
-      else
-        result = tree:root():named_descendant_for_range(unpack(range))
-      end
-
-      if result then
-        return result
-      end
-    end
-  end
-end
-
 --- @return TSNode | nil
 local function search_for_struct(node)
   while node:type() ~= "struct_item" do
@@ -86,7 +47,7 @@ local M = {}
 M.get_derives_at_cursor = function()
   local bufnr = vim.api.nvim_get_current_buf()
 
-  local cursor_node = get_node_at_cursor();
+  local cursor_node = vim.treesitter.get_node()
   if not cursor_node then return end
 
   local attribute_item = search_for_attribute_item(bufnr, cursor_node)
