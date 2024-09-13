@@ -53,14 +53,7 @@ return {
     end, {})
     vim.keymap.set('n', 'tb', builtin.buffers, {})
 
-    vim.keymap.set('n', 'tt', function()
-      if require("json_utils").is_json() then
-        -- Get all object fields with key "name"
-        require("json_utils.telescope").list_values_for_key("name")
-      else
-        builtin.lsp_document_symbols()
-      end
-    end, {})
+    vim.keymap.set('n', 'tt', builtin.lsp_document_symbols, {})
     vim.keymap.set('n', 'tl', function()
       builtin.builtin({ default_text = "lsp_", use_default_opts = true })
     end, {})

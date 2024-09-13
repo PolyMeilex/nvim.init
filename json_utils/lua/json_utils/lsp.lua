@@ -53,6 +53,7 @@ end
 
 ---@param method: string
 ---@param params lsp.DefinitionParams
+---@return lsp.Location | nil
 local function handle_goto_definition(method, params)
   local uri = params.textDocument.uri
   local lnum = params.position.line
@@ -99,6 +100,39 @@ local function handle_goto_definition(method, params)
   }
 end
 
+---@param method: string
+---@param params lsp.DocumentSymbolParams
+---@return lsp.DocumentSymbol[]
+local function handle_document_symbols(method, params)
+  local uri = params.textDocument.uri
+  local bufnr = vim.uri_to_bufnr(params.textDocument.uri)
+
+  ---@type lsp.DocumentSymbol[]
+  local out = {}
+  for _, entry in pairs(json_utils.values_for_key("name")) do
+    ---@type lsp.Range[]
+    local range = {
+      start = {
+        line = entry.line,
+        character = entry.col,
+      },
+      ["end"] = {
+        line = entry.line,
+        character = entry.col,
+      },
+    }
+
+    table.insert(out, {
+      name = entry.name,
+      kind = 8,
+      range = range,
+      selectionRange = range,
+    })
+  end
+
+  return out
+end
+
 local M = {}
 
 --- Register lsp server for https://github.com/fudini/bendec definition format
@@ -113,10 +147,12 @@ M.register_bendec_lsp_autocmd = function()
           name = "json-bendec-ls",
           cmd = server({
             capabilities = {
-              definitionProvider = true
+              definitionProvider = true,
+              documentSymbolProvider = true,
             },
             handlers = {
               ["textDocument/definition"] = handle_goto_definition,
+              ["textDocument/documentSymbol"] = handle_document_symbols,
             }
           })
         },

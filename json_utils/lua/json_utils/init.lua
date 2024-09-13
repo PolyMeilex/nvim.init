@@ -39,12 +39,12 @@ M.values_for_key = function(name)
     local key_as_string = vim.treesitter.get_node_text(node:child(1), bufnr)
 
     if key_as_string == name then
-      local line, _col = node:start()
+      local line, col = node:start()
 
       local parent = node:parent()
       local value = parent:field("value")[1]:child(1)
       local value_as_string = vim.treesitter.get_node_text(value, bufnr)
-      table.insert(out, { line = line + 1, name = value_as_string });
+      table.insert(out, { line = line + 1, col = col, name = value_as_string });
     end
   end
 

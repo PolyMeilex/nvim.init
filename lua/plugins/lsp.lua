@@ -180,6 +180,15 @@ return {
 
           require('lspconfig')[server_name].setup({ capabilities = lsp_capabilities() })
         end,
+        jsonls = function()
+          require('lspconfig').jsonls.setup({
+            capabilities = lsp_capabilities(),
+            on_attach = function(client)
+              -- Disable symbol provider, so bendec-lsp can take over
+              client.server_capabilities.documentSymbolProvider = false
+            end
+          })
+        end,
         rust_analyzer = function()
           require('lspconfig').rust_analyzer.setup({
             capabilities = lsp_capabilities(),
