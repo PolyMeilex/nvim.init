@@ -1,11 +1,3 @@
----@type fun(motion: fun(motion: string): string)
-local set_operatorfunc = vim.fn[vim.api.nvim_exec([[
-  func s:set_opfunc(val)
-    let &operatorfunc = a:val
-  endfunc
-  echon get(function('s:set_opfunc'), 'name')
-]], true)]
-
 local add_to_jumplist = function() vim.cmd([[normal! m']]) end
 local center_viewport = function() vim.cmd([[normal! zz']]) end
 
@@ -166,22 +158,7 @@ end
 vim.keymap.set('n', ']q', ':cn<CR>', { silent = true })
 vim.keymap.set('n', '[q', ':cp<CR>', { silent = true })
 
-local dot_repeat = function(fn, ...)
-  local args = ...
-  ---@type fun(motion: string): string
-  local op
-  op = function(motion)
-    if motion == nil then
-      set_operatorfunc(op)
-      return "g@ "
-    end
-    fn(args)
-    return ''
-  end
-
-  return op
-end
-
+local dot_repeat = require('dot_repeat')
 vim.keymap.set('n', '[p', dot_repeat(goto_parent), { expr = true })
 vim.keymap.set('n', '[s', dot_repeat(goto_sibling, 'prev'), { expr = true })
 vim.keymap.set('n', ']s', dot_repeat(goto_sibling, 'next'), { expr = true })
