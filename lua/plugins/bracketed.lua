@@ -6,7 +6,6 @@ local jump_to_node = function(node)
   add_to_jumplist()
   local row, col = node:start()
   vim.api.nvim_win_set_cursor(0, { row + 1, col })
-  center_viewport()
 end
 
 local goto_parent = function()
@@ -132,6 +131,10 @@ local goto_sibling = function(direction)
     end
     if node == nil then return end
     jump_to_node(node)
+
+    if direction == 'next' then
+      center_viewport()
+    end
     return
   end
 
@@ -153,6 +156,10 @@ local goto_sibling = function(direction)
 
   if node == nil then return end
   jump_to_node(node)
+
+  if direction == 'next' then
+    center_viewport()
+  end
 end
 
 vim.keymap.set('n', ']q', ':cn<CR>', { silent = true })
