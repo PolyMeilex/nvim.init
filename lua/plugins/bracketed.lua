@@ -7,15 +7,17 @@ local set_operatorfunc = vim.fn[vim.api.nvim_exec([[
 ]], true)]
 
 local add_to_jumplist = function() vim.cmd([[normal! m']]) end
+local center_viewport = function() vim.cmd([[normal! zz']]) end
 
 ---@param node TSNode
 local jump_to_node = function(node)
   add_to_jumplist()
   local row, col = node:start()
   vim.api.nvim_win_set_cursor(0, { row + 1, col })
+  center_viewport()
 end
 
-local treesitter_parent = function()
+local goto_parent = function()
   local cur_pos = vim.api.nvim_win_get_cursor(0)
 
   local node = vim.treesitter.get_node({ pos = { cur_pos[1] - 1, cur_pos[2] } })
@@ -77,14 +79,57 @@ local prev_search_block_child = function(block, row)
   end
 end
 
+---@param node TSNode
+---@param next fun(TSNode): TSNode
+local function until_significant(node, next)
+  while true do
+    local n = next(node)
+    if n == nil then break end
+
+    local prev_row, _ = node:start()
+    local row, _ = n:start()
+
+    if prev_row ~= nil then
+      if math.abs(prev_row - row) > 1 then
+        return n
+      end
+    end
+
+    node = n
+  end
+end
+
+---@param node TSNode
+---@return boolean
+local is_declaration_list = function(node)
+  if node:type() == 'declaration_list' then return true end
+  if node:type() == 'source_file' then return true end
+  return false
+end
+
+---@param child_node TSNode
+---@return TSNode | nil, TSNode | nil
+local ascend_to_declaration_list = function(child_node)
+  while true do
+    local parent = child_node:parent()
+    if parent == nil then return end
+
+    if is_declaration_list(parent) then
+      return parent, child_node
+    else
+      child_node = parent
+    end
+  end
+end
+
 ---@param direction string
-local treesitter_block = function(direction)
+local goto_sibling = function(direction)
   local cur_pos = vim.api.nvim_win_get_cursor(0)
 
   local node = vim.treesitter.get_node({ pos = { cur_pos[1] - 1, cur_pos[2] } })
   if node == nil then return end
 
-  if node:type() == 'block' then
+  if node:type() == 'block' or is_declaration_list(node) then
     if direction == 'next' then
       node = next_search_block_child(node, cur_pos[1] - 1)
     elseif direction == 'prev' then
@@ -95,26 +140,6 @@ local treesitter_block = function(direction)
     return
   end
 
-  ---@param node TSNode
-  ---@param next fun(TSNode): TSNode
-  local function until_significant(node, next)
-    while true do
-      local n = next(node)
-      if n == nil then break end
-
-      local prev_row, _ = node:start()
-      local row, _ = n:start()
-
-      if prev_row ~= nil then
-        if math.abs(prev_row - row) > 1 then
-          return n
-        end
-      end
-
-      node = n
-    end
-  end
-
   local next_fn
   if direction == 'next' then
     next_fn = function(n) return n:next_named_sibling() end
@@ -123,7 +148,11 @@ local treesitter_block = function(direction)
   end
 
   local block, child = ascend_to_block(node)
+  if child == nil then
+    block, child = ascend_to_declaration_list(node)
+  end
   if child == nil then return end
+
 
   node = until_significant(child, next_fn)
 
@@ -150,9 +179,8 @@ local dot_repeat = function(fn, ...)
   return op
 end
 
-vim.keymap.set('n', '[p', dot_repeat(treesitter_parent), { expr = true })
-
-vim.keymap.set('n', '[t', dot_repeat(treesitter_block, 'prev'), { expr = true })
-vim.keymap.set('n', ']t', dot_repeat(treesitter_block, 'next'), { expr = true })
+vim.keymap.set('n', '[p', dot_repeat(goto_parent), { expr = true })
+vim.keymap.set('n', '[s', dot_repeat(goto_sibling, 'prev'), { expr = true })
+vim.keymap.set('n', ']s', dot_repeat(goto_sibling, 'next'), { expr = true })
 
 return {}
