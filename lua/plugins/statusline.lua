@@ -225,11 +225,16 @@ return {
   enabled = IsNotVsCode,
   dependencies = {
     'nvim-tree/nvim-web-devicons',
+    'ThePrimeagen/harpoon',
   },
   config = function()
     require('nvim-navic').setup({
       highlight = true,
       click = true,
+    })
+
+    require('harpoon'):extend({
+      ADD = function() vim.api.nvim_command('redrawstatus!') end
     })
 
     vim.o.winbar     = "%{%v:lua.my_winbar()%}"
