@@ -55,6 +55,10 @@ local function hjkl_harpoon()
     return add_hl("GruvboxFg0", label)
   end
 
+  local function add_key_hl(label)
+    return add_hl("GruvboxFg4", label)
+  end
+
   local function add_orange_hl(label)
     return add_hl("GruvboxGreenBold", label)
   end
@@ -94,15 +98,22 @@ local function hjkl_harpoon()
 
     label = " " .. label .. " "
 
-    if item == current_filepath then
-      return add_orange_hl(label)
-    else
-      return add_fg_hl(label)
+    local key = '[_]'
+    if id == 1 then
+      key = '[h]'
+    elseif id == 2 then
+      key = '[j]'
+    elseif id == 3 then
+      key = '[k]'
+    elseif id == 4 then
+      key = '[l]'
     end
-  end
 
-  local function separator()
-    return add_green_hl("|")
+    if item == current_filepath then
+      return add_key_hl(key) .. add_orange_hl(label)
+    else
+      return add_key_hl(key) .. add_fg_hl(label)
+    end
   end
 
   local tabs = {}
@@ -123,7 +134,7 @@ local function hjkl_harpoon()
     table.insert(tabs, add_click(4, nth_item(4)))
   end
 
-  return table.concat(tabs, separator())
+  return table.concat(tabs, '')
 end
 
 local icons = {
