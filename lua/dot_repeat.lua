@@ -15,7 +15,7 @@ local dot_repeat = function(fn, ...)
   op = function(motion)
     if motion == nil then
       set_operatorfunc(op)
-      return "g@ "
+      return "g@l"
     end
     fn(args)
     return ''
