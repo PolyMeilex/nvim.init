@@ -1,5 +1,3 @@
-local parsers = require("nvim-treesitter.parsers")
-
 --- @param s string
 --- @return boolean
 local function trim(s)
@@ -44,6 +42,15 @@ end
 
 local M = {}
 
+
+--- @class DeriveNodeInfo
+--- @field bufnr integer
+--- @field derives table
+--- @field start_line integer
+--- @field end_line integer
+--- @field replace boolean
+
+---@return DeriveNodeInfo | nil
 M.get_derives_at_cursor = function()
   local bufnr = vim.api.nvim_get_current_buf()
 
@@ -54,14 +61,28 @@ M.get_derives_at_cursor = function()
 
   -- TODO: Make this smarter
   if not attribute_item then
-    attribute_item = search_for_struct(cursor_node)
+    local struct = search_for_struct(cursor_node)
 
-    if attribute_item == nil then return nil end
+    if struct == nil then return nil end
 
-    attribute_item = attribute_item:prev_sibling()
+    local sibling = struct:prev_sibling()
 
-    if attribute_item == nil then return nil end
+    local start_line = struct:start()
+
+    if sibling ~= nil and sibling:type() == 'attribute_item' then
+      attribute_item = sibling
+    else
+      return {
+        bufnr = bufnr,
+        derives = {},
+        start_line = start_line,
+        end_line = start_line,
+        replace = false,
+      }
+    end
   end
+
+  vim.print(attribute_item:type())
 
   local attribute = attribute_item:child(2)
   if attribute == nil then return nil end
@@ -86,14 +107,13 @@ M.get_derives_at_cursor = function()
     derives = derives,
     start_line = start_line,
     end_line = end_line,
+    replace = true,
   }
 end
 
---- @param bufnr integer
---- @param start_line integer
---- @param end_line integer
+--- @param info DeriveNodeInfo
 --- @param derive_list DeriveList
-M.replace_derive = function(bufnr, start_line, end_line, derive_list)
+M.replace_derive = function(info, derive_list)
   local derives = {}
 
   for _, v in pairs(derive_list.list) do
@@ -103,7 +123,11 @@ M.replace_derive = function(bufnr, start_line, end_line, derive_list)
   end
 
   local out = "#[derive(" .. table.concat(derives, ", ") .. ")]"
-  vim.api.nvim_buf_set_lines(bufnr, start_line, end_line + 1, false, { out })
+  if info.replace then
+    vim.api.nvim_buf_set_lines(info.bufnr, info.start_line, info.end_line + 1, false, { out })
+  else
+    vim.api.nvim_buf_set_lines(info.bufnr, info.start_line, info.end_line, false, { out })
+  end
 end
 
 return M

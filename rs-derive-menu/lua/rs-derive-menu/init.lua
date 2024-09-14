@@ -235,7 +235,8 @@ local function build_popup()
 
     P.tree:render()
 
-    RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
+    RustTree.replace_derive(rs_tree, items)
+    rs_tree.replace = true;
   end
 
   P.toggle = function()
@@ -251,7 +252,8 @@ local function build_popup()
 
     P.tree:render()
 
-    RustTree.replace_derive(rs_tree.bufnr, rs_tree.start_line, rs_tree.end_line, items)
+    RustTree.replace_derive(rs_tree, items)
+    rs_tree.replace = true;
   end
 
   return P
