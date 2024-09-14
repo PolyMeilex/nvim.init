@@ -103,7 +103,10 @@ end
 ---@return boolean
 local is_declaration_list = function(node)
   if node:type() == 'declaration_list' then return true end
+  -- Rust toplevel node
   if node:type() == 'source_file' then return true end
+  -- Lua toplevel node
+  if node:type() == 'chunk' then return true end
   return false
 end
 
