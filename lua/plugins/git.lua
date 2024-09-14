@@ -23,8 +23,8 @@ return {
         priority = 0,
       },
       mappings = {
-        goto_next = ']g',
-        goto_prev = '[g',
+        -- goto_next = ']h',
+        -- goto_prev = '[h',
       },
       options = {
         wrap_goto = true,
