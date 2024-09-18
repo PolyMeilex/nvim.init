@@ -237,6 +237,12 @@ return {
       ADD = function() vim.api.nvim_command('redrawstatus!') end
     })
 
+    vim.api.nvim_create_autocmd('DiagnosticChanged', {
+      callback = function(_)
+        vim.api.nvim_command('redrawstatus!')
+      end,
+    })
+
     vim.o.winbar     = "%{%v:lua.my_winbar()%}"
     vim.o.statusline = "%{%v:lua.my_statusline()%}"
   end,
