@@ -20,6 +20,18 @@ return {
     opts = {},
   },
   {
+    dir = '~/.config/nvim/railgun',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    enabled = IsNotVsCode,
+    config = function()
+      require('railgun').setup()
+
+      vim.keymap.set('n', 'tm', function()
+        require('telescope').extensions.railgun.list()
+      end, {})
+    end
+  },
+  {
     'echasnovski/mini.surround',
     version = '*',
     opts = {
@@ -36,23 +48,6 @@ return {
       vim.keymap.set('n', 'M', 'D')
       vim.keymap.set('v', 'P', 'p')
       vim.keymap.set('v', 'p', 'P')
-    end,
-  },
-  {
-    'tomasky/bookmarks.nvim',
-    enabled = IsNotVsCode,
-    config = function()
-      local bm = require("bookmarks")
-      bm.setup()
-
-      vim.api.nvim_create_user_command("BookmarkToggle", bm.bookmark_toggle,
-        { desc = "Add or remove bookmark at current line" })
-      vim.api.nvim_create_user_command("BookmarkAnnotate", bm.bookmark_ann,
-        { desc = "Add or edit mark annotation at current line" })
-
-      vim.keymap.set('n', 'tm', function()
-        require('telescope').extensions.bookmarks.list()
-      end, {})
     end,
   },
   {
