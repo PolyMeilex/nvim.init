@@ -65,7 +65,10 @@ return {
                   local buffer_as_string = table.concat(lines, "\n")
 
                   local out = vim
-                    .system({ "stylua", "--stdin-filepath", file, "-" }, { stdin = buffer_as_string, text = true })
+                    .system(
+                      { "stylua", "--search-parent-directories", "--stdin-filepath", file, "-" },
+                      { stdin = buffer_as_string, text = true }
+                    )
                     :wait()
 
                   if out.code == 0 then
