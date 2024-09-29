@@ -47,40 +47,6 @@ return {
             require("nvim-navic").attach(client, bufnr)
           end
 
-          if client.supports_method("textDocument/formatting") then
-            if filetype == "rust" then
-              -- Format the current buffer on save
-              vim.api.nvim_create_autocmd("BufWritePre", {
-                buffer = bufnr,
-                callback = function()
-                  vim.lsp.buf.format({ bufnr = bufnr, id = client.id, async = false })
-                end,
-              })
-            elseif filetype == "lua" then
-              vim.api.nvim_create_autocmd("BufWritePre", {
-                buffer = bufnr,
-                callback = function()
-                  local file = vim.api.nvim_buf_get_name(bufnr)
-                  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-                  local buffer_as_string = table.concat(lines, "\n")
-
-                  local out = vim
-                    .system(
-                      { "stylua", "--search-parent-directories", "--stdin-filepath", file, "-" },
-                      { stdin = buffer_as_string, text = true }
-                    )
-                    :wait()
-
-                  if out.code == 0 then
-                    local new_lines = vim.split(out.stdout, "\n")
-                    table.remove(new_lines)
-                    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
-                  end
-                end,
-              })
-            end
-          end
-
           local telescope = require("telescope.builtin")
           local opts = { buffer = bufnr }
 
