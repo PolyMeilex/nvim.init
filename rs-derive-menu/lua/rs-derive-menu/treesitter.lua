@@ -8,7 +8,9 @@ end
 local function search_for_struct(node)
   while node:type() ~= "struct_item" do
     node = node:parent()
-    if not node then return nil end
+    if not node then
+      return nil
+    end
   end
 
   return node
@@ -17,14 +19,18 @@ end
 --- @return string | nil
 local function attribute_ident(bufnr, attribute)
   local ident = attribute:child(0)
-  if not ident then return nil end
+  if not ident then
+    return nil
+  end
   return vim.treesitter.get_node_text(ident, bufnr)
 end
 
 --- @return string | nil
 local function attribute_item_ident(bufnr, attribute_item)
   local attribute = attribute_item:child(2)
-  if not attribute then return nil end
+  if not attribute then
+    return nil
+  end
   return attribute_ident(bufnr, attribute)
 end
 
@@ -32,16 +38,19 @@ end
 local function search_for_attribute_item(bufnr, node)
   while node:type() ~= "attribute_item" do
     node = node:parent()
-    if not node then return nil end
+    if not node then
+      return nil
+    end
   end
 
-  if attribute_item_ident(bufnr, node) ~= "derive" then return nil end
+  if attribute_item_ident(bufnr, node) ~= "derive" then
+    return nil
+  end
 
   return node
 end
 
 local M = {}
-
 
 --- @class DeriveNodeInfo
 --- @field bufnr integer
@@ -55,7 +64,9 @@ M.get_derives_at_cursor = function()
   local bufnr = vim.api.nvim_get_current_buf()
 
   local cursor_node = vim.treesitter.get_node()
-  if not cursor_node then return end
+  if not cursor_node then
+    return
+  end
 
   local attribute_item = search_for_attribute_item(bufnr, cursor_node)
 
@@ -63,13 +74,15 @@ M.get_derives_at_cursor = function()
   if not attribute_item then
     local struct = search_for_struct(cursor_node)
 
-    if struct == nil then return nil end
+    if struct == nil then
+      return nil
+    end
 
     local sibling = struct:prev_sibling()
 
     local start_line = struct:start()
 
-    if sibling ~= nil and sibling:type() == 'attribute_item' then
+    if sibling ~= nil and sibling:type() == "attribute_item" then
       attribute_item = sibling
     else
       return {
@@ -85,7 +98,9 @@ M.get_derives_at_cursor = function()
   vim.print(attribute_item:type())
 
   local attribute = attribute_item:child(2)
-  if attribute == nil then return nil end
+  if attribute == nil then
+    return nil
+  end
 
   local arguments_node = attribute:field("arguments")[1]
 

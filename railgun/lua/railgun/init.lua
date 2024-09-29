@@ -9,18 +9,16 @@ function M.setup(config)
 
   M.db = Db:new(config)
 
-  vim.api.nvim_create_user_command(
-    'RailgunMark',
-    function(opts)
-      M.add(opts.args)
-    end,
-    { nargs = "?" }
-  )
+  vim.api.nvim_create_user_command("RailgunMark", function(opts)
+    M.add(opts.args)
+  end, { nargs = "?" })
 end
 
 ---@param annotation? string
 function M.add(annotation)
-  if vim.trim(annotation or "") == "" then annotation = nil end
+  if vim.trim(annotation or "") == "" then
+    annotation = nil
+  end
 
   local project = vim.loop.cwd()
   local buf = vim.api.nvim_get_current_buf()

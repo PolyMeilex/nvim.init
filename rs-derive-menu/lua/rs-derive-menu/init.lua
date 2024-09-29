@@ -1,8 +1,8 @@
-local Line       = require("nui.line")
-local Text       = require("nui.text")
-local NuiTree    = require("nui.tree")
+local Line = require("nui.line")
+local Text = require("nui.text")
+local NuiTree = require("nui.tree")
 local DeriveList = require("rs-derive-menu.derive_list")
-local RustTree   = require("rs-derive-menu.treesitter")
+local RustTree = require("rs-derive-menu.treesitter")
 
 ---@param tree NuiTree
 ---@param parent? string
@@ -44,27 +44,27 @@ local M = {}
 
 local function init_window()
   local P = {
-    bufnr = vim.api.nvim_create_buf(false, true)
+    bufnr = vim.api.nvim_create_buf(false, true),
   }
 
   ---@param height intager
   P.open = function(height)
     local opts = {
-      relative = 'cursor',
+      relative = "cursor",
       row = 1, -- 1 line below the cursor
       col = 0, -- Same column as the cursor
       width = 30,
       height = height,
-      style = 'minimal', -- no line numbers, etc.
+      style = "minimal", -- no line numbers, etc.
     }
 
     P.winid = vim.api.nvim_open_win(P.bufnr, true, opts)
-    vim.api.nvim_set_option_value('cursorline', true, { win = P.winid })
-    vim.api.nvim_set_option_value('scrolloff', 1, { win = P.winid })
-    vim.api.nvim_set_option_value('sidescrolloff', 0, { win = P.winid })
-    vim.api.nvim_set_option_value('winhighlight', "Normal:Pmenu", { win = P.winid })
+    vim.api.nvim_set_option_value("cursorline", true, { win = P.winid })
+    vim.api.nvim_set_option_value("scrolloff", 1, { win = P.winid })
+    vim.api.nvim_set_option_value("sidescrolloff", 0, { win = P.winid })
+    vim.api.nvim_set_option_value("winhighlight", "Normal:Pmenu", { win = P.winid })
 
-    vim.api.nvim_create_autocmd('BufLeave', {
+    vim.api.nvim_create_autocmd("BufLeave", {
       buffer = P.bufnr,
       callback = function()
         P.close()
@@ -100,8 +100,8 @@ local function build_popup()
     NuiTree.Node({ name = "Eq", on = false, keybind = "e", link = "PartialEq" }),
     NuiTree.Node({ name = "Ord", on = false, keybind = "o", link = "PartialOrd" }),
     NuiTree.Node({ name = "Hash", on = false, keybind = "h" }),
-    NuiTree.Node({ name = "PartialEq", on = false, }),
-    NuiTree.Node({ name = "PartialOrd", on = false, }),
+    NuiTree.Node({ name = "PartialEq", on = false }),
+    NuiTree.Node({ name = "PartialOrd", on = false }),
   })
 
   local rs_tree = RustTree.get_derives_at_cursor() or {}
@@ -111,7 +111,7 @@ local function build_popup()
   end
 
   local P = {
-    popup = init_window()
+    popup = init_window(),
   }
 
   P.bufnr = function()
@@ -170,7 +170,7 @@ local function build_popup()
       end
 
       return { line }
-    end
+    end,
   })
 
   P.calculate_height = function()
@@ -188,7 +188,7 @@ local function build_popup()
       P.popup.set_size(30, P.height)
       P.tree:render()
 
-      vim.cmd('normal! zb')
+      vim.cmd("normal! zb")
     end
   end
 
@@ -225,7 +225,9 @@ local function build_popup()
   P.toggle_by_name = function(name)
     local item = items:get(name)
 
-    if item == nil then return end
+    if item == nil then
+      return
+    end
 
     item.on = not item.on
 
@@ -236,13 +238,15 @@ local function build_popup()
     P.tree:render()
 
     RustTree.replace_derive(rs_tree, items)
-    rs_tree.replace = true;
+    rs_tree.replace = true
   end
 
   P.toggle = function()
     local node = P.tree:get_node()
 
-    if node == nil then return end
+    if node == nil then
+      return
+    end
 
     node.on = not node.on
 
@@ -253,7 +257,7 @@ local function build_popup()
     P.tree:render()
 
     RustTree.replace_derive(rs_tree, items)
-    rs_tree.replace = true;
+    rs_tree.replace = true
   end
 
   return P
@@ -294,7 +298,7 @@ M.open = function()
 end
 
 M.setup = function()
-  vim.keymap.set('n', '<leader>cd', M.open, {})
+  vim.keymap.set("n", "<leader>cd", M.open, {})
 end
 
 return M

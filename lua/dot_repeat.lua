@@ -1,10 +1,13 @@
 ---@type fun(motion: fun(motion: string): string)
-local set_operatorfunc = vim.fn[vim.api.nvim_exec([[
+local set_operatorfunc = vim.fn[vim.api.nvim_exec(
+  [[
   func s:set_opfunc(val)
     let &operatorfunc = a:val
   endfunc
   echon get(function('s:set_opfunc'), 'name')
-]], true)]
+]],
+  true
+)]
 
 ---@param fn fun(...): any
 ---@vararg any
@@ -18,7 +21,7 @@ local dot_repeat = function(fn, ...)
       return "g@l"
     end
     fn(args)
-    return ''
+    return ""
   end
 
   return op

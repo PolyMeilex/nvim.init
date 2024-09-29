@@ -1,15 +1,11 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
 end
 
 local function add_on_click(level, fn, component)
-  return "%"
-      .. level
-      .. "@v:lua." .. fn .. "@"
-      .. component
-      .. "%X"
+  return "%" .. level .. "@v:lua." .. fn .. "@" .. component .. "%X"
 end
 
 local flame_right = add_hl("WinBarTerminator", "")
@@ -21,7 +17,7 @@ _G.my_harpoon_click_handler = function(minwid, _, _, _)
 end
 
 local function my_navic()
-  local navic = require('nvim-navic').get_location()
+  local navic = require("nvim-navic").get_location()
 
   if #navic == 0 then
     return ""
@@ -46,8 +42,10 @@ local function hjkl_harpoon()
 
   local function split(source, delimiters)
     local elements = {}
-    local pattern = '([^' .. delimiters .. ']+)'
-    string.gsub(source, pattern, function(value) elements[#elements + 1] = value; end);
+    local pattern = "([^" .. delimiters .. "]+)"
+    string.gsub(source, pattern, function(value)
+      elements[#elements + 1] = value
+    end)
     return elements
   end
 
@@ -68,18 +66,14 @@ local function hjkl_harpoon()
   end
 
   local function add_click(level, component)
-    return add_on_click(
-      level,
-      "my_harpoon_click_handler",
-      component
-    )
+    return add_on_click(level, "my_harpoon_click_handler", component)
   end
 
   local list = filter_empty_string(harpoon:list().items)
   local current_filepath = vim.fn.expand("%:.")
 
   local function nth_item(id)
-    local item = list[id];
+    local item = list[id]
 
     if item == nil then
       return ""
@@ -98,15 +92,15 @@ local function hjkl_harpoon()
 
     label = " " .. label .. " "
 
-    local key = '[_]'
+    local key = "[_]"
     if id == 1 then
-      key = '[h]'
+      key = "[h]"
     elseif id == 2 then
-      key = '[j]'
+      key = "[j]"
     elseif id == 3 then
-      key = '[k]'
+      key = "[k]"
     elseif id == 4 then
-      key = '[l]'
+      key = "[l]"
     end
 
     if item == current_filepath then
@@ -134,14 +128,14 @@ local function hjkl_harpoon()
     table.insert(tabs, add_click(4, nth_item(4)))
   end
 
-  return table.concat(tabs, '')
+  return table.concat(tabs, "")
 end
 
 local icons = {
-  error = '󰅚 ',
-  warn = '󰀪 ',
-  info = '󰋽 ',
-  hint = '󰌶 ',
+  error = "󰅚 ",
+  warn = "󰀪 ",
+  info = "󰋽 ",
+  hint = "󰌶 ",
 }
 
 local function diagnostics_status()
@@ -177,7 +171,7 @@ local function diagnostics_status()
   return ""
 end
 
-_G.my_winbar           = function()
+_G.my_winbar = function()
   if vim.bo.filetype == "neo-tree" then
     return ""
   end
@@ -191,10 +185,10 @@ end
 
 _G.my_git_blame_button = function()
   require("gitblame").toggle()
-  vim.api.nvim_command('redrawstatus!')
+  vim.api.nvim_command("redrawstatus!")
 end
 
-_G.my_statusline       = function()
+_G.my_statusline = function()
   if vim.bo.filetype == "neo-tree" then
     return ""
   end
@@ -216,34 +210,40 @@ _G.my_statusline       = function()
     git_icon = add_hl("GruvboxFg0", git_icon)
   end
 
-  return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) ..
-      flame_right .. "%=" .. flame_left .. git_icon
+  return diagnostics_status()
+    .. add_hl("GruvboxFg0", "%f " .. file_status)
+    .. flame_right
+    .. "%="
+    .. flame_left
+    .. git_icon
 end
 
 return {
-  'SmiteshP/nvim-navic',
+  "SmiteshP/nvim-navic",
   enabled = IsNotVsCode,
   dependencies = {
-    'nvim-tree/nvim-web-devicons',
-    'ThePrimeagen/harpoon',
+    "nvim-tree/nvim-web-devicons",
+    "ThePrimeagen/harpoon",
   },
   config = function()
-    require('nvim-navic').setup({
+    require("nvim-navic").setup({
       highlight = true,
       click = true,
     })
 
-    require('harpoon'):extend({
-      ADD = function() vim.api.nvim_command('redrawstatus!') end
-    })
-
-    vim.api.nvim_create_autocmd('DiagnosticChanged', {
-      callback = function(_)
-        vim.api.nvim_command('redrawstatus!')
+    require("harpoon"):extend({
+      ADD = function()
+        vim.api.nvim_command("redrawstatus!")
       end,
     })
 
-    vim.o.winbar     = "%{%v:lua.my_winbar()%}"
+    vim.api.nvim_create_autocmd("DiagnosticChanged", {
+      callback = function(_)
+        vim.api.nvim_command("redrawstatus!")
+      end,
+    })
+
+    vim.o.winbar = "%{%v:lua.my_winbar()%}"
     vim.o.statusline = "%{%v:lua.my_statusline()%}"
   end,
 }

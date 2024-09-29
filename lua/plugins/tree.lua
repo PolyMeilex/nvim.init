@@ -1,4 +1,4 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
   "nvim-neo-tree/neo-tree.nvim",
@@ -14,7 +14,7 @@ return {
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
 
-    require('nvim-web-devicons').setup({
+    require("nvim-web-devicons").setup({
       override = {
         rs = {
           icon = "",
@@ -22,17 +22,13 @@ return {
           cterm_color = "216",
           name = "Rs",
         },
-      }
+      },
     })
 
-    vim.fn.sign_define("DiagnosticSignError",
-      { text = " ", texthl = "DiagnosticSignError" })
-    vim.fn.sign_define("DiagnosticSignWarn",
-      { text = " ", texthl = "DiagnosticSignWarn" })
-    vim.fn.sign_define("DiagnosticSignInfo",
-      { text = " ", texthl = "DiagnosticSignInfo" })
-    vim.fn.sign_define("DiagnosticSignHint",
-      { text = "󰌵", texthl = "DiagnosticSignHint" })
+    vim.fn.sign_define("DiagnosticSignError", { text = " ", texthl = "DiagnosticSignError" })
+    vim.fn.sign_define("DiagnosticSignWarn", { text = " ", texthl = "DiagnosticSignWarn" })
+    vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSignInfo" })
+    vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵", texthl = "DiagnosticSignHint" })
 
     require("neo-tree").setup({
       close_if_last_window = true,
@@ -69,15 +65,15 @@ return {
         window = {
           mappings = {
             ["<S-f>"] = function(state)
-              local node = state.tree:get_node();
+              local node = state.tree:get_node()
               if node.type == "directory" then
-                require('telescope.builtin').live_grep({ cwd = node.path })
+                require("telescope.builtin").live_grep({ cwd = node.path })
               end
             end,
             ["<C-f>"] = function(state)
-              local node = state.tree:get_node();
+              local node = state.tree:get_node()
               if node.type == "directory" then
-                require('telescope.builtin').find_files({ cwd = node.path })
+                require("telescope.builtin").find_files({ cwd = node.path })
               end
             end,
           },
@@ -92,24 +88,24 @@ return {
           handler = function(args)
             local winid = args.winid
 
-            vim.wo[winid].signcolumn = 'no'
+            vim.wo[winid].signcolumn = "no"
 
             local autocmd_id
             autocmd_id = vim.api.nvim_create_autocmd("WinLeave", {
               callback = function()
                 if vim.api.nvim_get_current_win() == winid then
                   vim.api.nvim_del_autocmd(autocmd_id)
-                  vim.cmd 'Neotree close'
+                  vim.cmd("Neotree close")
                 end
-              end
+              end,
             })
-          end
+          end,
         },
-      }
+      },
     })
 
-    vim.keymap.set('n', '<C-e>', function()
-      require('neo-tree.command').execute({
+    vim.keymap.set("n", "<C-e>", function()
+      require("neo-tree.command").execute({
         action = "focus",
         source = "last",
       })

@@ -1,13 +1,13 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
   {
-    'saecki/crates.nvim',
+    "saecki/crates.nvim",
     enabled = IsNotVsCode,
     -- tag = 'stable',
-    dependencies = { 'nvim-lua/plenary.nvim' },
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
-      local crates = require('crates')
+      local crates = require("crates")
       crates.setup({
         lsp = {
           enabled = true,
@@ -17,18 +17,18 @@ return {
         },
       })
 
-      vim.keymap.set('n', '<leader>cv', function()
+      vim.keymap.set("n", "<leader>cv", function()
         crates.show_versions_popup()
         crates.focus_popup()
       end, {})
-      vim.keymap.set('n', '<leader>cf', function()
+      vim.keymap.set("n", "<leader>cf", function()
         crates.show_features_popup()
         crates.focus_popup()
       end, {})
-    end
+    end,
   },
   {
-    'vxpm/ferris.nvim',
+    "vxpm/ferris.nvim",
     enabled = IsNotVsCode,
     opts = {
       create_commands = true,

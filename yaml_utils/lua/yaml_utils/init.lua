@@ -1,7 +1,8 @@
 local namespace_id = vim.api.nvim_create_namespace("yaml_utils")
 
 local function keys_quary()
-  return vim.treesitter.query.parse("yaml",
+  return vim.treesitter.query.parse(
+    "yaml",
     [[
       ;; query
       ((block_mapping_pair
@@ -30,7 +31,7 @@ local function filtered_keys_quary(key_filter)
 end
 
 local function cached_keys_quary()
-  local cache = nil;
+  local cache = nil
   return function()
     if cache == nil then
       local ok, quary = pcall(keys_quary)
@@ -44,7 +45,7 @@ local function cached_keys_quary()
 end
 
 local function cached_filtered_seq_query()
-  local cache = nil;
+  local cache = nil
   return function()
     if cache == nil then
       local ok, quary = pcall(filtered_keys_quary, "messages")
@@ -64,7 +65,9 @@ local filtered_seq_query = cached_filtered_seq_query()
 
 local M = {}
 
-M.is_yaml = function() return vim.bo.filetype == "yaml" end
+M.is_yaml = function()
+  return vim.bo.filetype == "yaml"
+end
 
 M.all_keys = function(bufnr, key_filter)
   local tree = vim.treesitter.get_parser(bufnr, "yaml"):parse()[1]
@@ -77,7 +80,9 @@ M.all_keys = function(bufnr, key_filter)
     q = filtered_seq_query()
   end
 
-  if q == nil then return end
+  if q == nil then
+    return
+  end
 
   local iter = q:iter_captures(root, bufnr)
   return function()
@@ -99,7 +104,9 @@ M.clear = function()
 end
 
 M.seq_ids = function(key_filter, count_nested_flow_seq)
-  if not M.is_yaml() then return end
+  if not M.is_yaml() then
+    return
+  end
 
   M.clear()
 
@@ -136,16 +143,10 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
         { " ", "Comment" },
       }
 
-      vim.api.nvim_buf_set_extmark(
-        bufnr,
-        namespace_id,
-        line,
-        col,
-        {
-          virt_text_pos = "inline",
-          virt_text = virt_text,
-        }
-      )
+      vim.api.nvim_buf_set_extmark(bufnr, namespace_id, line, col, {
+        virt_text_pos = "inline",
+        virt_text = virt_text,
+      })
 
       id = id + 1
 
@@ -164,7 +165,7 @@ vim.api.nvim_create_user_command("YAMLSeqIds", function()
 end, { desc = "Mark seq ids" })
 
 vim.api.nvim_create_augroup("yaml_utils", { clear = true })
-vim.api.nvim_create_autocmd({ 'BufReadPost', 'TextChanged', 'TextChangedI' }, {
+vim.api.nvim_create_autocmd({ "BufReadPost", "TextChanged", "TextChangedI" }, {
   group = "yaml_utils",
   pattern = "*.yaml,*.yml",
   callback = function()

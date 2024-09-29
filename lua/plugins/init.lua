@@ -1,60 +1,75 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
-  'bkad/CamelCaseMotion',
+  "bkad/CamelCaseMotion",
   {
-    dir = '~/.config/nvim/yaml_utils',
+    dir = "~/.config/nvim/yaml_utils",
     ft = "yaml",
     enabled = IsNotVsCode,
     opts = {},
   },
   {
-    dir = '~/.config/nvim/json_utils',
+    dir = "~/.config/nvim/json_utils",
     enabled = IsNotVsCode,
     opts = {},
   },
   {
-    dir = '~/.config/nvim/rs-derive-menu',
+    dir = "~/.config/nvim/rs-derive-menu",
     enabled = IsNotVsCode,
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {},
   },
   {
-    dir = '~/.config/nvim/railgun',
-    dependencies = { 'nvim-lua/plenary.nvim' },
+    dir = "~/.config/nvim/railgun",
+    dependencies = { "nvim-lua/plenary.nvim" },
     enabled = IsNotVsCode,
     config = function()
-      require('railgun').setup()
+      require("railgun").setup()
 
-      vim.keymap.set('n', 'tm', function()
-        require('telescope').extensions.railgun.list()
+      vim.keymap.set("n", "tm", function()
+        require("telescope").extensions.railgun.list()
       end, {})
-    end
-  },
-  {
-    'echasnovski/mini.surround',
-    version = '*',
-    opts = {
-      n_lines = 1000
-    },
-  },
-  {
-    'svermeulen/vim-cutlass',
-    config = function()
-      vim.keymap.set('n', 'm', 'd')
-      vim.keymap.set('x', 'm', 'd')
-
-      vim.keymap.set('n', 'mm', 'dd')
-      vim.keymap.set('n', 'M', 'D')
-      vim.keymap.set('v', 'P', 'p')
-      vim.keymap.set('v', 'p', 'P')
     end,
   },
   {
-    'nvim-treesitter/nvim-treesitter',
+    "echasnovski/mini.surround",
+    version = "*",
+    opts = {
+      n_lines = 1000,
+    },
+  },
+  {
+    "sindrets/diffview.nvim",
+    opts = {
+      view = {
+        default = {
+          winbar_info = true,
+        },
+      },
+      hooks = {
+        diff_buf_win_enter = function(bufnr, winid)
+          vim.wo[winid].statusline = " "
+        end,
+      },
+    },
+  },
+  {
+    "svermeulen/vim-cutlass",
+    config = function()
+      vim.keymap.set("n", "m", "d")
+      vim.keymap.set("x", "m", "d")
+
+      vim.keymap.set("n", "mm", "dd")
+      vim.keymap.set("n", "M", "D")
+      vim.keymap.set("v", "P", "p")
+      vim.keymap.set("v", "p", "P")
+    end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
     enabled = IsNotVsCode,
-    run = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
+    run = ":TSUpdate",
+    main = "nvim-treesitter.configs",
     opts = {
       ensure_installed = { "lua", "rust" },
       ignore_install = {},
@@ -69,16 +84,16 @@ return {
         end,
         additional_vim_regex_highlighting = { "yaml" },
       },
-    }
+    },
   },
   {
-    'poljar/typos.nvim',
+    "poljar/typos.nvim",
     enabled = IsNotVsCode,
-    opts = {}
+    opts = {},
   },
   {
-    'wakatime/vim-wakatime',
+    "wakatime/vim-wakatime",
     enabled = IsNotVsCode,
     lazy = false,
-  }
+  },
 }

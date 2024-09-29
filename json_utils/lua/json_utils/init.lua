@@ -22,7 +22,9 @@ end
 
 local M = {}
 
-M.is_json = function() return vim.bo.filetype == "json" end
+M.is_json = function()
+  return vim.bo.filetype == "json"
+end
 
 M.setup = function()
   require("json_utils.lsp").register_bendec_lsp_autocmd()
@@ -30,7 +32,9 @@ end
 
 -- Get all values from keys called `name`
 M.values_for_key = function(name)
-  if not M.is_json() then return {} end
+  if not M.is_json() then
+    return {}
+  end
 
   local bufnr = vim.api.nvim_get_current_buf()
 
@@ -44,7 +48,7 @@ M.values_for_key = function(name)
       local parent = node:parent()
       local value = parent:field("value")[1]:child(1)
       local value_as_string = vim.treesitter.get_node_text(value, bufnr)
-      table.insert(out, { line = line + 1, col = col, name = value_as_string });
+      table.insert(out, { line = line + 1, col = col, name = value_as_string })
     end
   end
 

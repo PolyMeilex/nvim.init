@@ -1,7 +1,7 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
-  'ellisonleao/gruvbox.nvim',
+  "ellisonleao/gruvbox.nvim",
   enabled = IsNotVsCode,
   priority = 1000,
   config = function()
@@ -16,7 +16,7 @@ return {
         LspReferenceWrite = { bold = true },
         FloatBorder = { link = "GruvboxFg1" },
         YankIncSearch = { bg = "#544C45", fg = "NONE", reverse = false, bold = true },
-      }
+      },
     })
 
     vim.cmd.colorscheme("gruvbox")

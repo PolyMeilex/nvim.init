@@ -1,8 +1,8 @@
-local IsNotVsCode = require('vscode').IsNotVsCode()
+local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
   {
-    'f-person/git-blame.nvim',
+    "f-person/git-blame.nvim",
     enabled = IsNotVsCode,
     opts = {
       enabled = false,
@@ -11,15 +11,15 @@ return {
       set_extmark_options = {
         virt_text_pos = "right_align",
       },
-    }
+    },
   },
   {
-    'echasnovski/mini.diff',
-    version = '*',
+    "echasnovski/mini.diff",
+    version = "*",
     enabled = IsNotVsCode,
     opts = {
       view = {
-        style = 'sign',
+        style = "sign",
         priority = 0,
       },
       mappings = {
@@ -29,6 +29,6 @@ return {
       options = {
         wrap_goto = true,
       },
-    }
+    },
   },
 }
