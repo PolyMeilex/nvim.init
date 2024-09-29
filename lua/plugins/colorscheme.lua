@@ -15,6 +15,7 @@ return {
         LspReferenceRead = { bold = true },
         LspReferenceWrite = { bold = true },
         FloatBorder = { link = "GruvboxFg1" },
+        YankIncSearch = { bg = "#544C45", fg = "NONE", reverse = false, bold = true },
       }
     })
 
