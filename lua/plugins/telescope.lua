@@ -59,6 +59,9 @@ return {
     vim.keymap.set("n", "td", function()
       builtin.diagnostics({ severity_bound = "ERROR" })
     end, {})
+    vim.keymap.set("n", "tD", function()
+      builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
+    end, {})
     vim.keymap.set("n", "ts", select_dir_for_search, {})
 
     telescope.setup({
