@@ -14,23 +14,30 @@ return {
         LspReferenceText = { bold = true },
         LspReferenceRead = { bold = true },
         LspReferenceWrite = { bold = true },
-        FloatBorder = { link = "GruvboxFg1" },
+        TelescopeResultsBorder = { link = "FloatBorder" },
+        TelescopePromptBorder = { link = "FloatBorder" },
+        TelescopePreviewBorder = { link = "FloatBorder" },
+        FloatBorder = { bg = "#1f1f1f", fg = "#4e433a" },
+        NormalFloat = { link = "Normal" },
+        WinSeparator = { bg = "#1f1f1f", fg = "#322d29" },
         YankIncSearch = { bg = "#544C45", fg = "NONE", reverse = false, bold = true },
+        SignColumn = { link = "Normal" },
+
+        WinBar = { link = "Normal" },
+        WinBarNC = { link = "NormalNC" },
+
+        StatusLine = { link = "Normal" },
+        StatusLineNC = { link = "NormalNC" },
+
+        Normal = { bg = "#1f1f1f" },
+        NormalNC = { bg = "#1c1c1c" },
+
+        LspInlayHint = { bg = "#36302c", fg = "#878787" },
+        NeoTreeDirectoryIcon = { link = "GruvboxGreenBold" },
+        NeoTreeDirectoryName = { link = "GruvboxGreenBold" },
       },
     })
 
     vim.cmd.colorscheme("gruvbox")
-    -- vim.cmd.colorscheme("retrobox")
-
-    vim.api.nvim_set_hl(0, "WinBar", { bg = "#303030" })
-    vim.api.nvim_set_hl(0, "StatusLine", { bg = "#303030" })
-    vim.api.nvim_set_hl(0, "WinBarTerminator", { fg = "#1f1f1f", bg = "#303030" })
-
-    vim.api.nvim_set_hl(0, "Normal", { bg = "#1f1f1f" })
-
-    vim.api.nvim_set_hl(0, "LspInlayHint", { bg = "#36302c", fg = "#878787" })
-
-    vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { link = "GruvboxGreenBold" })
-    vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { link = "GruvboxGreenBold" })
   end,
 }

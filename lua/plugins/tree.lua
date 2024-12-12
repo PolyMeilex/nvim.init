@@ -39,7 +39,7 @@ return {
         "diagnostics",
       },
       source_selector = {
-        winbar = true,
+        winbar = false,
         sources = {
           { source = "filesystem" },
           { source = "diagnostics" },

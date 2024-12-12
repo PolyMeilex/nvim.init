@@ -8,9 +8,6 @@ local function add_on_click(level, fn, component)
   return "%" .. level .. "@v:lua." .. fn .. "@" .. component .. "%X"
 end
 
-local flame_right = add_hl("WinBarTerminator", "")
-local flame_left = add_hl("WinBarTerminator", " ")
-
 _G.my_harpoon_click_handler = function(minwid, _, _, _)
   local harpoon = require("harpoon")
   harpoon:list():select(minwid)
@@ -23,7 +20,7 @@ local function my_navic()
     return ""
   end
 
-  return navic .. add_hl("GruvboxFg0", " ") .. flame_right
+  return navic
 end
 
 local function hjkl_harpoon()
@@ -113,7 +110,7 @@ local function hjkl_harpoon()
   local tabs = {}
 
   if #list >= 1 then
-    table.insert(tabs, add_click(1, flame_left .. nth_item(1)))
+    table.insert(tabs, add_click(1, nth_item(1)))
   end
 
   if #list >= 2 then
@@ -210,12 +207,7 @@ _G.my_statusline = function()
     git_icon = add_hl("GruvboxFg0", git_icon)
   end
 
-  return diagnostics_status()
-    .. add_hl("GruvboxFg0", "%f " .. file_status)
-    .. flame_right
-    .. "%="
-    .. flame_left
-    .. git_icon
+  return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) .. "%=" .. git_icon
 end
 
 return {
