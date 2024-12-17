@@ -44,6 +44,8 @@ return {
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
       end, {})
 
+      require("lspconfig").dartls.setup({ capabilities = lsp_capabilities() })
+
       vim.api.nvim_create_autocmd("LspAttach", {
         desc = "LSP attach actions",
         callback = function(event)

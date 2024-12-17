@@ -7,6 +7,10 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     local cs = vim.bo.commentstring
 
     if not cs or not cs:match("%%s") then
+      if vim.bo.filetype == "dart" then
+        vim.bo.commentstring = "// %s"
+      end
+
       return
     end
 
