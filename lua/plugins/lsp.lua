@@ -11,6 +11,19 @@ local function lsp_capabilities()
           dynamicRegistration = false,
           lineFoldingOnly = true,
         },
+        codeLens = {
+          dynamicRegistration = true,
+        },
+      },
+      experimental = {
+        commands = {
+          commands = {
+            "rust-analyzer.runSingle",
+            -- "rust-analyzer.debugSingle",
+            -- "rust-analyzer.gotoLocation",
+            "rust-analyzer.showReferences",
+          },
+        },
       },
     }
   )
@@ -186,6 +199,15 @@ return {
               ["rust-analyzer"] = {
                 checkOnSave = {
                   command = "clippy",
+                },
+                lens = {
+                  enable = true,
+                  implementations = { enable = true },
+                  references = {
+                    adt = { enable = true },
+                    trait = { enable = true },
+                  },
+                  run = { enable = true },
                 },
               },
             },
