@@ -96,6 +96,9 @@ return {
             },
           },
         },
+        git_files = {
+          show_untracked = true,
+        },
       },
 
       extensions = {
