@@ -32,6 +32,11 @@ return {
     end,
   },
   {
+    dir = "~/.config/nvim/typos",
+    enabled = IsNotVsCode,
+    opts = {},
+  },
+  {
     "echasnovski/mini.surround",
     version = "*",
     opts = {
@@ -85,11 +90,6 @@ return {
         additional_vim_regex_highlighting = { "yaml" },
       },
     },
-  },
-  {
-    "poljar/typos.nvim",
-    enabled = IsNotVsCode,
-    opts = {},
   },
   {
     "wakatime/vim-wakatime",
