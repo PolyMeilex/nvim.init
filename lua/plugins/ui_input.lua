@@ -1,3 +1,13 @@
+local function try_typos_lsp_launch(buffer)
+  local has_lspconfig, lspconfig = pcall(require, "lspconfig")
+
+  if not has_lspconfig or lspconfig.typos_lsp == nil or lspconfig.typos_lsp.launch == nil then
+    return
+  end
+
+  lspconfig.typos_lsp.launch(buffer)
+end
+
 vim.ui.input = function(opts, on_confirm)
   vim.validate({
     opts = { opts, "table", true },
@@ -39,6 +49,8 @@ vim.ui.input = function(opts, on_confirm)
   vim.api.nvim_set_option_value("buftype", "acwrite", { buf = buffer })
   vim.api.nvim_set_option_value("filetype", "my.ui.input", { buf = buffer })
   vim.api.nvim_buf_set_name(buffer, "my.ui.input")
+
+  try_typos_lsp_launch(buffer)
 
   local window = vim.api.nvim_open_win(buffer, true, win_config)
   vim.api.nvim_buf_set_text(buffer, 0, 0, 0, 0, { default })

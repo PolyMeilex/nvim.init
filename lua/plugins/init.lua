@@ -32,11 +32,6 @@ return {
     end,
   },
   {
-    dir = "~/.config/nvim/typos",
-    enabled = IsNotVsCode,
-    opts = {},
-  },
-  {
     "echasnovski/mini.surround",
     version = "*",
     opts = {
