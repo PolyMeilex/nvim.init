@@ -73,12 +73,6 @@ return {
           vim.keymap.set("n", "gr", telescope.lsp_references, opts)
 
           vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, opts)
-          vim.keymap.set("n", "<F3>", function()
-            vim.lsp.buf.format({ async = true })
-          end, opts)
-          vim.keymap.set("x", "<F3>", function()
-            vim.lsp.buf.format({ async = true })
-          end, opts)
           vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
 
           vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
