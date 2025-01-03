@@ -232,6 +232,10 @@ return {
     opts = {
       notification = {
         override_vim_notify = true,
+        window = {
+          align = "top",
+          y_padding = 2,
+        },
       },
     },
   },
