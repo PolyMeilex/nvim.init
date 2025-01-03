@@ -26,40 +26,19 @@ return {
   enabled = IsNotVsCode,
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope-file-browser.nvim",
     "nvim-telescope/telescope-ui-select.nvim",
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+    },
+    {
+      dir = "~/.config/nvim/omni_picker",
     },
   },
   config = function()
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")
     local actions = require("telescope.actions")
-    local action_state = require("telescope.actions.state")
-
-    local select_dir_for_search = function()
-      telescope.extensions.file_browser.file_browser({
-        files = false,
-        depth = false,
-        attach_mappings = function()
-          actions.select_default:replace(function()
-            local entry_path = action_state.get_selected_entry().Path
-            local dir = entry_path:is_dir() and entry_path or entry_path:parent()
-            local relative = dir:make_relative(vim.fn.getcwd())
-            local absolute = dir:absolute()
-
-            builtin.find_files({
-              prompt_title = relative .. "/",
-              search_dirs = { absolute },
-            })
-          end)
-
-          return true
-        end,
-      })
-    end
 
     vim.keymap.set("n", "tpf", builtin.find_files, {})
     vim.keymap.set("n", "<C-p>", project_files, {})
@@ -81,7 +60,7 @@ return {
     vim.keymap.set("n", "tD", function()
       builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
     end, {})
-    vim.keymap.set("n", "ts", select_dir_for_search, {})
+    vim.keymap.set("n", "ts", telescope.extensions.omni_picker.omni_picker, {})
 
     telescope.setup({
       pickers = {
@@ -107,17 +86,9 @@ return {
         },
       },
     })
-    telescope.load_extension("file_browser")
     telescope.load_extension("ui-select")
     telescope.load_extension("fzf")
     telescope.load_extension("railgun")
-
-    -- open file_browser with the path of the current buffer
-    vim.api.nvim_set_keymap(
-      "n",
-      "<leader>fb",
-      ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
-      { noremap = true }
-    )
+    telescope.load_extension("omni_picker")
   end,
 }

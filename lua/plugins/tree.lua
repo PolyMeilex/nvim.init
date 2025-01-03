@@ -10,8 +10,8 @@ return {
     "MunifTanjim/nui.nvim",
   },
   config = function()
-    vim.g.loaded_netrw = 1
-    vim.g.loaded_netrwPlugin = 1
+    -- vim.g.loaded_netrw = 1
+    -- vim.g.loaded_netrwPlugin = 1
 
     require("nvim-web-devicons").setup({
       override = {
@@ -52,6 +52,7 @@ return {
         width = 60,
       },
       filesystem = {
+        hijack_netrw_behavior = "disabled",
         follow_current_file = {
           enabled = true,
           leave_dirs_open = false,
