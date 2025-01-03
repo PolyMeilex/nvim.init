@@ -39,21 +39,6 @@ return {
     },
   },
   {
-    "sindrets/diffview.nvim",
-    opts = {
-      view = {
-        default = {
-          winbar_info = true,
-        },
-      },
-      hooks = {
-        diff_buf_win_enter = function(bufnr, winid)
-          vim.wo[winid].statusline = " "
-        end,
-      },
-    },
-  },
-  {
     "svermeulen/vim-cutlass",
     config = function()
       vim.keymap.set("n", "m", "d")
