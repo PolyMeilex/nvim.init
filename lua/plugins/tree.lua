@@ -8,7 +8,6 @@ return {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
-    "mrbjarksen/neo-tree-diagnostics.nvim",
   },
   config = function()
     vim.g.loaded_netrw = 1
@@ -36,13 +35,11 @@ return {
         "buffers",
         "document_symbols",
         "filesystem",
-        "diagnostics",
       },
       source_selector = {
         winbar = false,
         sources = {
           { source = "filesystem" },
-          { source = "diagnostics" },
         },
         truncation_character = "",
       },
