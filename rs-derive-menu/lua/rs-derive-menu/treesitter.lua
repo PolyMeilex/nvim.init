@@ -5,8 +5,8 @@ local function trim(s)
 end
 
 --- @return TSNode | nil
-local function search_for_struct(node)
-  while node:type() ~= "struct_item" do
+local function search_for_struct_or_enum(node)
+  while node:type() ~= "struct_item" and node:type() ~= "enum_item" do
     node = node:parent()
     if not node then
       return nil
@@ -72,7 +72,7 @@ M.get_derives_at_cursor = function()
 
   -- TODO: Make this smarter
   if not attribute_item then
-    local struct = search_for_struct(cursor_node)
+    local struct = search_for_struct_or_enum(cursor_node)
 
     if struct == nil then
       return nil
