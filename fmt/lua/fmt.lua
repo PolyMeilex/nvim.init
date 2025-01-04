@@ -19,10 +19,14 @@ local function create_format_function(formatters)
 
     if opts.name == nil then
       local filetype = vim.bo[opts.bufnr].filetype
-      local lsp_name = formatters[filetype].lsp_name
+      local fmt_opts = formatters[filetype]
 
-      if lsp_name ~= nil then
-        opts.name = lsp_name
+      if fmt_opts ~= nil then
+        local lsp_name = formatters[filetype].lsp_name
+
+        if lsp_name ~= nil then
+          opts.name = lsp_name
+        end
       end
     end
 
