@@ -21,7 +21,7 @@ end
 
 return {
   "nvim-telescope/telescope.nvim",
-  commit = "85922dde3767e01d42a08e750a773effbffaea3e",
+  commit = "814f102cd1da3dc78c7d2f20f2ef3ed3cdf0e6e4",
   -- tag = '0.1.6',
   enabled = IsNotVsCode,
   dependencies = {
