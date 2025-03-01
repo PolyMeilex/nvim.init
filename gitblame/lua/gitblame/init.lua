@@ -87,14 +87,32 @@ M.run = function()
   end)
 end
 
-M.setup = function()
-  vim.o.updatetime = 500
+M.register_autocmd = function()
   vim.api.nvim_create_autocmd("CursorHold", {
     callback = function()
       M.run()
     end,
     group = group,
   })
+end
+
+M.setup = function()
+  vim.o.updatetime = 500
+end
+
+M.on = false
+
+M.toggle = function()
+  vim.api.nvim_buf_clear_namespace(0, namespace_id, 0, -1)
+  vim.api.nvim_clear_autocmds({ group = group })
+
+  if M.on then
+    M.on = false
+  else
+    M.on = true
+    M.run()
+    M.register_autocmd()
+  end
 end
 
 return M
