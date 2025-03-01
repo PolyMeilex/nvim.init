@@ -2,16 +2,9 @@ local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
   {
-    "f-person/git-blame.nvim",
+    dir = "~/.config/nvim/gitblame",
     enabled = IsNotVsCode,
-    opts = {
-      enabled = false,
-      message_template = "<author>, <date>: <summary>",
-      date_format = "%r",
-      set_extmark_options = {
-        virt_text_pos = "right_align",
-      },
-    },
+    opts = {},
   },
   {
     "echasnovski/mini.diff",
