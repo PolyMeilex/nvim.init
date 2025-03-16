@@ -58,10 +58,6 @@ return {
             return
           end
 
-          if client.server_capabilities.documentSymbolProvider then
-            require("nvim-navic").attach(client, bufnr)
-          end
-
           local telescope = require("telescope.builtin")
           local opts = { buffer = bufnr }
 

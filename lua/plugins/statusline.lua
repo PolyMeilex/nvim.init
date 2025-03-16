@@ -14,7 +14,7 @@ _G.my_harpoon_click_handler = function(minwid, _, _, _)
 end
 
 local function my_navic()
-  local navic = require("nvim-navic").get_location()
+  local navic = require("lsp-code-context").get_location()
 
   if #navic == 0 then
     return ""
@@ -211,16 +211,19 @@ _G.my_statusline = function()
 end
 
 return {
-  "SmiteshP/nvim-navic",
+  dir = "~/.config/nvim/lsp-code-context",
   enabled = IsNotVsCode,
   dependencies = {
     "nvim-tree/nvim-web-devicons",
     "ThePrimeagen/harpoon",
   },
   config = function()
-    require("nvim-navic").setup({
+    require("lsp-code-context").setup({
       highlight = true,
       click = true,
+      lsp = {
+        auto_attach = true,
+      },
     })
 
     require("harpoon"):extend({
