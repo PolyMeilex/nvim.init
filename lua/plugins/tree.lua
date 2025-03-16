@@ -40,6 +40,7 @@ return {
         winbar = false,
         sources = {
           { source = "filesystem" },
+          { source = "document_symbols" },
         },
         truncation_character = "",
       },
@@ -87,6 +88,8 @@ return {
             local winid = args.winid
 
             vim.wo[winid].signcolumn = "no"
+            vim.wo[winid].number = true
+            vim.wo[winid].relativenumber = true
 
             local autocmd_id
             autocmd_id = vim.api.nvim_create_autocmd("WinLeave", {
