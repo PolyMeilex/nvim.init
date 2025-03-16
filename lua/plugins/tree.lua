@@ -46,6 +46,7 @@ return {
       },
       window = {
         mappings = {
+          ["z"] = "noop",
           ["<Tab>"] = "next_source",
           ["<S-Tab>"] = "prev_source",
           ["<C-e>"] = "close_window",
