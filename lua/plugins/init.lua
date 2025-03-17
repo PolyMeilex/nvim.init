@@ -32,6 +32,11 @@ return {
     end,
   },
   {
+    dir = "~/.config/nvim/teletree",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {},
+  },
+  {
     "echasnovski/mini.surround",
     version = "*",
     opts = {
