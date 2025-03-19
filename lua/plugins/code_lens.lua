@@ -57,12 +57,15 @@ local function _is_lens_clicked()
   return false
 end
 
-vim.api.nvim_create_autocmd({ "CursorHold", "InsertLeave" }, {
-  desc = "LSP attach actions",
-  callback = function()
-    vim.lsp.codelens.refresh()
-  end,
-})
+-- TODO: codelens of RA seems to slow stuff down, perhaps heavly throttle codelens requests?
+if false then
+  vim.api.nvim_create_autocmd({ "CursorHold", "InsertLeave" }, {
+    desc = "LSP attach actions",
+    callback = function()
+      vim.lsp.codelens.refresh()
+    end,
+  })
+end
 
 vim.cmd([[
       aunmenu PopUp

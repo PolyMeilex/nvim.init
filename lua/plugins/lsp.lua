@@ -187,6 +187,10 @@ return {
         rust_analyzer = function()
           require("lspconfig").rust_analyzer.setup({
             capabilities = lsp_capabilities(),
+            on_attach = function(client, bufnr)
+              -- Remove once https://github.com/neovim/neovim/pull/32999 is merged
+              client.server_capabilities.inlayHintProvider = false
+            end,
             settings = {
               ["rust-analyzer"] = {
                 checkOnSave = {

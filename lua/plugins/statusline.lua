@@ -1,4 +1,5 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
+local spinner = require("spinner")
 
 local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
@@ -177,7 +178,7 @@ _G.my_winbar = function()
     return ""
   end
 
-  return my_navic() .. "%=" .. hjkl_harpoon()
+  return my_navic() .. " " .. spinner.label() .. "%=" .. hjkl_harpoon()
 end
 
 _G.my_git_blame_button = function()
