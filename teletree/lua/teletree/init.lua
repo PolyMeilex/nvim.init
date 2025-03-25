@@ -242,7 +242,7 @@ function M.create()
     end
   end
 
-  P.collapse = function()
+  P.toggle = function()
     if P.tree == nil then
       return
     end
@@ -295,7 +295,9 @@ function M.create()
 
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
-  P.map("n", "l", P.collapse)
+  P.map("n", "l", P.toggle)
+  P.map("n", "h", P.toggle)
+  P.map("n", "<Enter>", P.toggle)
   P.map("n", "a", P.reveal_path)
 
   return P
@@ -304,7 +306,7 @@ end
 M.current = nil
 
 function M.setup()
-  vim.keymap.set("n", "E", function()
+  vim.keymap.set("n", "<C-e>", function()
     local path = vim.fn.expand("%:p")
 
     if M.current == nil then

@@ -106,11 +106,11 @@ return {
       },
     })
 
-    vim.keymap.set("n", "<C-e>", function()
-      require("neo-tree.command").execute({
-        action = "focus",
-        source = "last",
-      })
-    end, {})
+    -- vim.keymap.set("n", "<C-e>", function()
+    --   require("neo-tree.command").execute({
+    --     action = "focus",
+    --     source = "last",
+    --   })
+    -- end, {})
   end,
 }
