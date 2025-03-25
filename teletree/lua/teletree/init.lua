@@ -37,7 +37,10 @@ local function scandir(directory)
 end
 
 -- Build a simple (non-recursive) file tree from the directory entries.
-local function build_file_tree(directory)
+---@param directory string
+---@param tree NuiTree | nil
+---@return table
+local function build_file_tree(directory, tree)
   local entries = scandir(directory)
   local nodes = {}
   for _, entry in ipairs(entries) do
@@ -46,11 +49,18 @@ local function build_file_tree(directory)
     local path = directory .. "/" .. entry.name
     if entry.type == "directory" then
       local text = entry.name
-      node = NuiTree.Node({ text = text, is_directory = true, path = path }, build_file_tree(path))
+      node = NuiTree.Node({ text = text, is_directory = true, path = path }, build_file_tree(path, tree))
     else
       local icon, highlight = web_devicons.get_icon(entry.name)
       local text = entry.name
       node = NuiTree.Node({ text = text, icon = icon, icon_highlight = highlight, is_directory = false, path = path })
+    end
+
+    local old_node = tree:get_node(path)
+    if old_node ~= nil then
+      if old_node:is_expanded() then
+        node:expand()
+      end
     end
 
     table.insert(nodes, node)
@@ -169,6 +179,9 @@ function M.create()
     bufnr = bufnr,
     nodes = {},
     prepare_node = prepare_node,
+    get_node_id = function(node)
+      return node.path
+    end,
   })
   P.path = nil
   P.bufnr = bufnr
@@ -177,7 +190,7 @@ function M.create()
   P.build_tree = function(path)
     P.path = path or vim.fn.getcwd()
 
-    local nodes = build_file_tree(P.path)
+    local nodes = build_file_tree(P.path, P.tree)
     P.tree:set_nodes(nodes)
     P.tree:render()
   end
