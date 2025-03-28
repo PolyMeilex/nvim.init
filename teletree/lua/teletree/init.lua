@@ -306,12 +306,32 @@ function M.create()
     vim.keymap.set(mode, lhs, rhs, { buffer = P.bufnr })
   end
 
+  P.delete = function()
+    if P.tree == nil then
+      return
+    end
+
+    local node = P.tree:get_node()
+
+    if node == nil then
+      return
+    end
+
+    vim.ui.input({ prompt = "Do you want to delete: " .. strip_cwd_prefix(node.path) .. "?" }, function(res)
+      if res == "y" then
+        vim.fn.system({ "rm", "-Rf", node.path })
+        P.refresh()
+      end
+    end)
+  end
+
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
   P.map("n", "l", P.toggle)
   P.map("n", "h", P.toggle)
   P.map("n", "<Enter>", P.toggle)
   P.map("n", "a", P.reveal_path)
+  P.map("n", "dd", P.delete)
 
   return P
 end
