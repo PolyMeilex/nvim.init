@@ -2,6 +2,30 @@ local NuiTree = require("nui.tree")
 local NuiLine = require("nui.line")
 local web_devicons = require("nvim-web-devicons")
 
+local function copy_to_clipboard(text)
+  vim.system({ "wl-copy", "-t", "text/uri-list" }, { stdin = text })
+end
+
+local function paste_from_clipboard(parent, done)
+  vim.system({ "wl-paste", "-t", "text/uri-list" }, { text = true }, function(obj)
+    if obj.code ~= 0 then
+      print("Failed to paste from clipboard")
+      return
+    end
+
+    local file_urls = vim.split(obj.stdout, "\n")
+    for _, entry in pairs(file_urls) do
+      local file_url = vim.trim(entry)
+
+      if #file_url > 0 then
+        vim.system({ "gio", "copy", file_url, parent }, {}, function(out)
+          vim.schedule(done)
+        end)
+      end
+    end
+  end)
+end
+
 -- Utility function to scan a directory and return a table of entries.
 local function scandir(directory)
   local results = {}
@@ -303,7 +327,7 @@ function M.create()
   end
 
   P.map = function(mode, lhs, rhs)
-    vim.keymap.set(mode, lhs, rhs, { buffer = P.bufnr })
+    vim.keymap.set(mode, lhs, rhs, { buffer = P.bufnr, nowait = true })
   end
 
   P.delete = function()
@@ -325,13 +349,49 @@ function M.create()
     end)
   end
 
+  P.copy = function()
+    if P.tree == nil then
+      return
+    end
+
+    local node = P.tree:get_node()
+
+    if node == nil then
+      return
+    end
+
+    copy_to_clipboard("file://" .. node.path)
+  end
+
+  P.paste = function()
+    if P.tree == nil then
+      return
+    end
+
+    local node = P.tree:get_node()
+
+    if node == nil then
+      return
+    end
+
+    if not node.is_directory then
+      node = P.tree:get_node(node:get_parent_id())
+    end
+
+    paste_from_clipboard("file://" .. node.path, function()
+      P.refresh()
+    end)
+  end
+
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
   P.map("n", "l", P.toggle)
   P.map("n", "h", P.toggle)
   P.map("n", "<Enter>", P.toggle)
   P.map("n", "a", P.reveal_path)
-  P.map("n", "dd", P.delete)
+  P.map("n", "d", P.delete)
+  P.map("n", "y", P.copy)
+  P.map("n", "p", P.paste)
 
   return P
 end
