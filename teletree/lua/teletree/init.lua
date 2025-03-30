@@ -18,7 +18,7 @@ local function paste_from_clipboard(parent, done)
       local file_url = vim.trim(entry)
 
       if #file_url > 0 then
-        vim.system({ "gio", "copy", file_url, parent }, {}, function(out)
+        vim.system({ "gio", "copy", "-b", file_url, parent }, {}, function(out)
           vim.schedule(done)
         end)
       end
