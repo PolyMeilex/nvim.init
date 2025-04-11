@@ -3,6 +3,7 @@ local NuiLine = require("nui.line")
 local web_devicons = require("nvim-web-devicons")
 local uv = vim.uv
 local async = require("plenary.async")
+local Path = require("plenary.path")
 
 local render = require("teletree.render")
 local window = require("teletree.window")
@@ -152,6 +153,34 @@ local function create()
 
   P.render = function()
     P.tree:render()
+  end
+
+  P.rename = function()
+    local node = P.tree:get_node()
+    if node == nil then
+      return
+    end
+
+    vim.ui.input({ prompt = "New Name: " }, function(res)
+      if res == nil then
+        return
+      end
+
+      res = vim.trim(res)
+      if #res == 0 then
+        return
+      end
+
+      ---@type Path
+      local path = Path:new(node.path)
+      ---@type Path
+      local parent = path:parent()
+      ---@type Path
+      local new_name = parent:joinpath(res)
+
+      path:rename({ new_name = new_name.filename })
+      P.refresh()
+    end)
   end
 
   P.new_file = function()
@@ -341,6 +370,7 @@ local function create()
   P.map("n", "l", P.toggle)
   P.map("n", "h", P.toggle)
   P.map("n", "<Enter>", P.toggle)
+  P.map("n", "r", P.rename)
   P.map("n", "a", P.new_file)
   P.map("n", "d", P.delete)
   P.map("n", "y", P.copy)
