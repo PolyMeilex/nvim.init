@@ -57,7 +57,9 @@ end
 function M.omni_picker(opts)
   opts = opts or {}
 
-  opts.cwd = opts.cwd or vim.fn.getcwd() .. "/"
+  opts.cwd = opts.cwd or vim.fn.getcwd()
+  opts.cwd = opts.cwd .. "/"
+
   opts.prompt_title = opts.prompt_title or "./"
 
   local finder = new_finder(opts.cwd)
