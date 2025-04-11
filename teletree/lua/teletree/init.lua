@@ -1,6 +1,8 @@
 local NuiTree = require("nui.tree")
 local NuiLine = require("nui.line")
 local web_devicons = require("nvim-web-devicons")
+local uv = vim.uv
+local async = require("plenary.async")
 
 local function copy_to_clipboard(text)
   vim.system({ "wl-copy", "-t", "text/uri-list" }, { stdin = text })
@@ -26,71 +28,95 @@ local function paste_from_clipboard(parent, done)
   end)
 end
 
--- Utility function to scan a directory and return a table of entries.
-local function scandir(directory)
-  local results = {}
-  local handle = vim.loop.fs_scandir(directory)
-  if not handle then
-    return results
-  end
-  while true do
-    local name, type = vim.loop.fs_scandir_next(handle)
-    if not name then
-      break
+---@param list uv.fs_readdir.entry[]
+local function sort_readdir_entries(list)
+  table.sort(list, function(a, b)
+    if a.type == b.type then
+      return a.name < b.name
+    else
+      return a.type == "directory"
     end
-    if name ~= ".git" and name ~= "node_modules" and name ~= "target" then
-      table.insert(results, { name = name, type = type })
-    end
-  end
-
-  local sorted = {}
-
-  for index, entry in ipairs(results) do
-    if entry.type == "directory" then
-      table.insert(sorted, entry)
-    end
-  end
-
-  for index, entry in ipairs(results) do
-    if entry.type ~= "directory" then
-      table.insert(sorted, entry)
-    end
-  end
-
-  return sorted
+  end)
 end
 
--- Build a simple (non-recursive) file tree from the directory entries.
 ---@param directory string
----@param tree NuiTree | nil
----@return table
-local function build_file_tree(directory, tree)
-  local entries = scandir(directory)
-  local nodes = {}
-  for _, entry in ipairs(entries) do
-    local node
+---@param cb fun(out: uv.fs_readdir.entry[])
+local function readdir_async(directory, cb)
+  local MAX = 1000
 
-    local path = directory .. "/" .. entry.name
-    if entry.type == "directory" then
-      local text = entry.name
-      node = NuiTree.Node({ text = text, is_directory = true, path = path }, build_file_tree(path, tree))
-    else
-      local icon, highlight = web_devicons.get_icon(entry.name)
-      local text = entry.name
-      node = NuiTree.Node({ text = text, icon = icon, icon_highlight = highlight, is_directory = false, path = path })
+  uv.fs_opendir(directory, function(err, luv_dir)
+    if err then
+      return
     end
 
-    local old_node = tree:get_node(path)
-    if old_node ~= nil then
-      if old_node:is_expanded() then
-        node:expand()
+    local out = {}
+
+    ---@param _err string?
+    ---@param res uv.fs_readdir.entry[]
+    local function handle_readdir(_err, res)
+      if res then
+        vim.list_extend(out, res)
+
+        if #res >= MAX then
+          uv.fs_readdir(luv_dir, handle_readdir)
+          return
+        end
       end
+
+      uv.fs_closedir(luv_dir)
+      sort_readdir_entries(out)
+      cb(out)
     end
 
-    table.insert(nodes, node)
+    uv.fs_readdir(luv_dir, handle_readdir)
+  end, MAX)
+end
+local readdir_co = async.wrap(readdir_async, 2)
+
+local function scandir_async(directory, tree)
+  local res = readdir_co(directory)
+
+  local out = {}
+
+  local function load_item(entry)
+    local icon, highlight = web_devicons.get_icon(entry.name)
+    local path = directory .. "/" .. entry.name
+
+    local node = {
+      text = entry.name,
+      type = entry.type,
+      path = path,
+      icon = icon,
+      icon_highlight = highlight,
+      is_directory = entry.type == "directory",
+    }
+
+    local n
+    if node.is_directory then
+      n = NuiTree.Node(node, scandir_async(node.path, tree))
+    else
+      n = NuiTree.Node(node)
+    end
+
+    return n
   end
 
-  return nodes
+  for _key, entry in pairs(res) do
+    if entry.name ~= ".git" then
+      local node = load_item(entry)
+
+      local old_node = tree:get_node(node.path)
+      if old_node ~= nil then
+        if old_node:is_expanded() then
+          node:expand()
+        end
+      end
+
+      table.insert(out, node)
+    end
+  end
+
+  return out
 end
 
 local function init_window(bufnr)
@@ -211,16 +237,23 @@ function M.create()
   P.bufnr = bufnr
   P.window = init_window(bufnr)
 
-  P.build_tree = function(path)
+  P.build_tree = function(path, cb)
     P.path = path or vim.fn.getcwd()
 
-    local nodes = build_file_tree(P.path, P.tree)
-    P.tree:set_nodes(nodes)
-    P.tree:render()
+    async.run(
+      function()
+        return scandir_async(P.path, P.tree)
+      end,
+      vim.schedule_wrap(function(nodes)
+        P.tree:set_nodes(nodes)
+        P.tree:render()
+        cb()
+      end)
+    )
   end
 
   P.refresh = function()
-    P.build_tree(P.path)
+    P.build_tree(P.path, function() end)
   end
 
   P.render = function()
@@ -444,7 +477,11 @@ function M.setup()
 
     if M.current == nil then
       M.current = M.create()
-      M.current.build_tree()
+      M.current.build_tree(nil, function()
+        M.current.open()
+        M.current.reveal_path(path)
+      end)
+      return
     end
 
     M.current.open()
