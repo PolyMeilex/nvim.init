@@ -155,8 +155,46 @@ local function create()
   end
 
   P.new_file = function()
+    local node = P.tree:get_node()
+    if node == nil then
+      return
+    end
+
+    if not node.is_directory then
+      node = P.tree:get_node(node:get_parent_id())
+    end
+
+    if node == nil then
+      return
+    end
+
     vim.ui.input({ prompt = "New Name: " }, function(res)
-      vim.print(res)
+      if res == nil then
+        return
+      end
+
+      res = vim.trim(res)
+      if #res == 0 then
+        return
+      end
+
+      local is_dir = vim.endswith(res, "/")
+      local destination = node.path .. "/" .. res
+
+      node:expand()
+
+      if is_dir then
+        uv.fs_mkdir(destination, 493)
+      else
+        local open_mode = uv.constants.O_CREAT + uv.constants.O_WRONLY + uv.constants.O_TRUNC
+        local fd = uv.fs_open(destination, open_mode, 420)
+
+        if fd then
+          uv.fs_close(fd)
+        end
+      end
+
+      P.refresh()
     end)
   end
 
@@ -303,7 +341,7 @@ local function create()
   P.map("n", "l", P.toggle)
   P.map("n", "h", P.toggle)
   P.map("n", "<Enter>", P.toggle)
-  P.map("n", "a", P.reveal_path)
+  P.map("n", "a", P.new_file)
   P.map("n", "d", P.delete)
   P.map("n", "y", P.copy)
   P.map("n", "p", P.paste)
