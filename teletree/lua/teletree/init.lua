@@ -151,9 +151,7 @@ local function create()
   end
 
   P.render = function()
-    if P.tree ~= nil then
-      P.tree:render()
-    end
+    P.tree:render()
   end
 
   P.new_file = function()
@@ -163,10 +161,6 @@ local function create()
   end
 
   P.reveal_path = function(path)
-    if P.tree == nil then
-      return
-    end
-
     path = strip_cwd_prefix(path)
     local segments = split_path(path)
 
@@ -193,12 +187,7 @@ local function create()
   end
 
   P.toggle = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
@@ -244,12 +233,7 @@ local function create()
   end
 
   P.delete = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
@@ -263,12 +247,7 @@ local function create()
   end
 
   P.copy = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
@@ -277,12 +256,7 @@ local function create()
   end
 
   P.paste = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
@@ -301,12 +275,7 @@ local function create()
   end
 
   P.live_grep = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
@@ -318,12 +287,7 @@ local function create()
   end
 
   P.find_files = function()
-    if P.tree == nil then
-      return
-    end
-
     local node = P.tree:get_node()
-
     if node == nil then
       return
     end
