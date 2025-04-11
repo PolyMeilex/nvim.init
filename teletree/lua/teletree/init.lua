@@ -378,9 +378,47 @@ function M.create()
       node = P.tree:get_node(node:get_parent_id())
     end
 
+    if node == nil then
+      return
+    end
+
     paste_from_clipboard("file://" .. node.path, function()
       P.refresh()
     end)
+  end
+
+  P.live_grep = function()
+    if P.tree == nil then
+      return
+    end
+
+    local node = P.tree:get_node()
+
+    if node == nil then
+      return
+    end
+
+    if node.is_directory then
+      P.close()
+      require("telescope.builtin").live_grep({ cwd = node.path })
+    end
+  end
+
+  P.find_files = function()
+    if P.tree == nil then
+      return
+    end
+
+    local node = P.tree:get_node()
+
+    if node == nil then
+      return
+    end
+
+    if node.is_directory then
+      P.close()
+      require("telescope").extensions.omni_picker.omni_picker({ cwd = node.path })
+    end
   end
 
   P.map("n", "<Esc>", P.close)
@@ -392,6 +430,8 @@ function M.create()
   P.map("n", "d", P.delete)
   P.map("n", "y", P.copy)
   P.map("n", "p", P.paste)
+  P.map("n", "<S-f>", P.live_grep)
+  P.map("n", "<c-f>", P.find_files)
 
   return P
 end
