@@ -38,7 +38,7 @@ local function scandir(directory)
     if not name then
       break
     end
-    if name ~= ".git" then
+    if name ~= ".git" and name ~= "node_modules" and name ~= "target" then
       table.insert(results, { name = name, type = type })
     end
   end
