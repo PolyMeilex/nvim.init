@@ -4,29 +4,9 @@ local web_devicons = require("nvim-web-devicons")
 local uv = vim.uv
 local async = require("plenary.async")
 
-local function copy_to_clipboard(text)
-  vim.system({ "wl-copy", "-t", "text/uri-list" }, { stdin = text })
-end
-
-local function paste_from_clipboard(parent, done)
-  vim.system({ "wl-paste", "-t", "text/uri-list" }, { text = true }, function(obj)
-    if obj.code ~= 0 then
-      print("Failed to paste from clipboard")
-      return
-    end
-
-    local file_urls = vim.split(obj.stdout, "\n")
-    for _, entry in pairs(file_urls) do
-      local file_url = vim.trim(entry)
-
-      if #file_url > 0 then
-        vim.system({ "gio", "copy", "-b", file_url, parent }, {}, function(out)
-          vim.schedule(done)
-        end)
-      end
-    end
-  end)
-end
+local render = require("teletree.render")
+local window = require("teletree.window")
+local clipboard = require("teletree.clipboard")
 
 ---@param list uv.fs_readdir.entry[]
 local function sort_readdir_entries(list)
@@ -119,123 +99,37 @@ local function scandir_async(directory, tree)
   return out
 end
 
-local function init_window(bufnr)
-  local P = {
-    bufnr = bufnr,
-  }
-
-  ---@param width number
-  ---@param height number
-  P.open = function(row, col, width, height)
-    local opts = {
-      style = "minimal",
-      relative = "editor",
-      width = width,
-      height = height,
-      row = row,
-      col = col,
-      border = "rounded",
-    }
-
-    P.winid = vim.api.nvim_open_win(P.bufnr, true, opts)
-    vim.wo[P.winid].cursorline = true
-    vim.wo[P.winid].number = true
-    vim.wo[P.winid].relativenumber = true
-    -- vim.wo[P.winid].winhighlight = "Normal:Pmenu"
-
-    if false then
-      vim.api.nvim_create_autocmd("BufLeave", {
-        buffer = P.bufnr,
-        callback = function()
-          P.close()
-        end,
-      })
-    end
-  end
-
-  P.close = function()
-    if P.winid ~= nil and vim.api.nvim_win_is_valid(P.winid) then
-      vim.api.nvim_win_close(P.winid, true)
-      P.winid = nil
-    end
-    -- if vim.api.nvim_buf_is_valid(P.bufnr) then
-    --   vim.api.nvim_buf_delete(P.bufnr, { force = true })
-    -- end
-  end
-
-  P.set_size = function(width, height)
-    vim.api.nvim_win_set_config(P.winid, {
-      width = width,
-      height = height,
-    })
-  end
-
-  return P
+local function split_path(path)
+  local separator = package.config:sub(1, 1) -- Returns "/" on Unix, "\\" on Windows
+  local segments = vim.split(path, separator, { plain = true, trimempty = true })
+  return segments
 end
 
-local function prepare_node(node, _)
-  if not node.text then
-    error("missing node.text")
+local function strip_cwd_prefix(path, cwd)
+  cwd = cwd or vim.fn.getcwd()
+  if path:sub(1, #cwd) == cwd then
+    path = path:sub(#cwd + 2) -- Strip the cwd part and the following "/"
   end
-
-  local texts = node.text
-
-  if type(node.text) ~= "table" or node.text.content then
-    texts = { node.text }
-  end
-
-  local lines = {}
-
-  for i, text in ipairs(texts) do
-    local line = NuiLine()
-
-    line:append(string.rep("  ", node._depth - 1))
-
-    if node.is_directory then
-      line:append(" ")
-      if node:is_expanded() then
-        line:append(" ", "GruvboxGreenBold")
-      else
-        line:append(" ", "GruvboxGreenBold")
-      end
-      line:append(text, "GruvboxGreenBold")
-    else
-      if node.icon then
-        line:append(" ")
-        line:append(node.icon, node.icon_highlight or "Normal")
-        line:append(" ")
-      else
-        line:append(" ")
-        line:append("")
-        line:append(" ")
-      end
-
-      line:append(text)
-    end
-
-    table.insert(lines, line)
-  end
-
-  return lines
+  return path
 end
 
 local M = {}
 
-function M.create()
+local function create()
   local bufnr = vim.api.nvim_create_buf(false, true)
 
   local P = {}
   P.tree = NuiTree({
     bufnr = bufnr,
     nodes = {},
-    prepare_node = prepare_node,
+    prepare_node = render.prepare_node,
     get_node_id = function(node)
       return node.path
     end,
   })
   P.path = nil
   P.bufnr = bufnr
-  P.window = init_window(bufnr)
+  P.window = window.init_window(bufnr)
 
   P.build_tree = function(path, cb)
     P.path = path or vim.fn.getcwd()
@@ -266,20 +160,6 @@ function M.create()
     vim.ui.input({ prompt = "New Name: " }, function(res)
       vim.print(res)
     end)
-  end
-
-  local function split_path(path)
-    local separator = package.config:sub(1, 1) -- Returns "/" on Unix, "\\" on Windows
-    local segments = vim.split(path, separator, { plain = true, trimempty = true })
-    return segments
-  end
-
-  local function strip_cwd_prefix(path, cwd)
-    local cwd = cwd or vim.fn.getcwd()
-    if path:sub(1, #cwd) == cwd then
-      path = path:sub(#cwd + 2) -- Strip the cwd part and the following "/"
-    end
-    return path
   end
 
   P.reveal_path = function(path)
@@ -393,7 +273,7 @@ function M.create()
       return
     end
 
-    copy_to_clipboard("file://" .. node.path)
+    clipboard.copy_to_clipboard("file://" .. node.path)
   end
 
   P.paste = function()
@@ -415,7 +295,7 @@ function M.create()
       return
     end
 
-    paste_from_clipboard("file://" .. node.path, function()
+    clipboard.paste_from_clipboard("file://" .. node.path, function()
       P.refresh()
     end)
   end
@@ -476,7 +356,7 @@ function M.setup()
     local path = vim.fn.expand("%:p")
 
     if M.current == nil then
-      M.current = M.create()
+      M.current = create()
       M.current.build_tree(nil, function()
         M.current.open()
         M.current.reveal_path(path)
