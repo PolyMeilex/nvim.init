@@ -107,11 +107,7 @@ local function split_path(path)
 end
 
 local function strip_cwd_prefix(path, cwd)
-  cwd = cwd or vim.fn.getcwd()
-  if path:sub(1, #cwd) == cwd then
-    path = path:sub(#cwd + 2) -- Strip the cwd part and the following "/"
-  end
-  return path
+  return Path:new(path):make_relative(cwd or vim.fn.getcwd())
 end
 
 local M = {}
@@ -161,7 +157,9 @@ local function create()
       return
     end
 
-    vim.ui.input({ prompt = "New Name: " }, function(res)
+    local split = split_path(node.path)
+
+    vim.ui.input({ prompt = "New Name: ", default = split[#split] }, function(res)
       if res == nil then
         return
       end
@@ -208,7 +206,7 @@ local function create()
       end
 
       local is_dir = vim.endswith(res, "/")
-      local destination = node.path .. "/" .. res
+      local destination = Path:new(node.path, res).filename
 
       node:expand()
 
@@ -307,7 +305,8 @@ local function create()
 
     vim.ui.input({ prompt = "Do you want to delete: " .. strip_cwd_prefix(node.path) .. "?" }, function(res)
       if res == "y" then
-        vim.fn.system({ "rm", "-Rf", node.path })
+        local path = Path:new(node.path)
+        path:rm({ recursive = path:is_dir() })
         P.refresh()
       end
     end)
