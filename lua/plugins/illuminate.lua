@@ -29,7 +29,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       return
     end
 
-    if not client.supports_method("textDocument/documentHighlight") then
+    if not client:supports_method("textDocument/documentHighlight") then
       return
     end
 

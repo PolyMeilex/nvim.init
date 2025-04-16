@@ -222,7 +222,7 @@ return {
   {
     "j-hui/fidget.nvim",
     enabled = IsNotVsCode,
-    tag = "v1.4.5",
+    tag = "v1.6.1",
     opts = {
       notification = {
         override_vim_notify = true,
