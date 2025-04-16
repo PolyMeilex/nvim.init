@@ -25,7 +25,9 @@ return {
     })
 
     vim.diagnostic.config({
-      virtual_text = true,
+      virtual_text = {
+        severity = vim.diagnostic.severity.ERROR,
+      },
       virtual_lines = {
         current_line = true,
       },
