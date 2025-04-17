@@ -8,60 +8,15 @@ local Path = require("plenary.path")
 local render = require("teletree.render")
 local window = require("teletree.window")
 local clipboard = require("teletree.clipboard")
+local io = require("teletree.io")
 
----@param list uv.fs_readdir.entry[]
-local function sort_readdir_entries(list)
-  table.sort(list, function(a, b)
-    if a.type == b.type then
-      return a.name < b.name
-    else
-      return a.type == "directory"
-    end
-  end)
-end
-
----@param directory string
----@param cb fun(out: uv.fs_readdir.entry[])
-local function readdir_async(directory, cb)
-  local MAX = 1000
-
-  uv.fs_opendir(directory, function(err, luv_dir)
-    if err then
-      return
-    end
-
-    local out = {}
-
-    ---@param _err string?
-    ---@param res uv.fs_readdir.entry[]
-    local function handle_readdir(_err, res)
-      if res then
-        vim.list_extend(out, res)
-
-        if #res >= MAX then
-          uv.fs_readdir(luv_dir, handle_readdir)
-          return
-        end
-      end
-
-      uv.fs_closedir(luv_dir)
-      sort_readdir_entries(out)
-      cb(out)
-    end
-
-    uv.fs_readdir(luv_dir, handle_readdir)
-  end, MAX)
-end
-local readdir_co = async.wrap(readdir_async, 2)
-
-local function scandir_async(directory, tree)
-  local res = readdir_co(directory)
+local function scandir_co(directory, tree)
+  local res = io.readdir_co(directory)
 
   local out = {}
 
-  local function load_item(entry)
+  local function load_item(path, entry, expanded)
     local icon, highlight = web_devicons.get_icon(entry.name)
-    local path = directory .. "/" .. entry.name
 
     local node = {
       text = entry.name,
@@ -70,11 +25,20 @@ local function scandir_async(directory, tree)
       icon = icon,
       icon_highlight = highlight,
       is_directory = entry.type == "directory",
+      is_loaded = entry.type == "file",
     }
 
     local n
     if node.is_directory then
-      n = NuiTree.Node(node, scandir_async(node.path, tree))
+      local children = {}
+      if expanded then
+        children = scandir_co(node.path, tree)
+      end
+
+      n = NuiTree.Node(node, children)
+      if expanded then
+        n:expand()
+      end
     else
       n = NuiTree.Node(node)
     end
@@ -84,20 +48,27 @@ local function scandir_async(directory, tree)
 
   for _key, entry in pairs(res) do
     if entry.name ~= ".git" then
-      local node = load_item(entry)
+      local path = directory .. "/" .. entry.name
 
-      local old_node = tree:get_node(node.path)
-      if old_node ~= nil then
-        if old_node:is_expanded() then
-          node:expand()
-        end
-      end
+      local old_node = tree:get_node(path)
+      local expanded = old_node ~= nil and old_node:is_expanded()
 
+      local node = load_item(path, entry, expanded)
       table.insert(out, node)
     end
   end
 
   return out
+end
+
+---@param directory string
+---@param tree NuiTree
+local function scandir_sync(directory, tree)
+  local nodes = {}
+  async.util.block_on(function()
+    nodes = scandir_co(directory, tree)
+  end, 5000)
+  return nodes
 end
 
 local function split_path(path)
@@ -108,6 +79,17 @@ end
 
 local function strip_cwd_prefix(path, cwd)
   return Path:new(path):make_relative(cwd or vim.fn.getcwd())
+end
+
+---@param node NuiTreeNode
+---@param tree NuiTree
+local function expand(node, tree)
+  if not node.is_loaded then
+    local nodes = scandir_sync(node.path, tree)
+    tree:set_nodes(nodes, node:get_id())
+    node.is_loaded = true
+  end
+  node:expand()
 end
 
 local M = {}
@@ -131,16 +113,11 @@ local function create()
   P.build_tree = function(path, cb)
     P.path = path or vim.fn.getcwd()
 
-    async.run(
-      function()
-        return scandir_async(P.path, P.tree)
-      end,
-      vim.schedule_wrap(function(nodes)
-        P.tree:set_nodes(nodes)
-        P.tree:render()
-        cb()
-      end)
-    )
+    local nodes = scandir_sync(P.path, P.tree)
+    P.tree:set_nodes(nodes)
+    P.tree:render()
+
+    cb()
   end
 
   P.refresh = function()
@@ -235,7 +212,7 @@ local function create()
     for _, segment in ipairs(segments) do
       for _, child in ipairs(children) do
         if child.text == segment then
-          child:expand()
+          P.expand(child)
           node_id = child:get_id()
           children = P.tree:get_nodes(node_id)
         end
@@ -251,17 +228,22 @@ local function create()
     end
   end
 
+  ---@param node NuiTreeNode
+  P.expand = function(node)
+    expand(node, P.tree)
+  end
+
   P.toggle = function()
     local node = P.tree:get_node()
     if node == nil then
       return
     end
 
-    if node:has_children() then
+    if node.is_directory then
       if node:is_expanded() then
         node:collapse()
       else
-        node:expand()
+        P.expand(node)
       end
     else
       P.window.close()
