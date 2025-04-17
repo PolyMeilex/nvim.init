@@ -46,6 +46,13 @@ return {
 
       require("lspconfig").dartls.setup({ capabilities = lsp_capabilities() })
 
+      -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
+      vim.lsp.config["stylua-lsp-rs"] = {
+        cmd = { "stylua", "--lsp" },
+        filetypes = { "lua" },
+      }
+      vim.lsp.enable("stylua-lsp-rs")
+
       vim.api.nvim_create_autocmd("LspAttach", {
         desc = "LSP attach actions",
         callback = function(event)

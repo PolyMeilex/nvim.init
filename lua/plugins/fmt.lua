@@ -10,12 +10,17 @@ return {
         on_save = true,
       },
       lua = {
-        lsp_name = "stylua-lsp", -- Prefer stylua over lua_ls
+        -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
+        lsp_name = "stylua-lsp-rs", -- Prefer stylua over lua_ls
         on_save = true,
-        startup = function(buffer)
-          require("fmt.stylua").start(buffer)
-        end,
       },
+      -- lua = {
+      --   lsp_name = "stylua-lsp", -- Prefer stylua over lua_ls
+      --   on_save = true,
+      --   startup = function(buffer)
+      --     require("fmt.stylua").start(buffer)
+      --   end,
+      -- },
     },
     on_attach = function(buffer, format)
       local opts = { buffer = buffer }
