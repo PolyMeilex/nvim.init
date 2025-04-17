@@ -269,8 +269,8 @@ local function create()
     local parent_id = node:get_parent_id()
     if parent_id ~= nil then
       local _parent, linenr = P.tree:get_node(parent_id)
-      if linenr ~= nil then
-        vim.api.nvim_win_set_cursor(0, { linenr, 0 })
+      if linenr ~= nil and P.window.winid ~= nil then
+        vim.api.nvim_win_set_cursor(P.window.winid, { linenr, 0 })
       end
     end
   end
