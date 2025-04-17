@@ -183,21 +183,17 @@ local function create()
       end
 
       local is_dir = vim.endswith(res, "/")
-      local destination = Path:new(node.path, res).filename
 
-      node:expand()
+      ---@type Path
+      local destination = Path:new(node.path, res)
 
       if is_dir then
-        uv.fs_mkdir(destination, 493)
+        destination:mkdir({ parents = true })
       else
-        local open_mode = uv.constants.O_CREAT + uv.constants.O_WRONLY + uv.constants.O_TRUNC
-        local fd = uv.fs_open(destination, open_mode, 420)
-
-        if fd then
-          uv.fs_close(fd)
-        end
+        destination:touch({ parents = true })
       end
 
+      node:expand()
       P.refresh()
     end)
   end
