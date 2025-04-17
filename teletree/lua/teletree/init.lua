@@ -1,7 +1,5 @@
 local NuiTree = require("nui.tree")
-local NuiLine = require("nui.line")
 local web_devicons = require("nvim-web-devicons")
-local uv = vim.uv
 local async = require("plenary.async")
 local Path = require("plenary.path")
 
@@ -10,14 +8,30 @@ local window = require("teletree.window")
 local clipboard = require("teletree.clipboard")
 local io = require("teletree.io")
 
+---@class TeletreeNodeData
+---@field text string
+---@field type string
+---@field path string
+---@field icon string
+---@field icon_highlight string
+---@field is_directory boolean
+---@field is_loaded boolean
+---
+---@alias TeletreeNode TeletreeNodeData | NuiTree.Node
+
+---@param directory string
+---@param tree NuiTree
+---@return TeletreeNode[]
 local function scandir_co(directory, tree)
   local res = io.readdir_co(directory)
 
   local out = {}
 
+  ---@return TeletreeNode
   local function load_item(path, entry, expanded)
     local icon, highlight = web_devicons.get_icon(entry.name)
 
+    ---@type TeletreeNodeData
     local node = {
       text = entry.name,
       type = entry.type,
@@ -46,10 +60,11 @@ local function scandir_co(directory, tree)
     return n
   end
 
-  for _key, entry in pairs(res) do
+  for _, entry in pairs(res) do
     if entry.name ~= ".git" then
-      local path = directory .. "/" .. entry.name
+      local path = Path:new(directory, entry.name).filename
 
+      ---@type TeletreeNode | nil
       local old_node = tree:get_node(path)
       local expanded = old_node ~= nil and old_node:is_expanded()
 
@@ -63,6 +78,7 @@ end
 
 ---@param directory string
 ---@param tree NuiTree
+---@return TeletreeNode[]
 local function scandir_sync(directory, tree)
   local nodes = {}
   async.util.block_on(function()
@@ -81,7 +97,7 @@ local function strip_cwd_prefix(path, cwd)
   return Path:new(path):make_relative(cwd or vim.fn.getcwd())
 end
 
----@param node NuiTreeNode
+---@param node TeletreeNode
 ---@param tree NuiTree
 local function expand(node, tree)
   if not node.is_loaded then
@@ -102,6 +118,7 @@ local function create()
     bufnr = bufnr,
     nodes = {},
     prepare_node = render.prepare_node,
+    ---@param node TeletreeNode
     get_node_id = function(node)
       return node.path
     end,
@@ -128,8 +145,16 @@ local function create()
     P.tree:render()
   end
 
+  ---@param node_id_or_linenr? string | integer
+  ---@return TeletreeNode|nil node
+  ---@return nil|integer linenr
+  ---@return nil|integer linenr
+  P.get_node = function(node_id_or_linenr)
+    return P.tree:get_node(node_id_or_linenr)
+  end
+
   P.rename = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -159,13 +184,13 @@ local function create()
   end
 
   P.new_file = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
 
     if not node.is_directory then
-      node = P.tree:get_node(node:get_parent_id())
+      node = P.get_node(node:get_parent_id())
     end
 
     if node == nil then
@@ -217,20 +242,20 @@ local function create()
 
     P.render()
 
-    local _, linenr = P.tree:get_node(node_id)
+    local _, linenr = P.get_node(node_id)
 
     if P.window.winid ~= nil and linenr ~= nil then
       vim.api.nvim_win_set_cursor(P.window.winid, { linenr, 0 })
     end
   end
 
-  ---@param node NuiTreeNode
+  ---@param node TeletreeNode
   P.expand = function(node)
     expand(node, P.tree)
   end
 
   P.enter = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -246,7 +271,7 @@ local function create()
   end
 
   P.exit = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -261,14 +286,14 @@ local function create()
   end
 
   P.jump_to_parent = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
 
     local parent_id = node:get_parent_id()
     if parent_id ~= nil then
-      local _parent, linenr = P.tree:get_node(parent_id)
+      local _, linenr = P.get_node(parent_id)
       if linenr ~= nil and P.window.winid ~= nil then
         vim.api.nvim_win_set_cursor(P.window.winid, { linenr, 0 })
       end
@@ -302,7 +327,7 @@ local function create()
   end
 
   P.delete = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -317,7 +342,7 @@ local function create()
   end
 
   P.copy = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -326,13 +351,13 @@ local function create()
   end
 
   P.paste = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
 
     if not node.is_directory then
-      node = P.tree:get_node(node:get_parent_id())
+      node = P.get_node(node:get_parent_id())
     end
 
     if node == nil then
@@ -345,7 +370,7 @@ local function create()
   end
 
   P.live_grep = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end
@@ -357,7 +382,7 @@ local function create()
   end
 
   P.find_files = function()
-    local node = P.tree:get_node()
+    local node = P.get_node()
     if node == nil then
       return
     end

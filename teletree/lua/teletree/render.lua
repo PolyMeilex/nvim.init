@@ -2,6 +2,7 @@ local NuiLine = require("nui.line")
 
 local M = {}
 
+---@param node TeletreeNode
 function M.prepare_node(node, _)
   if not node.text then
     error("missing node.text")
