@@ -412,22 +412,22 @@ end
 
 M.current = nil
 
-function M.setup()
-  vim.keymap.set("n", "<C-e>", function()
-    local path = vim.fn.expand("%:p")
+function M.open()
+  local path = vim.fn.expand("%:p")
 
-    if M.current == nil then
-      M.current = create()
-      M.current.build_tree(nil, function()
-        M.current.open()
-        M.current.reveal_path(path)
-      end)
-      return
-    end
+  if M.current == nil then
+    M.current = create()
+    M.current.build_tree(nil, function()
+      M.current.open()
+      M.current.reveal_path(path)
+    end)
+    return
+  end
 
-    M.current.open()
-    M.current.reveal_path(path)
-  end)
+  M.current.open()
+  M.current.reveal_path(path)
 end
+
+function M.setup() end
 
 return M

@@ -40,6 +40,23 @@ return {
     "neovim/nvim-lspconfig",
     enabled = IsNotVsCode,
     config = function()
+      vim.diagnostic.config({
+        virtual_text = {
+          severity = vim.diagnostic.severity.ERROR,
+        },
+        -- virtual_lines = {
+        --   current_line = true,
+        -- },
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN] = " ",
+            [vim.diagnostic.severity.INFO] = " ",
+            [vim.diagnostic.severity.HINT] = "󰌵",
+          },
+        },
+      })
+
       vim.api.nvim_create_user_command("LspToggleInlayHints", function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
       end, {})
