@@ -233,24 +233,50 @@ local function create()
     expand(node, P.tree)
   end
 
-  P.toggle = function()
+  P.enter = function()
     local node = P.tree:get_node()
     if node == nil then
       return
     end
 
     if node.is_directory then
-      if node:is_expanded() then
-        node:collapse()
-      else
-        P.expand(node)
-      end
+      P.expand(node)
     else
       P.window.close()
       vim.api.nvim_command("edit " .. node.path)
     end
 
     P.render()
+  end
+
+  P.exit = function()
+    local node = P.tree:get_node()
+    if node == nil then
+      return
+    end
+
+    if node.is_directory then
+      node:collapse()
+    else
+      P.jump_to_parent()
+    end
+
+    P.render()
+  end
+
+  P.jump_to_parent = function()
+    local node = P.tree:get_node()
+    if node == nil then
+      return
+    end
+
+    local parent_id = node:get_parent_id()
+    if parent_id ~= nil then
+      local _parent, linenr = P.tree:get_node(parent_id)
+      if linenr ~= nil then
+        vim.api.nvim_win_set_cursor(0, { linenr, 0 })
+      end
+    end
   end
 
   P.close = function()
@@ -348,9 +374,10 @@ local function create()
 
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
-  P.map("n", "l", P.toggle)
-  P.map("n", "h", P.toggle)
-  P.map("n", "<Enter>", P.toggle)
+  P.map("n", "l", P.enter)
+  P.map("n", "h", P.exit)
+  P.map("n", "<S-h>", P.jump_to_parent)
+  P.map("n", "<Enter>", P.enter)
   P.map("n", "r", P.rename)
   P.map("n", "a", P.new_file)
   P.map("n", "d", P.delete)
