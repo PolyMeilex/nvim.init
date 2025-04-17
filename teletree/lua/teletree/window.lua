@@ -11,8 +11,8 @@ function M.init_window(bufnr)
     local opts = {
       style = "minimal",
       relative = "editor",
-      width = width,
-      height = height,
+      width = math.floor(width),
+      height = math.floor(height),
       row = row,
       col = col,
       border = "rounded",
