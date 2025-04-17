@@ -5,6 +5,7 @@ local Path = require("plenary.path")
 
 ---@class RailgunDbProjectData
 ---@field files table<string, RailgunDbTargetData[]>
+---@field marks table<string>
 
 ---@class RailgunDbTargetData
 ---@field annotation? string
@@ -74,6 +75,22 @@ function M:add(project_path, file_path, line, col, annotation)
   files[relative_file] = file
 
   project.files = files
+  self.data.projects[project_path] = project
+
+  self:save()
+end
+
+---@param project_path string
+---@param file_path string
+function M:add_quick_mark(project_path, file_path)
+  local project = self.data.projects[project_path] or {}
+
+  local marks = project.marks or {}
+
+  local relative_file = Path:new(file_path):make_relative(project_path)
+  table.insert(marks, relative_file)
+
+  project.marks = marks
   self.data.projects[project_path] = project
 
   self:save()
