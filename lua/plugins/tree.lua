@@ -28,9 +28,9 @@ return {
       virtual_text = {
         severity = vim.diagnostic.severity.ERROR,
       },
-      virtual_lines = {
-        current_line = true,
-      },
+      -- virtual_lines = {
+      --   current_line = true,
+      -- },
       signs = {
         text = {
           [vim.diagnostic.severity.ERROR] = " ",
