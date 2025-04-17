@@ -202,7 +202,7 @@ _G.my_statusline = function()
 
   local git_icon = add_on_click(1, "my_git_blame_button", "")
 
-  if vim.g.gitblame_enabled then
+  if require("gitblame").on then
     git_icon = add_hl("GruvboxOrange", git_icon)
   else
     git_icon = add_hl("GruvboxFg0", git_icon)
