@@ -4,6 +4,7 @@ return {
   {
     "nvim-tree/nvim-web-devicons",
     enabled = IsNotVsCode,
+    lazy = true,
     opts = {
       override = {
         rs = {
@@ -24,6 +25,7 @@ return {
       "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
     },
+    cmd = "Neotree",
     opts = {},
   },
   {

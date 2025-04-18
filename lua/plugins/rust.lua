@@ -47,6 +47,7 @@ return {
   {
     "saecki/crates.nvim",
     enabled = IsNotVsCode,
+    ft = "toml",
     -- tag = 'stable',
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
@@ -73,6 +74,7 @@ return {
   {
     "vxpm/ferris.nvim",
     enabled = IsNotVsCode,
+    ft = "rust",
     opts = {
       create_commands = true,
     },

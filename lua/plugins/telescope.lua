@@ -35,6 +35,7 @@ return {
       dir = "~/.config/nvim/omni_picker",
     },
   },
+  keys = { "tpf", "<C-p>", "tc", "tf", "tF", "to", "tb", "tt", "tl", "td", "tD", "ts" },
   config = function()
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")

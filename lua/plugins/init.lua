@@ -1,7 +1,10 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
-  "bkad/CamelCaseMotion",
+  {
+    "bkad/CamelCaseMotion",
+    keys = { "<leader>" },
+  },
   {
     dir = "~/.config/nvim/yaml_utils",
     ft = "yaml",
@@ -10,12 +13,14 @@ return {
   },
   {
     dir = "~/.config/nvim/json_utils",
+    ft = "json",
     enabled = IsNotVsCode,
     opts = {},
   },
   {
     dir = "~/.config/nvim/rs-derive-menu",
     enabled = IsNotVsCode,
+    ft = "rust",
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {},
   },
@@ -23,13 +28,15 @@ return {
     dir = "~/.config/nvim/railgun",
     dependencies = { "nvim-lua/plenary.nvim" },
     enabled = IsNotVsCode,
-    config = function()
-      require("railgun").setup()
-
-      vim.keymap.set("n", "tm", function()
-        require("telescope").extensions.railgun.list()
-      end, {})
-    end,
+    keys = {
+      {
+        "tm",
+        function()
+          require("telescope").extensions.railgun.list()
+        end,
+      },
+    },
+    opts = {},
   },
   {
     "echasnovski/mini.surround",
