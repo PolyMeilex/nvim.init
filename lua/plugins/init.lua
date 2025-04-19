@@ -1,10 +1,7 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
 
 return {
-  {
-    "bkad/CamelCaseMotion",
-    keys = { "<leader>" },
-  },
+  "bkad/CamelCaseMotion",
   {
     dir = "~/.config/nvim/yaml_utils",
     ft = "yaml",
