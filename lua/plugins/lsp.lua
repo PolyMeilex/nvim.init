@@ -192,11 +192,6 @@ return {
       ensure_installed = { "rust_analyzer", "taplo", "lua_ls" },
       handlers = {
         function(server_name)
-          -- TODO: Remove once mason is updated
-          if server_name == "tsserver" then
-            server_name = "ts_ls"
-          end
-
           require("lspconfig")[server_name].setup({ capabilities = lsp_capabilities() })
         end,
         jsonls = function()
