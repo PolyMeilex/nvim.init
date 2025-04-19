@@ -72,7 +72,7 @@ return {
     end,
   },
   {
-    "vxpm/ferris.nvim",
+    dir = "~/.config/nvim/ferris",
     enabled = IsNotVsCode,
     ft = "rust",
     opts = {
