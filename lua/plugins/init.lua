@@ -39,23 +39,15 @@ return {
     opts = {},
   },
   {
+    dir = "~/.config/nvim/black-hole",
+    opts = {},
+  },
+  {
     "echasnovski/mini.surround",
     version = "*",
     opts = {
       n_lines = 1000,
     },
-  },
-  {
-    "svermeulen/vim-cutlass",
-    config = function()
-      vim.keymap.set("n", "m", "d")
-      vim.keymap.set("x", "m", "d")
-
-      vim.keymap.set("n", "mm", "dd")
-      vim.keymap.set("n", "M", "D")
-      vim.keymap.set("v", "P", "p")
-      vim.keymap.set("v", "p", "P")
-    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",
