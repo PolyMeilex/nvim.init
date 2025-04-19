@@ -178,7 +178,7 @@ _G.my_winbar = function()
     return ""
   end
 
-  return my_navic() .. " " .. spinner.label() .. "%=" .. hjkl_harpoon()
+  return my_navic() .. " " .. spinner.label() .. " " .. add_hl("Comment", vim.lsp.status()) .. "%=" .. hjkl_harpoon()
 end
 
 _G.my_git_blame_button = function()
@@ -241,5 +241,7 @@ return {
 
     vim.o.winbar = "%{%v:lua.my_winbar()%}"
     vim.o.statusline = "%{%v:lua.my_statusline()%}"
+
+    vim.cmd("autocmd LspProgress * redrawstatus")
   end,
 }

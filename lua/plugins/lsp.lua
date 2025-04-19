@@ -243,18 +243,4 @@ return {
       },
     },
   },
-  {
-    "j-hui/fidget.nvim",
-    enabled = IsNotVsCode,
-    tag = "v1.6.1",
-    opts = {
-      notification = {
-        override_vim_notify = true,
-        window = {
-          align = "top",
-          y_padding = 2,
-        },
-      },
-    },
-  },
 }
