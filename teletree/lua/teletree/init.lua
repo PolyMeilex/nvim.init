@@ -395,8 +395,13 @@ local function create()
 
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
+
+  P.map("n", "<Right>", P.enter)
   P.map("n", "l", P.enter)
+
+  P.map("n", "<Left>", P.exit)
   P.map("n", "h", P.exit)
+
   P.map("n", "<S-h>", P.jump_to_parent)
   P.map("n", "<Enter>", P.enter)
   P.map("n", "r", P.rename)
