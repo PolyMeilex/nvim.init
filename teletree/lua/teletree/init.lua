@@ -276,7 +276,7 @@ local function create()
       return
     end
 
-    if node.is_directory then
+    if node.is_directory and node:is_expanded() then
       node:collapse()
     else
       P.jump_to_parent()
