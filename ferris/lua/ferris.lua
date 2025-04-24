@@ -34,7 +34,6 @@ function M.create_commands(bufnr)
   end
 
   cmd("FerrisExpandMacro", "ferris.methods.expand_macro")
-  cmd("FerrisJoinLines", "ferris.methods.join_lines", { range = true })
   cmd("FerrisViewMemoryLayout", "ferris.methods.view_memory_layout")
   cmd("FerrisOpenCargoToml", "ferris.methods.open_cargo_toml")
   cmd("FerrisOpenParentModule", "ferris.methods.open_parent_module")
