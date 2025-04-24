@@ -210,7 +210,13 @@ local function create()
       local is_dir = vim.endswith(res, "/")
 
       ---@type Path
-      local destination = Path:new(node.path, res)
+      local parent = Path:new(node.path)
+      if not parent:is_dir() then
+        parent = parent:parent()
+      end
+
+      ---@type Path
+      local destination = Path:new(parent, res)
 
       if is_dir then
         destination:mkdir({ parents = true })
