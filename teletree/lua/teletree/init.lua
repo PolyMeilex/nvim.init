@@ -7,6 +7,7 @@ local render = require("teletree.render")
 local window = require("teletree.window")
 local clipboard = require("teletree.clipboard")
 local io = require("teletree.io")
+local utils = require("teletree.utils")
 
 ---@class TeletreeNodeData
 ---@field text string
@@ -87,12 +88,6 @@ local function scandir_sync(directory, tree)
   return nodes
 end
 
-local function split_path(path)
-  local separator = package.config:sub(1, 1) -- Returns "/" on Unix, "\\" on Windows
-  local segments = vim.split(path, separator, { plain = true, trimempty = true })
-  return segments
-end
-
 local function strip_cwd_prefix(path, cwd)
   return Path:new(path):make_relative(cwd or vim.fn.getcwd())
 end
@@ -159,7 +154,7 @@ local function create()
       return
     end
 
-    local split = split_path(node.path)
+    local split = utils.split_path(node.path)
 
     vim.ui.input({ prompt = "New Name: ", default = split[#split] }, function(res)
       if res == nil then
@@ -231,7 +226,7 @@ local function create()
 
   P.reveal_path = function(path)
     path = strip_cwd_prefix(path)
-    local segments = split_path(path)
+    local segments = utils.split_path(path)
 
     local node_id = nil
 
@@ -353,7 +348,7 @@ local function create()
       return
     end
 
-    clipboard.copy_to_clipboard("file://" .. node.path)
+    clipboard.copy_to_clipboard(node.path)
   end
 
   P.paste = function()
@@ -370,7 +365,7 @@ local function create()
       return
     end
 
-    clipboard.paste_from_clipboard("file://" .. node.path, function()
+    clipboard.paste_from_clipboard(node.path, function()
       P.refresh()
     end)
   end
