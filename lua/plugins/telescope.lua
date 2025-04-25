@@ -41,7 +41,7 @@ return {
     local builtin = require("telescope.builtin")
     local actions = require("telescope.actions")
 
-    vim.keymap.set("n", "tpf", builtin.find_files, {})
+    vim.keymap.set("n", "tng", builtin.find_files, {})
     vim.keymap.set("n", "<C-p>", project_files, {})
     vim.keymap.set("n", "tc", builtin.commands, {})
     vim.keymap.set("n", "tf", builtin.current_buffer_fuzzy_find, {})
@@ -62,6 +62,7 @@ return {
       builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
     end, {})
     vim.keymap.set("n", "ts", telescope.extensions.omni_picker.omni_picker, {})
+    vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
 
     telescope.setup({
       pickers = {
