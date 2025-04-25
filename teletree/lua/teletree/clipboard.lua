@@ -19,22 +19,25 @@ function M.paste_from_clipboard(parent, done)
     end
 
     local file_urls = vim.split(obj.stdout, "\n")
-    for _, entry in pairs(file_urls) do
-      local file_url = vim.trim(entry)
 
-      local path = strip_uri(file_url)
+    vim.schedule(function()
+      for _, entry in pairs(file_urls) do
+        local file_url = vim.trim(entry)
 
-      --- @type Path
-      local file_path = Path:new(path)
-      --- @type Path
-      local destination = Path:new(parent, utils.path_last_segment(path))
+        local path = strip_uri(file_url)
 
-      if #path > 0 then
-        file_path:copy({ recursive = true, destination = destination, interactive = true, parents = true })
+        --- @type Path
+        local file_path = Path:new(path)
+        --- @type Path
+        local destination = Path:new(parent, utils.path_last_segment(path))
+
+        if #path > 0 then
+          file_path:copy({ recursive = true, destination = destination, interactive = true, parents = true })
+        end
       end
-    end
 
-    vim.schedule(done)
+      done()
+    end)
   end)
 end
 
