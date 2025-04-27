@@ -74,7 +74,6 @@ return {
         desc = "LSP attach actions",
         callback = function(event)
           local bufnr = event.buf
-          local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
 
           ---@type vim.lsp.Client|nil
           local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -96,13 +95,17 @@ return {
           vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
 
           vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
-          vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-          vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+          vim.keymap.set("n", "[d", function()
+            vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.WARN } })
+          end, opts)
+          vim.keymap.set("n", "]d", function()
+            vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.WARN } })
+          end, opts)
           vim.keymap.set("n", "[D", function()
-            vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+            vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.ERROR } })
           end, opts)
           vim.keymap.set("n", "]D", function()
-            vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+            vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.ERROR } })
           end, opts)
         end,
       })
