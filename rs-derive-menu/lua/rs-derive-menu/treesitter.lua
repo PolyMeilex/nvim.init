@@ -137,7 +137,11 @@ M.replace_derive = function(info, derive_list)
     end
   end
 
-  local out = "#[derive(" .. table.concat(derives, ", ") .. ")]"
+  local out = ""
+  if #derives ~= 0 then
+    out = "#[derive(" .. table.concat(derives, ", ") .. ")]"
+  end
+
   if info.replace then
     vim.api.nvim_buf_set_lines(info.bufnr, info.start_line, info.end_line + 1, false, { out })
   else
