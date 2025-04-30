@@ -158,9 +158,7 @@ local function create()
       return
     end
 
-    local split = utils.split_path(node.path)
-
-    vim.ui.input({ prompt = "New Name: ", default = split[#split] }, function(res)
+    vim.ui.input({ prompt = "New Name: ", default = vim.fs.basename(node.path) }, function(res)
       if res == nil then
         return
       end
@@ -174,10 +172,8 @@ local function create()
       local path = Path:new(node.path)
       ---@type Path
       local parent = path:parent()
-      ---@type Path
-      local new_name = parent:joinpath(res)
 
-      path:rename({ new_name = new_name.filename })
+      path:rename({ new_name = vim.fs.joinpath(parent.filename, res) })
       P.refresh()
     end)
   end

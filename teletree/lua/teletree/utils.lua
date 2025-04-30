@@ -6,9 +6,4 @@ function M.split_path(path)
   return segments
 end
 
-function M.path_last_segment(path)
-  local split = M.split_path(path)
-  return split[#split]
-end
-
 return M
