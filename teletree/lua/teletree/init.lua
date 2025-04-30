@@ -8,6 +8,7 @@ local window = require("teletree.window")
 local clipboard = require("teletree.clipboard")
 local io = require("teletree.io")
 local utils = require("teletree.utils")
+local diagnostics = require("teletree.diagnostics")
 
 ---@class TeletreeNodeData
 ---@field text string
@@ -41,6 +42,7 @@ local function scandir_co(directory, tree)
       icon_highlight = highlight,
       is_directory = entry.type == "directory",
       is_loaded = entry.type == "file",
+      diagnostics = diagnostics.get(path),
     }
 
     local n
@@ -123,6 +125,8 @@ local function create()
   P.window = window.init_window(bufnr)
 
   P.build_tree = function(path, cb)
+    diagnostics.load()
+
     P.path = path or vim.fn.getcwd()
 
     local nodes = scandir_sync(P.path, P.tree)

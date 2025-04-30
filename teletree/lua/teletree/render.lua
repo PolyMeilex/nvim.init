@@ -16,10 +16,20 @@ function M.prepare_node(node, _)
 
   local lines = {}
 
-  for i, text in ipairs(texts) do
+  for _, text in pairs(texts) do
     local line = NuiLine()
 
     line:append(string.rep("  ", node._depth - 1))
+
+    local hi = nil
+    local icon = nil
+    if node.diagnostics == vim.diagnostic.severity.ERROR then
+      hi = "DiagnosticError"
+      icon = ""
+    elseif node.diagnostics == vim.diagnostic.severity.WARN then
+      hi = "DiagnosticWarn"
+      icon = ""
+    end
 
     if node.is_directory then
       line:append(" ")
@@ -28,7 +38,7 @@ function M.prepare_node(node, _)
       else
         line:append(" ", "GruvboxGreenBold")
       end
-      line:append(text, "GruvboxGreenBold")
+      line:append(text, hi or "GruvboxGreenBold")
     else
       if node.icon then
         line:append(" ")
@@ -40,7 +50,12 @@ function M.prepare_node(node, _)
         line:append(" ")
       end
 
-      line:append(text)
+      line:append(text, hi)
+    end
+
+    if icon then
+      line:append(" ")
+      line:append(icon, hi)
     end
 
     table.insert(lines, line)
