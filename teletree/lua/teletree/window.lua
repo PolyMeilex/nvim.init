@@ -22,6 +22,8 @@ function M.init_window(bufnr)
     vim.wo[P.winid].cursorline = true
     vim.wo[P.winid].number = true
     vim.wo[P.winid].relativenumber = true
+    vim.wo[P.winid].wrap = false
+
     -- vim.wo[P.winid].winhighlight = "Normal:Pmenu"
 
     if false then

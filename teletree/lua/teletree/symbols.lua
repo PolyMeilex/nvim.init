@@ -73,7 +73,10 @@ local function build_node(res)
   end
 
   i = i + 1
-  local node = NuiTree.Node({ id = i, name = name, kind = res.kind, text = icons[res.kind] .. name }, children)
+  local node = NuiTree.Node(
+    { id = i, name = name, kind = res.kind, text = icons[res.kind] .. name, detail = res.detail or "" },
+    children
+  )
   node:expand()
   return node
 end
@@ -100,7 +103,7 @@ function M.get(bufnr)
   local out = {}
 
   for client_id, client in pairs(res) do
-    if vim.lsp.get_client_by_id(client_id).name ~= "rust_analyzer" and client.error and client.result then
+    if vim.lsp.get_client_by_id(client_id).name ~= "rust_analyzer" or client.error or not client.result then
     else
       for _, n in pairs(client.result) do
         table.insert(out, build_node(n))
@@ -135,6 +138,7 @@ function M.create()
       end
 
       line:append(node.text, "NavicIcons" .. lsp_num_to_str[node.kind])
+      line:append(" " .. node.detail, "Comment")
 
       return line
     end,
