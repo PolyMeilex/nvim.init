@@ -10,7 +10,7 @@ local icons = {
   [3] = "󰌗 ", -- Namespace
   [4] = " ", -- Package
   [5] = "󰌗 ", -- Class
-  [6] = "󰆧 ", -- Method
+  [6] = "󰊕 ", -- Method
   [7] = " ", -- Property
   [8] = " ", -- Field
   [9] = " ", -- Constructor
@@ -72,12 +72,18 @@ local function build_node(res)
     table.insert(children, build_node(ch))
   end
 
+  local detail = res.detail or ""
+  -- Probably a bug in rust_analyzer, extra space after `fn(` in multiline signatures
+  if vim.startswith(detail, "fn( ") then
+    detail = detail:sub(1, 3) .. detail:sub(5)
+  end
+
   i = i + 1
-  local node = NuiTree.Node(
-    { id = i, name = name, kind = res.kind, text = icons[res.kind] .. name, detail = res.detail or "" },
-    children
-  )
-  node:expand()
+  local node =
+    NuiTree.Node({ id = i, name = name, kind = res.kind, text = icons[res.kind] .. name, detail = detail }, children)
+  if res.kind ~= 6 and res.kind ~= 12 then
+    node:expand()
+  end
   return node
 end
 
@@ -102,9 +108,8 @@ function M.get(bufnr)
 
   local out = {}
 
-  for client_id, client in pairs(res) do
-    if vim.lsp.get_client_by_id(client_id).name ~= "rust_analyzer" or client.error or not client.result then
-    else
+  for _, client in pairs(res) do
+    if client.result then
       for _, n in pairs(client.result) do
         table.insert(out, build_node(n))
       end
@@ -146,14 +151,16 @@ function M.create()
   P.path = nil
   P.bufnr = bufnr
   P.window = window.init_window(bufnr)
+  P.source_buf = 0
 
-  P.build_tree = function(bufnr)
-    P.tree:set_nodes(M.get(bufnr))
+  P.build_tree = function(source_buf)
+    P.source_buf = source_buf
+    P.tree:set_nodes(M.get(source_buf))
     P.tree:render()
   end
 
   P.refresh = function()
-    P.build_tree(0)
+    P.build_tree(P.source_buf)
   end
 
   P.render = function()
@@ -166,6 +173,31 @@ function M.create()
   ---@return nil|integer linenr
   P.get_node = function(node_id_or_linenr)
     return P.tree:get_node(node_id_or_linenr)
+  end
+
+  P.expand = function()
+    local node = P.get_node()
+    if node == nil then
+      return
+    end
+
+    node:expand()
+    P.render()
+  end
+
+  P.collapse = function()
+    local node = P.get_node()
+    if node == nil then
+      return
+    end
+
+    if node:is_expanded() then
+      node:collapse()
+    else
+      P.jump_to_parent()
+    end
+
+    P.render()
   end
 
   P.close = function()
@@ -197,12 +229,19 @@ function M.create()
   P.map("n", "<Esc>", P.close)
   P.map("n", "<F5>", P.refresh)
 
+  P.map("n", "<Right>", P.expand)
+  P.map("n", "l", P.expand)
+
+  P.map("n", "<Left>", P.collapse)
+  P.map("n", "h", P.collapse)
+
   return P
 end
 
 function M.open(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   local current = M.create()
-  current.build_tree(bufnr or 0)
+  current.build_tree(bufnr)
   current.open()
 end
 

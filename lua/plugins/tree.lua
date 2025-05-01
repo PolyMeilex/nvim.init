@@ -32,6 +32,13 @@ return {
         end,
         desc = "TeleTree",
       },
+      {
+        "<C-s>",
+        function()
+          require("teletree.symbols").open()
+        end,
+        desc = "TeleTree",
+      },
     },
   },
 }

@@ -434,10 +434,6 @@ function M.open()
   M.current.reveal_path(path)
 end
 
-function M.setup()
-  vim.keymap.set("n", "<C-s>", function()
-    require("teletree.symbols").open()
-  end)
-end
+function M.setup() end
 
 return M
