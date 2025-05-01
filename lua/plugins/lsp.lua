@@ -209,24 +209,81 @@ return {
         rust_analyzer = function()
           require("lspconfig").rust_analyzer.setup({
             capabilities = lsp_capabilities(),
-            on_attach = function(client, bufnr)
-              -- Remove once https://github.com/neovim/neovim/pull/32999 is merged
-              client.server_capabilities.inlayHintProvider = false
-            end,
             settings = {
               ["rust-analyzer"] = {
-                checkOnSave = {
+                checkOnSave = true,
+                check = {
                   command = "clippy",
                 },
-                lens = {
-                  enable = true,
-                  implementations = { enable = true },
-                  references = {
-                    adt = { enable = true },
-                    trait = { enable = true },
+                completion = {
+                  snippets = {
+                    custom = {
+                      rccell = {
+                        postfix = "rccell",
+                        body = "Rc::new(RefCell::new(${receiver}))",
+                        requires = { "std::rc::Rc", "std::cell::RefCell" },
+                        description = "Put the expression into an `Rc`",
+                        scope = "expr",
+                      },
+                      ["RefCell::new"] = {
+                        postfix = "refcell",
+                        body = "RefCell::new(${receiver})",
+                        requires = "std::cell::RefCell",
+                        description = "Put the expression into an `RefCell`",
+                        scope = "expr",
+                      },
+                      -- Defaults (not sure why I can't add my snippets without overriding defaults)
+                      ["Ok"] = {
+                        postfix = "ok",
+                        body = "Ok(${receiver})",
+                        description = "Wrap the expression in a `Result::Ok`",
+                        scope = "expr",
+                      },
+                      ["Box::pin"] = {
+                        postfix = "pinbox",
+                        body = "Box::pin(${receiver})",
+                        requires = "std::boxed::Box",
+                        description = "Put the expression into a pinned `Box`",
+                        scope = "expr",
+                      },
+                      ["Arc::new"] = {
+                        postfix = "arc",
+                        body = "Arc::new(${receiver})",
+                        requires = "std::sync::Arc",
+                        description = "Put the expression into an `Arc`",
+                        scope = "expr",
+                      },
+                      ["Some"] = {
+                        postfix = "some",
+                        body = "Some(${receiver})",
+                        description = "Wrap the expression in an `Option::Some`",
+                        scope = "expr",
+                      },
+                      ["Err"] = {
+                        postfix = "err",
+                        body = "Err(${receiver})",
+                        description = "Wrap the expression in a `Result::Err`",
+                        scope = "expr",
+                      },
+                      ["Rc::new"] = {
+                        postfix = "rc",
+                        body = "Rc::new(${receiver})",
+                        requires = "std::rc::Rc",
+                        description = "Put the expression into an `Rc`",
+                        scope = "expr",
+                      },
+                    },
                   },
-                  run = { enable = true },
                 },
+                -- lens = {
+                --   enable = true,
+                --   implementations = { enable = true },
+                --   references = {
+                --     adt = { enable = true },
+                --     trait = { enable = true },
+                --   },
+                --   run = { enable = true },
+                -- },
               },
             },
           })
