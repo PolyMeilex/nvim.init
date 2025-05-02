@@ -34,12 +34,37 @@ return {
     "folke/lazydev.nvim",
     enabled = IsNotVsCode,
     ft = "lua",
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  {
+    "echasnovski/mini.completion",
+    dependencies = { "echasnovski/mini.icons" },
+    opts = {
+      delay = { completion = 150, info = 100, signature = 50 },
+      window = {
+        info = { border = "single" },
+        signature = { border = "none" },
+      },
+    },
+  },
+  {
+    "williamboman/mason.nvim",
     opts = {},
+    run = function()
+      pcall(vim.api.nvim_command, "MasonUpdate")
+    end,
   },
   {
     "neovim/nvim-lspconfig",
     enabled = IsNotVsCode,
     config = function()
+      local lspconfig = require("lspconfig")
+
       vim.diagnostic.config({
         virtual_text = {
           severity = vim.diagnostic.severity.ERROR,
@@ -60,15 +85,6 @@ return {
       vim.api.nvim_create_user_command("LspToggleInlayHints", function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
       end, {})
-
-      require("lspconfig").dartls.setup({ capabilities = lsp_capabilities() })
-
-      -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
-      vim.lsp.config["stylua-lsp-rs"] = {
-        cmd = { "stylua", "--lsp" },
-        filetypes = { "lua" },
-      }
-      vim.lsp.enable("stylua-lsp-rs")
 
       vim.api.nvim_create_autocmd("LspAttach", {
         desc = "LSP attach actions",
@@ -109,137 +125,104 @@ return {
           end, opts)
         end,
       })
-    end,
-  },
-  {
-    "echasnovski/mini.completion",
-    dependencies = {
-      "echasnovski/mini.icons",
-    },
-    opts = {
-      delay = { completion = 150, info = 100, signature = 50 },
-      window = {
-        info = { border = "single" },
-        signature = { border = "none" },
-      },
-    },
-  },
-  {
-    "williamboman/mason-lspconfig.nvim",
-    dependencies = {
-      {
-        "williamboman/mason.nvim",
-        opts = {},
-        run = function()
-          pcall(vim.api.nvim_command, "MasonUpdate")
-        end,
-      },
-    },
-    opts = {
-      ensure_installed = { "rust_analyzer", "taplo", "lua_ls" },
-      handlers = {
-        function(server_name)
-          require("lspconfig")[server_name].setup({ capabilities = lsp_capabilities() })
-        end,
-        jsonls = function()
-          require("lspconfig").jsonls.setup({
-            capabilities = lsp_capabilities(),
-            on_attach = function(client)
-              -- Disable symbol provider, so bendec-lsp can take over
-              client.server_capabilities.documentSymbolProvider = false
-            end,
-          })
-        end,
-        rust_analyzer = function()
-          require("lspconfig").rust_analyzer.setup({
-            capabilities = lsp_capabilities(),
-            settings = {
-              ["rust-analyzer"] = {
-                checkOnSave = true,
-                check = {
-                  command = "clippy",
-                },
-                completion = {
-                  snippets = {
-                    custom = {
-                      rccell = {
-                        postfix = "rccell",
-                        body = "Rc::new(RefCell::new(${receiver}))",
-                        requires = { "std::rc::Rc", "std::cell::RefCell" },
-                        description = "Put the expression into an `Rc`",
-                        scope = "expr",
-                      },
-                      ["RefCell::new"] = {
-                        postfix = "refcell",
-                        body = "RefCell::new(${receiver})",
-                        requires = "std::cell::RefCell",
-                        description = "Put the expression into an `RefCell`",
-                        scope = "expr",
-                      },
-                      -- Defaults (not sure why I can't add my snippets without overriding defaults)
-                      ["Ok"] = {
-                        postfix = "ok",
-                        body = "Ok(${receiver})",
-                        description = "Wrap the expression in a `Result::Ok`",
-                        scope = "expr",
-                      },
-                      ["Box::pin"] = {
-                        postfix = "pinbox",
-                        body = "Box::pin(${receiver})",
-                        requires = "std::boxed::Box",
-                        description = "Put the expression into a pinned `Box`",
-                        scope = "expr",
-                      },
-                      ["Arc::new"] = {
-                        postfix = "arc",
-                        body = "Arc::new(${receiver})",
-                        requires = "std::sync::Arc",
-                        description = "Put the expression into an `Arc`",
-                        scope = "expr",
-                      },
-                      ["Some"] = {
-                        postfix = "some",
-                        body = "Some(${receiver})",
-                        description = "Wrap the expression in an `Option::Some`",
-                        scope = "expr",
-                      },
-                      ["Err"] = {
-                        postfix = "err",
-                        body = "Err(${receiver})",
-                        description = "Wrap the expression in a `Result::Err`",
-                        scope = "expr",
-                      },
-                      ["Rc::new"] = {
-                        postfix = "rc",
-                        body = "Rc::new(${receiver})",
-                        requires = "std::rc::Rc",
-                        description = "Put the expression into an `Rc`",
-                        scope = "expr",
-                      },
-                    },
+
+      -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
+      vim.lsp.config["stylua-lsp-rs"] = {
+        cmd = { "stylua", "--lsp" },
+        filetypes = { "lua" },
+      }
+      vim.lsp.enable("stylua-lsp-rs")
+
+      for _, server_name in pairs({ "yamlls", "pyright", "html", "lua_ls", "clangd", "ts_ls", "taplo", "dartls" }) do
+        lspconfig[server_name].setup({ capabilities = lsp_capabilities() })
+      end
+
+      lspconfig.typos_lsp.setup({
+        capabilities = lsp_capabilities(),
+        init_options = {
+          diagnosticSeverity = "Hint",
+        },
+      })
+      lspconfig.rust_analyzer.setup({
+        capabilities = lsp_capabilities(),
+        settings = {
+          ["rust-analyzer"] = {
+            checkOnSave = true,
+            check = {
+              command = "clippy",
+            },
+            completion = {
+              snippets = {
+                custom = {
+                  rccell = {
+                    postfix = "rccell",
+                    body = "Rc::new(RefCell::new(${receiver}))",
+                    requires = { "std::rc::Rc", "std::cell::RefCell" },
+                    description = "Put the expression into an `Rc`",
+                    scope = "expr",
+                  },
+                  ["RefCell::new"] = {
+                    postfix = "refcell",
+                    body = "RefCell::new(${receiver})",
+                    requires = "std::cell::RefCell",
+                    description = "Put the expression into an `RefCell`",
+                    scope = "expr",
+                  },
+                  -- Defaults (not sure why I can't add my snippets without overriding defaults)
+                  ["Ok"] = {
+                    postfix = "ok",
+                    body = "Ok(${receiver})",
+                    description = "Wrap the expression in a `Result::Ok`",
+                    scope = "expr",
+                  },
+                  ["Box::pin"] = {
+                    postfix = "pinbox",
+                    body = "Box::pin(${receiver})",
+                    requires = "std::boxed::Box",
+                    description = "Put the expression into a pinned `Box`",
+                    scope = "expr",
+                  },
+                  ["Arc::new"] = {
+                    postfix = "arc",
+                    body = "Arc::new(${receiver})",
+                    requires = "std::sync::Arc",
+                    description = "Put the expression into an `Arc`",
+                    scope = "expr",
+                  },
+                  ["Some"] = {
+                    postfix = "some",
+                    body = "Some(${receiver})",
+                    description = "Wrap the expression in an `Option::Some`",
+                    scope = "expr",
+                  },
+                  ["Err"] = {
+                    postfix = "err",
+                    body = "Err(${receiver})",
+                    description = "Wrap the expression in a `Result::Err`",
+                    scope = "expr",
+                  },
+                  ["Rc::new"] = {
+                    postfix = "rc",
+                    body = "Rc::new(${receiver})",
+                    requires = "std::rc::Rc",
+                    description = "Put the expression into an `Rc`",
+                    scope = "expr",
                   },
                 },
-                -- lens = {
-                --   enable = true,
-                --   implementations = { enable = true },
-                --   references = {
-                --     adt = { enable = true },
-                --     trait = { enable = true },
-                --   },
-                --   run = { enable = true },
-                -- },
               },
             },
-          })
-        end,
-        typos_lsp = function()
-          require("lspconfig").typos_lsp.setup({
-            init_options = {
-              diagnosticSeverity = "Hint",
-            },
-          })
-        end,
-      },
-    },
+            -- lens = {
+            --   enable = true,
+            --   implementations = { enable = true },
+            --   references = {
+            --     adt = { enable = true },
+            --     trait = { enable = true },
+            --   },
+            --   run = { enable = true },
+            -- },
+          },
+        },
+      })
+    end,
   },
 }
