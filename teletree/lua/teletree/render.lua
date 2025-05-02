@@ -40,9 +40,12 @@ function M.prepare_node(node, _)
       end
       line:append(text, hi or "GruvboxGreenBold")
     else
-      if node.icon then
+      local web_devicons = require("nvim-web-devicons")
+      local file_icon, highlight = web_devicons.get_icon(node.text)
+
+      if file_icon then
         line:append(" ")
-        line:append(node.icon, node.icon_highlight or "Normal")
+        line:append(file_icon, highlight or "Normal")
         line:append(" ")
       else
         line:append(" ")

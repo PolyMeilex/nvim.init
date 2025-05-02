@@ -5,7 +5,6 @@ return {
     dir = "~/.config/nvim/teletree",
     enabled = IsNotVsCode,
     dependencies = {
-      "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
     },
     opts = {},

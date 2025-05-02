@@ -215,7 +215,6 @@ return {
   dir = "~/.config/nvim/lsp-code-context",
   enabled = IsNotVsCode,
   dependencies = {
-    "nvim-tree/nvim-web-devicons",
     "ThePrimeagen/harpoon",
   },
   config = function()

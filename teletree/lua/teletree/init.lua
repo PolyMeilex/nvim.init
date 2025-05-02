@@ -1,5 +1,4 @@
 local NuiTree = require("nui.tree")
-local web_devicons = require("nvim-web-devicons")
 local async = require("plenary.async")
 local Path = require("plenary.path")
 
@@ -14,8 +13,6 @@ local diagnostics = require("teletree.diagnostics")
 ---@field text string
 ---@field type string
 ---@field path string
----@field icon string
----@field icon_highlight string
 ---@field is_directory boolean
 ---@field is_loaded boolean
 ---
@@ -31,15 +28,11 @@ local function scandir_co(directory, tree)
 
   ---@return TeletreeNode
   local function load_item(path, entry, expanded)
-    local icon, highlight = web_devicons.get_icon(entry.name)
-
     ---@type TeletreeNodeData
     local node = {
       text = entry.name,
       type = entry.type,
       path = path,
-      icon = icon,
-      icon_highlight = highlight,
       is_directory = entry.type == "directory",
       is_loaded = entry.type == "file",
       diagnostics = diagnostics.get(path),
