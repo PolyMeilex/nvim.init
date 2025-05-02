@@ -4,7 +4,7 @@ local function lsp_capabilities()
   return vim.tbl_deep_extend(
     "force",
     vim.lsp.protocol.make_client_capabilities(),
-    require("cmp_nvim_lsp").default_capabilities(),
+    require("mini.completion").get_lsp_capabilities(),
     {
       textDocument = {
         foldingRange = {
@@ -112,73 +112,17 @@ return {
     end,
   },
   {
-    "hrsh7th/nvim-cmp",
+    "echasnovski/mini.completion",
     dependencies = {
-      { "hrsh7th/cmp-path" },
-      { "hrsh7th/cmp-nvim-lsp-signature-help" },
-      { "hrsh7th/cmp-nvim-lsp" },
+      "echasnovski/mini.icons",
     },
-    config = function()
-      local cmp = require("cmp")
-
-      local kind_icons = {
-        Text = "",
-        Method = "󰆧",
-        Function = "󰊕",
-        Constructor = "",
-        Field = "󰇽",
-        Variable = "󰂡",
-        Class = "󰠱",
-        Interface = "",
-        Module = "",
-        Property = "󰜢",
-        Unit = "",
-        Value = "󰎠",
-        Enum = "",
-        Keyword = "󰌋",
-        Snippet = "",
-        Color = "󰏘",
-        File = "󰈙",
-        Reference = "",
-        Folder = "󰉋",
-        EnumMember = "",
-        Constant = "󰏿",
-        Struct = "",
-        Event = "",
-        Operator = "󰆕",
-        TypeParameter = "󰅲",
-      }
-
-      cmp.setup({
-        formatting = {
-          expandable_indicator = true,
-          fields = { "abbr", "kind", "menu" },
-          format = function(entry, vim_item)
-            vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind) -- This concatenates the icons with the name of the item kind
-
-            if entry.source.name == "async_path" then
-              vim_item.menu = "path"
-            elseif entry.source.name == "nvim_lsp" then
-              vim_item.menu = ""
-            else
-              vim_item.menu = entry.source.name
-            end
-
-            return vim_item
-          end,
-        },
-        completion = {
-          completeopt = "menu,menuone",
-        },
-        sources = {
-          { name = "nvim_lsp_signature_help" },
-          { name = "nvim_lsp" },
-          { name = "buffer" },
-          { name = "path" },
-        },
-        mapping = cmp.mapping.preset.insert({}),
-      })
-    end,
+    opts = {
+      delay = { completion = 150, info = 100, signature = 50 },
+      window = {
+        info = { border = "single" },
+        signature = { border = "none" },
+      },
+    },
   },
   {
     "williamboman/mason-lspconfig.nvim",
