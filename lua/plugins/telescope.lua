@@ -27,7 +27,6 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope-ui-select.nvim",
-    "echasnovski/mini.icons",
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
@@ -65,8 +64,6 @@ return {
     vim.keymap.set("n", "ts", telescope.extensions.omni_picker.omni_picker, {})
     vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
 
-    local SymbolKind = vim.lsp.protocol.SymbolKind
-
     telescope.setup({
       pickers = {
         buffers = {
@@ -82,18 +79,6 @@ return {
         },
         git_files = {
           show_untracked = true,
-        },
-        lsp_document_symbols = {
-          symbol_highlights = {
-            [SymbolKind[SymbolKind.Class]] = "TelescopeResultsClass",
-            [SymbolKind[SymbolKind.Constant]] = "TelescopeResultsConstant",
-            [SymbolKind[SymbolKind.Field]] = "TelescopeResultsField",
-            [SymbolKind[SymbolKind.Function]] = "TelescopeResultsFunction",
-            [SymbolKind[SymbolKind.Method]] = "TelescopeResultsMethod",
-            [SymbolKind[SymbolKind.Property]] = "TelescopeResultsOperator",
-            [SymbolKind[SymbolKind.Struct]] = "TelescopeResultsStruct",
-            [SymbolKind[SymbolKind.Variable]] = "TelescopeResultsVariable",
-          },
         },
       },
 

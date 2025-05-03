@@ -56,6 +56,32 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+-- completion
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if not client or not client:supports_method("textDocument/completion") then
+      return
+    end
+
+    vim.lsp.completion.enable(true, client.id, args.buf, {
+      autotrigger = true,
+      convert = function(item)
+        local kind = vim.lsp.protocol.CompletionItemKind[item.kind] or "Unknown"
+        local icon = LspItemTypeIcons[item.kind] or ""
+        return {
+          kind = icon .. " " .. kind,
+          kind_hlgroup = LspItemTypeHighlight[item.kind] or nil,
+          menu = "",
+        }
+      end,
+    })
+  end,
+})
+
+vim.keymap.set("i", "<c-n>", vim.lsp.completion.get)
+vim.o.completeopt = "menu,menuone,noinsert"
+
 return {
   {
     "folke/lazydev.nvim",
@@ -64,17 +90,6 @@ return {
       library = {
         -- Load luvit types when the `vim.uv` word is found
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-      },
-    },
-  },
-  {
-    "echasnovski/mini.completion",
-    dependencies = { "echasnovski/mini.icons" },
-    opts = {
-      delay = { completion = 150, info = 100, signature = 50 },
-      window = {
-        info = { border = "single" },
-        signature = { border = "none" },
       },
     },
   },
@@ -88,14 +103,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      vim.lsp.config("*", {
-        capabilities = vim.tbl_deep_extend(
-          "force",
-          vim.lsp.protocol.make_client_capabilities(),
-          require("mini.completion").get_lsp_capabilities()
-        ),
-      })
-
       -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
       vim.lsp.config["stylua-lsp-rs"] = {
         cmd = { "stylua", "--lsp" },
