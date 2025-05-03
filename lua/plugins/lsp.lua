@@ -1,17 +1,3 @@
-vim.diagnostic.config({
-  virtual_text = {
-    severity = vim.diagnostic.severity.ERROR,
-  },
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = " ",
-      [vim.diagnostic.severity.WARN] = " ",
-      [vim.diagnostic.severity.INFO] = " ",
-      [vim.diagnostic.severity.HINT] = "󰌵",
-    },
-  },
-})
-
 vim.api.nvim_create_user_command("LspToggleInlayHints", function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
 end, {})
@@ -30,7 +16,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local telescope = require("telescope.builtin")
     local opts = { buffer = bufnr }
 
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "gd", telescope.lsp_definitions, opts)
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
     vim.keymap.set("n", "gi", telescope.lsp_implementations, opts)
@@ -39,20 +24,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
-
-    vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "[d", function()
-      vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.WARN } })
-    end, opts)
-    vim.keymap.set("n", "]d", function()
-      vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.WARN } })
-    end, opts)
-    vim.keymap.set("n", "[D", function()
-      vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.ERROR } })
-    end, opts)
-    vim.keymap.set("n", "]D", function()
-      vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.ERROR } })
-    end, opts)
   end,
 })
 
