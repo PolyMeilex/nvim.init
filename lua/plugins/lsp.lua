@@ -49,96 +49,31 @@ return {
     "neovim/nvim-lspconfig",
     config = function()
       -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
-      vim.lsp.config["stylua-lsp-rs"] = {
-        cmd = { "stylua", "--lsp" },
-        filetypes = { "lua" },
-      }
+      vim.lsp.config["stylua-lsp-rs"] = { cmd = { "stylua", "--lsp" }, filetypes = { "lua" } }
+      vim.lsp.enable("stylua-lsp-rs")
 
-      vim.lsp.config("typos_lsp", {
-        init_options = {
-          diagnosticSeverity = "Hint",
-        },
-      })
-
-      for _, server_name in pairs({
-        "yamlls",
-        "pyright",
-        "html",
-        "lua_ls",
-        "clangd",
-        "ts_ls",
-        "taplo",
-        "dartls",
-        "stylua-lsp-rs",
-        "typos_lsp",
-        "rust_analyzer",
-      }) do
-        vim.lsp.enable(server_name)
-      end
+      vim.lsp.config("typos_lsp", { init_options = { diagnosticSeverity = "Hint" } })
+      vim.lsp.enable("typos_lsp")
 
       vim.lsp.config("rust_analyzer", {
         settings = {
           ["rust-analyzer"] = {
             checkOnSave = true,
-            check = {
-              command = "clippy",
-            },
-            completion = {
-              snippets = {
-                custom = {
-                  rccell = {
-                    postfix = "rccell",
-                    body = "Rc::new(RefCell::new(${receiver}))",
-                    requires = { "std::rc::Rc", "std::cell::RefCell" },
-                    description = "Put the expression into an `Rc`",
-                    scope = "expr",
-                  },
-                  ["RefCell::new"] = {
-                    postfix = "refcell",
-                    body = "RefCell::new(${receiver})",
-                    requires = "std::cell::RefCell",
-                    description = "Put the expression into an `RefCell`",
-                    scope = "expr",
-                  },
-                  -- Defaults (not sure why I can't add my snippets without overriding defaults)
-                  ["Ok"] = {
-                    postfix = "ok",
-                    body = "Ok(${receiver})",
-                    description = "Wrap the expression in a `Result::Ok`",
-                    scope = "expr",
-                  },
-                  ["Err"] = {
-                    postfix = "err",
-                    body = "Err(${receiver})",
-                    description = "Wrap the expression in a `Result::Err`",
-                    scope = "expr",
-                  },
-                  ["Some"] = {
-                    postfix = "some",
-                    body = "Some(${receiver})",
-                    description = "Wrap the expression in an `Option::Some`",
-                    scope = "expr",
-                  },
-                  ["Arc::new"] = {
-                    postfix = "arc",
-                    body = "Arc::new(${receiver})",
-                    requires = "std::sync::Arc",
-                    description = "Put the expression into an `Arc`",
-                    scope = "expr",
-                  },
-                  ["Rc::new"] = {
-                    postfix = "rc",
-                    body = "Rc::new(${receiver})",
-                    requires = "std::rc::Rc",
-                    description = "Put the expression into an `Rc`",
-                    scope = "expr",
-                  },
-                },
-              },
-            },
+            check = { command = "clippy" },
+            completion = { snippets = { custom = RustSnippets } },
           },
         },
       })
+      vim.lsp.enable("rust_analyzer")
+
+      vim.lsp.enable("yamlls")
+      vim.lsp.enable("pyright")
+      vim.lsp.enable("html")
+      vim.lsp.enable("lua_ls")
+      vim.lsp.enable("clangd")
+      vim.lsp.enable("ts_ls")
+      vim.lsp.enable("taplo")
+      vim.lsp.enable("dartls")
     end,
   },
 }

@@ -1,47 +1,54 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
 
-vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
-  local args = command.arguments[1].args
-
-  local handle
-  handle = vim.loop.spawn("kgx", {
-    args = {
-      "--tab",
-      "-e",
-      "fish",
-      "-C",
-      "cargo " .. table.concat(args.cargoArgs, " "),
-    },
-    stdio = { nil, nil, nil },
-    function()
-      handle:close()
-    end,
-  })
-end
-
-vim.lsp.commands["rust-analyzer.showReferences"] = function(command)
-  local pickers = require("telescope.pickers")
-  local finders = require("telescope.finders")
-  local conf = require("telescope.config").values
-  local make_entry = require("telescope.make_entry")
-
-  local locations = command.arguments[3]
-  local title = command.title
-
-  pickers
-    .new({}, {
-      prompt_title = title,
-      finder = finders.new_table({
-        results = vim.lsp.util.locations_to_items(locations, "utf-8"),
-        entry_maker = make_entry.gen_from_quickfix({}),
-      }),
-      previewer = conf.qflist_previewer({}),
-      sorter = conf.generic_sorter({}),
-      push_cursor_on_edit = true,
-      push_tagstack_on_edit = true,
-    })
-    :find()
-end
+RustSnippets = {
+  rccell = {
+    postfix = "rccell",
+    body = "Rc::new(RefCell::new(${receiver}))",
+    requires = { "std::rc::Rc", "std::cell::RefCell" },
+    description = "Put the expression into an `Rc`",
+    scope = "expr",
+  },
+  ["RefCell::new"] = {
+    postfix = "refcell",
+    body = "RefCell::new(${receiver})",
+    requires = "std::cell::RefCell",
+    description = "Put the expression into an `RefCell`",
+    scope = "expr",
+  },
+  -- Defaults (not sure why I can't add my snippets without overriding defaults)
+  ["Ok"] = {
+    postfix = "ok",
+    body = "Ok(${receiver})",
+    description = "Wrap the expression in a `Result::Ok`",
+    scope = "expr",
+  },
+  ["Err"] = {
+    postfix = "err",
+    body = "Err(${receiver})",
+    description = "Wrap the expression in a `Result::Err`",
+    scope = "expr",
+  },
+  ["Some"] = {
+    postfix = "some",
+    body = "Some(${receiver})",
+    description = "Wrap the expression in an `Option::Some`",
+    scope = "expr",
+  },
+  ["Arc::new"] = {
+    postfix = "arc",
+    body = "Arc::new(${receiver})",
+    requires = "std::sync::Arc",
+    description = "Put the expression into an `Arc`",
+    scope = "expr",
+  },
+  ["Rc::new"] = {
+    postfix = "rc",
+    body = "Rc::new(${receiver})",
+    requires = "std::rc::Rc",
+    description = "Put the expression into an `Rc`",
+    scope = "expr",
+  },
+}
 
 return {
   {
