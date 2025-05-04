@@ -29,4 +29,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 vim.keymap.set("i", "<c-n>", vim.lsp.completion.get)
 vim.o.completeopt = "menuone,noinsert"
 
+-- Prevent `<CR>` from accepting completion
+vim.keymap.set("i", "<CR>", function()
+  return vim.fn.pumvisible() == 1 and "<C-c>a<CR>" or "<CR>"
+end, { expr = true, noremap = true })
+
 return {}
