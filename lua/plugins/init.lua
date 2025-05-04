@@ -1,12 +1,9 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
 
+vim.g.camelcasemotion_key = "<leader>"
+
 return {
-  {
-    "bkad/CamelCaseMotion",
-    config = function()
-      vim.g.camelcasemotion_key = "<leader>"
-    end,
-  },
+  "bkad/CamelCaseMotion",
   {
     dir = "~/.config/nvim/yaml_utils",
     ft = "yaml",
