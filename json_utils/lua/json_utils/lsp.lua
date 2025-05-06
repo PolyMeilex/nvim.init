@@ -121,11 +121,11 @@ local function handle_document_symbols(method, params)
     ---@type lsp.Range[]
     local range = {
       start = {
-        line = entry.line,
+        line = entry.line - 1,
         character = entry.col,
       },
       ["end"] = {
-        line = entry.line,
+        line = entry.line - 1,
         character = entry.col,
       },
     }
