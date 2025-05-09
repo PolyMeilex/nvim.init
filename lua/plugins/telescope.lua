@@ -35,14 +35,14 @@ return {
       dir = "~/.config/nvim/omni_picker",
     },
   },
-  keys = { "tpf", "<C-p>", "tc", "tf", "tF", "to", "tb", "tt", "tl", "td", "tD", "ts" },
+  keys = { "tpf", "<C-p>", "tc", "tf", "tF", "to", "tb", "tt", "tl", "td", "tD", "tg" },
   config = function()
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")
     local actions = require("telescope.actions")
 
     vim.keymap.set("n", "tng", builtin.find_files, {})
-    vim.keymap.set("n", "<C-p>", project_files, {})
+    vim.keymap.set("n", "tg", project_files, {})
     vim.keymap.set("n", "tc", builtin.commands, {})
     vim.keymap.set("n", "tf", builtin.current_buffer_fuzzy_find, {})
     vim.keymap.set("n", "tF", builtin.live_grep, {})
@@ -61,7 +61,7 @@ return {
     vim.keymap.set("n", "tD", function()
       builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
     end, {})
-    vim.keymap.set("n", "ts", telescope.extensions.omni_picker.omni_picker, {})
+    vim.keymap.set("n", "<C-p>", telescope.extensions.omni_picker.omni_picker, {})
     vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
 
     telescope.setup({
