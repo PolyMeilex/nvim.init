@@ -19,6 +19,46 @@ local function project_files()
   end
 end
 
+local function symbols_in_selection()
+  local pickers = require("telescope.pickers")
+  local finders = require("telescope.finders")
+  local sorters = require("telescope.sorters")
+  local previewers = require("telescope.previewers")
+  local make_entry = require("telescope.make_entry")
+
+  local function get_visual_range()
+    local _, ls = unpack(vim.fn.getpos("'<"))
+    local _, le = unpack(vim.fn.getpos("'>"))
+    if ls > le then
+      ls, le = le, ls
+    end
+    return ls - 1, le - 1
+  end
+
+  local opts = {}
+  local lmin, lmax = get_visual_range()
+
+  vim.lsp.buf.document_symbol({
+    on_list = function(result)
+      local filtered = vim.tbl_filter(function(s)
+        return s.lnum >= lmin and s.lnum <= lmax
+      end, result.items)
+
+      pickers
+        .new(opts, {
+          prompt_title = "Symbols in Selection",
+          finder = finders.new_table({
+            results = filtered,
+            entry_maker = make_entry.gen_from_quickfix({ path_display = "hidden" }),
+          }),
+          previewer = previewers.vim_buffer_qflist.new(opts),
+          sorter = sorters.get_generic_fuzzy_sorter(),
+        })
+        :find()
+    end,
+  })
+end
+
 return {
   "nvim-telescope/telescope.nvim",
   commit = "a4ed82509cecc56df1c7138920a1aeaf246c0ac5",
@@ -51,7 +91,13 @@ return {
     end, {})
     vim.keymap.set("n", "tb", builtin.buffers, {})
 
+    function _G._symbols_in_selection()
+      symbols_in_selection()
+    end
+
+    vim.keymap.set("v", "tt", ":<C-u>lua _symbols_in_selection()<CR>", { silent = true })
     vim.keymap.set("n", "tt", builtin.lsp_document_symbols, {})
+
     vim.keymap.set("n", "tl", function()
       builtin.builtin({ default_text = "lsp_", use_default_opts = true })
     end, {})
