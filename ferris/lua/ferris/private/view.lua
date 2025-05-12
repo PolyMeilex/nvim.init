@@ -33,6 +33,7 @@ function M.open(tag, view, header, filetype)
     -- create new window for view
     vim.cmd("vsplit")
     local win_id = vim.api.nvim_get_current_win()
+    vim.wo[win_id].wrap = false
     vim.api.nvim_win_set_buf(win_id, VIEWS[tag])
 
     -- when the window is closed, delete the view buffer

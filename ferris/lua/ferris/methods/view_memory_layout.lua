@@ -1,6 +1,5 @@
+local ferris = require("ferris")
 local view = require("ferris.private.view")
-local lsp = require("ferris.private.ra_lsp")
-local error = require("ferris.private.error")
 local tree = require("ferris.private.tree")
 local util = require("ferris.private.util")
 
@@ -333,25 +332,22 @@ function FieldGrid:render()
 end
 
 local function view_memory_layout()
-  if not error.ensure_ra() then
+  local client = ferris.ra_client()
+  if not client then
     return
   end
 
-  lsp.request(
-    "viewRecursiveMemoryLayout",
-    vim.lsp.util.make_position_params(0, lsp.offset_encoding()),
-    function(response)
-      if response.result == nil then
-        if response.error == nil then
-          error.raise("no answer from rust-analyzer for memory layout in given cursor position")
-          return
-        end
-
-        error.raise_lsp_error("error viewing memory layout", response.error)
+  client:request(
+    "rust-analyzer/viewRecursiveMemoryLayout",
+    vim.lsp.util.make_position_params(0, client.offset_encoding),
+    function(err, response)
+      if err then
+        vim.notify("error opening external documentation: " .. err, vim.log.levels.ERROR)
+        return
       end
 
       ---@type RANode[]
-      local list = response.result.nodes
+      local list = response.nodes
       local tree = to_tree(list)
       local grid = to_grid(tree)
       view.open("memory_layout", grid:render(), "Memory Layout of the " .. tree.value.type .. " type")

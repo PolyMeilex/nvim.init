@@ -1,16 +1,22 @@
 local M = {}
 
+---Returns the Rust-Analyzer client of the given buffer.
+---@param bufnr integer? # The buffer number or nil for current
+---@return vim.lsp.Client?
+function M.ra_client(bufnr)
+  local clients = vim.lsp.get_clients({ bufnr = bufnr or 0, name = "rust_analyzer" })
+  return clients and clients[1] or nil
+end
+
 function M.setup()
   vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("ferris_commands", { clear = true }),
     desc = "Add Ferris user commands to rust_analyzer buffers",
     callback = function(args)
-      local lsp = require("ferris.private.ra_lsp")
-
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       ---@cast client -nil
 
-      if lsp.client_is_ra(client) then
+      if client.name == "rust_analyzer" then
         M.create_commands(args.buf)
       end
     end,

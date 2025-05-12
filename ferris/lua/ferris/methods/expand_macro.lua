@@ -1,31 +1,30 @@
+local ferris = require("ferris")
 local view = require("ferris.private.view")
-local lsp = require("ferris.private.ra_lsp")
-local error = require("ferris.private.error")
 
 ---Expands the macro under the current cursor position.
 local function expand_macro()
-  if not error.ensure_ra() then
+  local client = ferris.ra_client()
+  if not client then
     return
   end
 
-  lsp.request("expandMacro", vim.lsp.util.make_position_params(0, lsp.offset_encoding()), function(response)
-    if response.result == nil then
-      if response.error == nil then
-        error.raise("no answer from rust-analyzer for macro expansion in given cursor position")
+  client:request(
+    "rust-analyzer/expandMacro",
+    vim.lsp.util.make_position_params(0, client.offset_encoding),
+    function(err, response)
+      if err then
+        vim.notify("error opening external documentation: " .. err, vim.log.levels.ERROR)
         return
       end
 
-      error.raise_lsp_error("error expanding macro", response.error)
-      return
+      ---@type string
+      local name = response.name
+      ---@type string
+      local expansion = response.expansion
+
+      view.open("macro", expansion, "Recursive expansion of the " .. name .. " macro")
     end
-
-    ---@type string
-    local name = response.result.name
-    ---@type string
-    local expansion = response.result.expansion
-
-    view.open("macro", expansion, "Recursive expansion of the " .. name .. " macro")
-  end)
+  )
 end
 
 return expand_macro
