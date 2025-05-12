@@ -50,6 +50,11 @@ RustSnippets = {
   },
 }
 
+vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
+  local args = command.arguments[1].args
+  require("kgx").in_new_tab("cargo " .. table.concat(args.cargoArgs, " "))
+end
+
 return {
   {
     "saecki/crates.nvim",

@@ -63,6 +63,18 @@ return {
             completion = { snippets = { custom = RustSnippets } },
           },
         },
+        capabilities = {
+          experimental = {
+            commands = {
+              commands = {
+                "rust-analyzer.runSingle",
+                -- "rust-analyzer.debugSingle",
+                -- "rust-analyzer.gotoLocation",
+                -- "rust-analyzer.showReferences",
+              },
+            },
+          },
+        },
       })
       vim.lsp.enable("rust_analyzer")
 
