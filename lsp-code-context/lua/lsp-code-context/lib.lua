@@ -1,6 +1,6 @@
 -- @Private Methods
 
--- relation of 'other' with repect to 'symbol'
+-- relation of 'other' with respect to 'symbol'
 local function symbol_relation(symbol, other)
   local s = symbol.scope
   local o = other.scope
@@ -47,7 +47,7 @@ local function symbolInfo_treemaker(symbols, root_node)
     node.containerName = nil
   end
 
-  -- sort with repect to node height and location
+  -- sort with respect to node height and location
   -- nodes closer to root node come before others
   -- nodes and same level are arranged according to scope
   table.sort(symbols, function(a, b)
@@ -240,9 +240,7 @@ function M.parse(symbols)
 end
 
 -- Make request to lsp server
-function M.request_symbol(for_buf, handler, client, file_uri, retry_count)
-  local textDocument_argument = vim.lsp.util.make_text_document_params()
-
+function M.request_symbol(for_buf, handler, client, retry_count)
   if retry_count == nil then
     retry_count = 10
   elseif retry_count == 0 then
@@ -250,35 +248,32 @@ function M.request_symbol(for_buf, handler, client, file_uri, retry_count)
     return
   end
 
-  if file_uri ~= nil then
-    textDocument_argument = {
-      textDocument = {
-        uri = file_uri,
-      },
-    }
-  end
-
   if not vim.api.nvim_buf_is_loaded(for_buf) then
     return
   end
 
-  client:request("textDocument/documentSymbol", { textDocument = textDocument_argument }, function(err, symbols, _)
-    if symbols == nil then
-      if vim.api.nvim_buf_is_valid(for_buf) then
-        handler(for_buf, {})
+  client:request(
+    "textDocument/documentSymbol",
+    { textDocument = vim.lsp.util.make_text_document_params() },
+    function(err, symbols, _)
+      if symbols == nil then
+        if vim.api.nvim_buf_is_valid(for_buf) then
+          handler(for_buf, {})
+        end
+      elseif err ~= nil then
+        if vim.api.nvim_buf_is_valid(for_buf) then
+          vim.defer_fn(function()
+            M.request_symbol(for_buf, handler, client, retry_count - 1)
+          end, 750)
+        end
+      elseif symbols ~= nil then
+        if vim.api.nvim_buf_is_loaded(for_buf) then
+          handler(for_buf, symbols)
+        end
       end
-    elseif err ~= nil then
-      if vim.api.nvim_buf_is_valid(for_buf) then
-        vim.defer_fn(function()
-          M.request_symbol(for_buf, handler, client, file_uri, retry_count - 1)
-        end, 750)
-      end
-    elseif symbols ~= nil then
-      if vim.api.nvim_buf_is_loaded(for_buf) then
-        handler(for_buf, symbols)
-      end
-    end
-  end, for_buf)
+    end,
+    for_buf
+  )
 end
 
 local navic_symbols = {}
@@ -367,82 +362,14 @@ function M.update_context(for_buf, arg_cursor_pos)
   navic_context_data[for_buf] = new_context_data
 end
 
--- stylua: ignore
-local lsp_str_to_num = {
-	File          = 1,
-	Module        = 2,
-	Namespace     = 3,
-	Package       = 4,
-	Class         = 5,
-	Method        = 6,
-	Property      = 7,
-	Field         = 8,
-	Constructor   = 9,
-	Enum          = 10,
-	Interface     = 11,
-	Function      = 12,
-	Variable      = 13,
-	Constant      = 14,
-	String        = 15,
-	Number        = 16,
-	Boolean       = 17,
-	Array         = 18,
-	Object        = 19,
-	Key           = 20,
-	Null          = 21,
-	EnumMember    = 22,
-	Struct        = 23,
-	Event         = 24,
-	Operator      = 25,
-	TypeParameter = 26,
-}
-setmetatable(lsp_str_to_num, {
-  __index = function()
-    return 0
-  end,
-})
-
-function M.adapt_lsp_str_to_num(s)
-  return lsp_str_to_num[s]
-end
-
--- stylua: ignore
-local lsp_num_to_str = {
-	[1]  = "File",
-	[2]  = "Module",
-	[3]  = "Namespace",
-	[4]  = "Package",
-	[5]  = "Class",
-	[6]  = "Method",
-	[7]  = "Property",
-	[8]  = "Field",
-	[9]  = "Constructor",
-	[10] = "Enum",
-	[11] = "Interface",
-	[12] = "Function",
-	[13] = "Variable",
-	[14] = "Constant",
-	[15] = "String",
-	[16] = "Number",
-	[17] = "Boolean",
-	[18] = "Array",
-	[19] = "Object",
-	[20] = "Key",
-	[21] = "Null",
-	[22] = "EnumMember",
-	[23] = "Struct",
-	[24] = "Event",
-	[25] = "Operator",
-	[26] = "TypeParameter",
-}
-setmetatable(lsp_num_to_str, {
-  __index = function()
-    return "Text"
-  end,
-})
-
 function M.adapt_lsp_num_to_str(n)
-  return lsp_num_to_str[n]
+  for name, value in pairs(vim.lsp.protocol.SymbolKind) do
+    if n == value then
+      return name
+    end
+  end
+
+  return "Text"
 end
 
 return M

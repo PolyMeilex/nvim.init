@@ -6,6 +6,7 @@ local lib = require("lsp-code-context.lib")
 
 ---@class Options
 ---@field icons table | nil
+---@field separator string | nil
 ---@field highlight boolean | nil
 ---@field format_text function | nil
 ---@field depth_limit number | nil
@@ -76,6 +77,8 @@ local function setup_auto_attach(opts)
   vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
+      ---@cast client -nil
+
       if not client.server_capabilities.documentSymbolProvider then
         return
       end
@@ -98,7 +101,7 @@ local function setup_auto_attach(opts)
 
       for _, preferred_lsp in ipairs(opts.lsp.preference) do
         -- If new client comes first, then remove the previous
-        -- attached server and attatch the new one
+        -- attached server and attach the new one
         if preferred_lsp == client.name then
           vim.b[args.buf].navic_client_id = nil
           vim.b[args.buf].navic_client_name = nil
@@ -125,9 +128,7 @@ function M.setup(opts)
 
   if opts.icons ~= nil then
     for k, v in pairs(opts.icons) do
-      if lib.adapt_lsp_str_to_num(k) then
-        config.icons[lib.adapt_lsp_str_to_num(k)] = v
-      end
+      config.icons[vim.lsp.protocol.SymbolKind[k]] = v
     end
   end
 
@@ -201,9 +202,7 @@ function M.format_data(data, opts)
 
     if opts.icons ~= nil then
       for k, v in pairs(opts.icons) do
-        if lib.adapt_lsp_str_to_num(k) then
-          local_config.icons[lib.adapt_lsp_str_to_num(k)] = v
-        end
+        local_config.icons[vim.lsp.protocol.SymbolKind[k]] = v
       end
     end
 
@@ -248,14 +247,6 @@ function M.format_data(data, opts)
         data[minwid].scope["start"].line,
         data[minwid].scope["start"].character,
       })
-      if cnt > 1 then
-        local ok, navbuddy = pcall(require, "nvim-navbuddy")
-        if ok then
-          navbuddy.open(bufnr)
-        else
-          vim.notify("lsp-code-context: Double click requires nvim-navbuddy to be installed.", vim.log.levels.WARN)
-        end
-      end
     end
   end
 
