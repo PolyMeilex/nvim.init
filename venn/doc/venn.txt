@@ -1,0 +1,48 @@
+COMMANDS
+
+                                                *:VBox*
+:VBox                     
+                Draw a single line box or arrow.
+
+                                                *:VBoxD*
+:VBoxD          
+                Draw a double line box or arrow.
+
+                                                *:VBoxH*
+:VBoxH          
+                Draw a heavy line box or arrow.
+
+                                                *:VBoxO*
+:VBoxO                     
+                Draw a single line box or arrow. It tries
+                to give the impression the box is drawn
+                over existing characters.
+
+    With |:VBox|:
+
+         ┌───┐
+         │ ┌───┐
+         └─│─┘ │
+           └───┘
+
+    With |:VBoxO|:
+
+         ┌───┐
+         │ ┌─┼─┐
+         └─┼─┘ │
+           └───┘
+
+                                                *:VBoxDO*
+:VBoxDO          
+                Draw a double line box or arrow. Draw
+                over.
+
+                                                *:VBoxHO*
+:VBoxHO          
+                Draw a heavy line box or arrow. Draw over.
+
+                                                *:VFill*
+:VFill          
+                Fill the area with a solid color.
+
+ vim:tw=58:ts=8:ft=help:norl:
