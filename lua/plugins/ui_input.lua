@@ -20,8 +20,8 @@ vim.ui.input = function(opts, on_confirm)
   local default = opts.default or ""
 
   -- Calculate a minimal width with a bit buffer
-  local default_width = vim.str_utfindex(default) + 20
-  local prompt_width = vim.str_utfindex(prompt) + 20
+  local default_width = vim.str_utfindex(default, "utf-8") + 20
+  local prompt_width = vim.str_utfindex(prompt, "utf-8") + 20
   local input_width = default_width > prompt_width and default_width or prompt_width
 
   local win_config = {
@@ -57,7 +57,7 @@ vim.ui.input = function(opts, on_confirm)
 
   -- Put cursor at the end of the default value
   vim.cmd("startinsert")
-  vim.api.nvim_win_set_cursor(window, { 1, vim.str_utfindex(default) + 1 })
+  vim.api.nvim_win_set_cursor(window, { 1, vim.str_utfindex(default, "utf-8") + 1 })
 
   local close = function()
     vim.cmd("stopinsert")

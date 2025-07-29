@@ -409,9 +409,9 @@ end
 function M.get_bytes(line, col)
   -- kinda slow, not sure how to
   -- make it faster.
-  local len = vim.str_utfindex(line)
+  local len = vim.str_utfindex(line, "utf-32")
   for i=0,len do
-    local idx = vim.str_byteindex(line, i)
+    local idx = vim.str_byteindex(line, "utf-32", i)
     if vim.fn.strdisplaywidth(line:sub(1,idx)) >= col then
       return idx
     end
