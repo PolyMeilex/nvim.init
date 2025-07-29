@@ -99,6 +99,8 @@ local function hjkl_harpoon()
       key = "[k]"
     elseif id == 4 then
       key = "[l]"
+    elseif id == 5 then
+      key = "[;]"
     end
 
     if item == current_filepath then
@@ -124,6 +126,10 @@ local function hjkl_harpoon()
 
   if #list >= 4 then
     table.insert(tabs, add_click(4, nth_item(4)))
+  end
+
+  if #list >= 5 then
+    table.insert(tabs, add_click(5, nth_item(5)))
   end
 
   return table.concat(tabs, "")

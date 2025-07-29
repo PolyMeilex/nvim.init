@@ -43,6 +43,12 @@ return {
         require("harpoon"):list():select(4)
       end,
     },
+    {
+      "<C-;>",
+      function()
+        require("harpoon"):list():select(5)
+      end,
+    },
   },
   opts = {},
 }
