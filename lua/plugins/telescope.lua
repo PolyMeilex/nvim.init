@@ -63,8 +63,8 @@ end
 
 return {
   "nvim-telescope/telescope.nvim",
-  commit = "a4ed82509cecc56df1c7138920a1aeaf246c0ac5",
-  -- tag = '0.1.6',
+  commit = "b4da76be54691e854d3e0e02c36b0245f945c2c7",
+  -- tag = '0.1.8',
   enabled = IsNotVsCode,
   dependencies = {
     "nvim-lua/plenary.nvim",
