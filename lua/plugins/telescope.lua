@@ -49,7 +49,7 @@ local function symbols_in_selection()
           prompt_title = "Symbols in Selection",
           finder = finders.new_table({
             results = filtered,
-            entry_maker = make_entry.gen_from_quickfix({ path_display = "hidden" }),
+            entry_maker = make_entry.gen_from_lsp_symbols({ path_display = "hidden" }),
           }),
           previewer = previewers.vim_buffer_qflist.new(opts),
           sorter = sorters.get_generic_fuzzy_sorter(),
