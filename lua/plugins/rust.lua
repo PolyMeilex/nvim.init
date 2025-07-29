@@ -1,5 +1,3 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 RustSnippets = {
   rccell = {
     postfix = "rccell",
@@ -58,7 +56,6 @@ end
 return {
   {
     "saecki/crates.nvim",
-    enabled = IsNotVsCode,
     ft = "toml",
     -- tag = 'stable',
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -85,7 +82,6 @@ return {
   },
   {
     dir = "~/.config/nvim/ferris",
-    enabled = IsNotVsCode,
     ft = "rust",
     opts = {
       create_commands = true,

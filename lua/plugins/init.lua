@@ -1,5 +1,3 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 vim.g.camelcasemotion_key = "<leader>"
 
 return {
@@ -7,18 +5,15 @@ return {
   {
     dir = "~/.config/nvim/yaml_utils",
     ft = "yaml",
-    enabled = IsNotVsCode,
     opts = {},
   },
   {
     dir = "~/.config/nvim/json_utils",
     ft = "json",
-    enabled = IsNotVsCode,
     opts = {},
   },
   {
     dir = "~/.config/nvim/rs-derive-menu",
-    enabled = IsNotVsCode,
     ft = "rust",
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {},
@@ -26,7 +21,6 @@ return {
   {
     dir = "~/.config/nvim/railgun",
     dependencies = { "nvim-lua/plenary.nvim" },
-    enabled = IsNotVsCode,
     keys = {
       {
         "tm",
@@ -82,7 +76,6 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    enabled = IsNotVsCode,
     run = ":TSUpdate",
     main = "nvim-treesitter.configs",
     opts = {
@@ -103,7 +96,6 @@ return {
   },
   {
     "wakatime/vim-wakatime",
-    enabled = IsNotVsCode,
     lazy = false,
   },
 }

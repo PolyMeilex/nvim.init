@@ -1,8 +1,5 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 return {
   "ellisonleao/gruvbox.nvim",
-  enabled = IsNotVsCode,
   priority = 1000,
   config = function()
     require("gruvbox").setup({

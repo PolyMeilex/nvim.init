@@ -1,4 +1,3 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
 local spinner = require("spinner")
 local icons = require("icons")
 
@@ -213,7 +212,6 @@ end
 
 return {
   dir = "~/.config/nvim/lsp-code-context",
-  enabled = IsNotVsCode,
   dependencies = {
     "ThePrimeagen/harpoon",
   },

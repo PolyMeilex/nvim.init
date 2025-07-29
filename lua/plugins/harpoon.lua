@@ -1,8 +1,5 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 return {
   "ThePrimeagen/harpoon",
-  enabled = IsNotVsCode,
   branch = "harpoon2",
   dependencies = { "nvim-lua/plenary.nvim" },
   keys = {

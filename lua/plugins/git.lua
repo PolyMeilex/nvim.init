@@ -1,15 +1,11 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 return {
   {
     dir = "~/.config/nvim/gitblame",
-    enabled = IsNotVsCode,
     opts = {},
   },
   {
     "echasnovski/mini.diff",
     version = "*",
-    enabled = IsNotVsCode,
     opts = {
       view = {
         style = "sign",

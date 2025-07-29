@@ -1,8 +1,5 @@
-local IsNotVsCode = require("vscode").IsNotVsCode()
-
 return {
   dir = "~/.config/nvim/fmt",
-  enabled = IsNotVsCode,
   --- @type fmt.setup.Opts
   opts = {
     formatters = {
