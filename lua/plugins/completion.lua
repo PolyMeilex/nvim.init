@@ -1,3 +1,5 @@
+local icons = require("icons")
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -15,10 +17,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       autotrigger = false,
       convert = function(item)
         local kind = vim.lsp.protocol.CompletionItemKind[item.kind] or "Unknown"
-        local icon = LspItemTypeIcons[item.kind] or ""
+        local icon = icons.lsp.item_type.icons[item.kind] or ""
         return {
           kind = icon .. " " .. kind,
-          kind_hlgroup = LspItemTypeHighlight[item.kind] or nil,
+          kind_hlgroup = icons.lsp.item_type.highlight[item.kind] or nil,
           menu = "",
         }
       end,

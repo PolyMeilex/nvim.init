@@ -1,15 +1,10 @@
+local icons = require("icons")
+
 vim.diagnostic.config({
   virtual_text = {
     severity = vim.diagnostic.severity.ERROR,
   },
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = " ",
-      [vim.diagnostic.severity.WARN] = " ",
-      [vim.diagnostic.severity.INFO] = " ",
-      [vim.diagnostic.severity.HINT] = "󰌵",
-    },
-  },
+  signs = { text = icons.diagnostic_signs },
 })
 
 vim.keymap.set("n", "gl", vim.diagnostic.open_float)

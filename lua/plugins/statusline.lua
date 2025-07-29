@@ -1,5 +1,6 @@
 local IsNotVsCode = require("vscode").IsNotVsCode()
 local spinner = require("spinner")
+local icons = require("icons")
 
 local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
@@ -135,13 +136,6 @@ local function hjkl_harpoon()
   return table.concat(tabs, "")
 end
 
-local icons = {
-  error = "󰅚 ",
-  warn = "󰀪 ",
-  info = "󰋽 ",
-  hint = "󰌶 ",
-}
-
 local function diagnostics_status()
   local count = vim.diagnostic.count(0)
   local error_count = count[vim.diagnostic.severity.ERROR] or 0
@@ -152,19 +146,19 @@ local function diagnostics_status()
   local list = {}
 
   if error_count > 0 then
-    table.insert(list, add_hl("DiagnosticError", icons.error .. error_count))
+    table.insert(list, add_hl("DiagnosticError", icons.diagnostic_signs[vim.diagnostic.severity.ERROR] .. error_count))
   end
 
   if warning_count > 0 then
-    table.insert(list, add_hl("DiagnosticWarn", icons.warn .. warning_count))
+    table.insert(list, add_hl("DiagnosticWarn", icons.diagnostic_signs[vim.diagnostic.severity.WARN] .. warning_count))
   end
 
   if info_count > 0 then
-    table.insert(list, add_hl("DiagnosticInfo", icons.info .. info_count))
+    table.insert(list, add_hl("DiagnosticInfo", icons.diagnostic_signs[vim.diagnostic.severity.INFO] .. info_count))
   end
 
   if hint_count > 0 then
-    table.insert(list, add_hl("DiagnosticHint", icons.hint .. hint_count))
+    table.insert(list, add_hl("DiagnosticHint", icons.diagnostic_signs[vim.diagnostic.severity.HINT] .. hint_count))
   end
 
   if #list > 0 then
