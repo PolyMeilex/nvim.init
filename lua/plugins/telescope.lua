@@ -53,6 +53,8 @@ local function symbols_in_selection()
           }),
           previewer = previewers.vim_buffer_qflist.new(opts),
           sorter = sorters.get_generic_fuzzy_sorter(),
+          push_cursor_on_edit = true,
+          push_tagstack_on_edit = true,
         })
         :find()
     end,
