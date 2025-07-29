@@ -40,11 +40,7 @@ end
 function M.list_requests()
   local count = 0
   for _, client in ipairs(vim.lsp.get_clients()) do
-    if client.name == "stylua-lsp" then
-      goto continue
-    end
-
-    if client.name == "json-bendec-ls" then
+    if client.name == "crates.nvim" then
       goto continue
     end
 

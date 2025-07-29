@@ -15,7 +15,7 @@ local function server(opts)
     local srv = {}
     local request_id = 0
 
-    function srv.request(method, params, callback)
+    function srv.request(method, params, callback, notify_reply_callback)
       pcall(on_request, method, params)
       local handler = handlers[method]
       if handler then
@@ -29,6 +29,9 @@ local function server(opts)
         callback(nil, nil)
       end
       request_id = request_id + 1
+      if notify_reply_callback then
+        notify_reply_callback(request_id)
+      end
       return true, request_id
     end
 
