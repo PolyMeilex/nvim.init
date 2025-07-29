@@ -66,6 +66,13 @@ function M.omni_picker(opts)
 
   pickers
     .new(opts, {
+      __locations_input = true,
+      on_input_filter_cb = function(prompt)
+        if vim.startswith(prompt, "./") then
+          return { prompt = string.sub(prompt, 3) }
+        end
+        return prompt
+      end,
       finder = finder,
       sorter = conf.generic_sorter({}),
       previewer = conf.qflist_previewer({}),
