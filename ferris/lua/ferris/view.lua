@@ -1,5 +1,4 @@
 local M = {}
-local util = require("ferris.private.util")
 
 ---Adds a header to the given line array.
 ---@param lines string[] # The line array
@@ -18,6 +17,23 @@ end
 
 ---@type table<string, integer>
 VIEWS = {}
+
+---Turns some string into an array of lines.
+---@param s string # The string
+---@return string[] # An array of lines
+local function string_to_line_array(s)
+  local lines = {}
+
+  if s:sub(-1) ~= "\n" then
+    s = s .. "\n"
+  end
+
+  for line in s:gmatch("(.-)\n") do
+    table.insert(lines, line)
+  end
+
+  return lines
+end
 
 ---Opens the given view in a split.
 ---@param tag string # The tag of the view. Views with the same tag
@@ -51,7 +67,7 @@ function M.open(tag, view, header, filetype)
 
   -- set the contents of the buffer
   if type(view) == "string" then
-    local view_lines = util.string_to_line_array(view)
+    local view_lines = string_to_line_array(view)
     vim.api.nvim_buf_set_lines(VIEWS[tag], 0, -1, false, add_header(view_lines, header))
   else
     vim.api.nvim_buf_set_lines(VIEWS[tag], 0, -1, false, add_header(view, header))

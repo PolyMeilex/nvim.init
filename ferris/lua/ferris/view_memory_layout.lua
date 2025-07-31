@@ -1,7 +1,44 @@
 local ferris = require("ferris")
-local view = require("ferris.private.view")
-local tree = require("ferris.private.tree")
-local util = require("ferris.private.util")
+local view = require("ferris.view")
+
+local tree = {}
+
+---@class Node
+---@field value any
+---@field children Node[]
+tree.Node = {}
+tree.Node.__index = tree.Node
+
+---Creates a new Node.
+---@param value any # The value of the Node.
+---@param children Node[]? # The children of the Node.
+---@return Node
+function tree.Node.new(value, children)
+  local o = setmetatable({}, tree.Node)
+  o.value = value
+  o.children = children or {}
+  return o
+end
+
+---Add a new child to this node's children.
+---@param child Node # The child node to add as children to this node.
+function tree.Node:push(child)
+  table.insert(self.children, child)
+end
+
+---Returns the maximum key in a table with numeric keys.
+---@param tbl table<number, any>
+---@return number
+local function max_key(tbl)
+  local max = 0
+  for i, _ in pairs(tbl) do
+    if i > max then
+      max = i
+    end
+  end
+
+  return max
+end
 
 -- NOTE: code here is a little messy and unoptimal, but it works, so that's fine!
 
@@ -129,7 +166,7 @@ end
 function FieldGrid:width()
   local max = 0
   for _, row in pairs(self) do
-    local width = util.max_key(row)
+    local width = max_key(row)
     if width > max then
       max = width
     end
@@ -230,15 +267,15 @@ function FieldGrid:render_divisor(row)
   -- render the divisor of each cell
   for column = 1, self:width() do
     -- if we are in the last row and past it's end, we can stop early
-    local last_row_and_past_end = next_row_offset == nil and column > util.max_key(row_elements)
+    local last_row_and_past_end = next_row_offset == nil and column > max_key(row_elements)
     if last_row_and_past_end then
       break
     end
 
     -- if there's a field below or we are not past the next row's
     -- maximum index, then draw a divisor
-    local past_row_max = column > util.max_key(row_elements)
-    local past_next_row_max = column > util.max_key(next_row_elements)
+    local past_row_max = column > max_key(row_elements)
+    local past_next_row_max = column > max_key(next_row_elements)
     if past_row_max and past_next_row_max then
       break
     end
@@ -263,7 +300,7 @@ function FieldGrid:render_cell(row, col)
   local row_offset = self:get_offset(row)
   local row_elements = self[row_offset]
   local cell_element = row_elements[col]
-  local last_column = util.max_key(row_elements)
+  local last_column = max_key(row_elements)
   local column_width = self:column_width(col)
 
   local result = { header = "", body = "" }

@@ -1,5 +1,5 @@
 local ferris = require("ferris")
-local view = require("ferris.private.view")
+local view = require("ferris.view")
 
 ---Expands the macro under the current cursor position.
 local function expand_macro()
