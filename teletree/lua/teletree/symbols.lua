@@ -64,12 +64,23 @@ local lsp_num_to_str = {
 }
 
 local i = 0
-local function build_node(res)
+local function build_node(res, ctx)
   local name = res.name
+  local start_line = res.range.start.line
+  local end_line = res.range["end"].line
+
+  i = i + 1
+  local id = tostring(i)
+
+  local in_range_of_cursor = ctx.source_line >= start_line and ctx.source_line <= end_line
+  if in_range_of_cursor then
+    ctx.selected_node = id
+  end
+
   local children = {}
 
   for _, ch in pairs(res.children or {}) do
-    table.insert(children, build_node(ch))
+    table.insert(children, build_node(ch, ctx))
   end
 
   local detail = res.detail or ""
@@ -78,10 +89,8 @@ local function build_node(res)
     detail = detail:sub(1, 3) .. detail:sub(5)
   end
 
-  i = i + 1
-
   local node = NuiTree.Node({
-    id = i,
+    id = id,
     name = name,
     kind = res.kind,
     text = icons[res.kind] .. name,
@@ -89,15 +98,25 @@ local function build_node(res)
     range = res.range,
   }, children)
 
-  if res.kind ~= 6 and res.kind ~= 12 then
+  if (res.kind ~= 6 and res.kind ~= 12) or in_range_of_cursor then
     node:expand()
   end
+
   return node
 end
 
 function M.get(bufnr)
   bufnr = bufnr or 0
   i = 0
+
+  -- Find the window ID of the original source buffer
+  local source_winid = vim.fn.bufwinid(bufnr)
+  if source_winid == -1 then
+    vim.notify("Original buffer window not found", vim.log.levels.WARN)
+    return {}
+  end
+  local source_pos = vim.api.nvim_win_get_cursor(source_winid)
+  local source_line = source_pos[1] - 1
 
   local res, err = vim.lsp.buf_request_sync(
     bufnr,
@@ -115,18 +134,22 @@ function M.get(bufnr)
   end
 
   local out = {}
+  local ctx = {
+    source_line = source_line,
+    selected_node = nil,
+  }
 
   for _, client in pairs(res) do
     if client.result then
       for _, n in pairs(client.result) do
-        table.insert(out, build_node(n))
+        table.insert(out, build_node(n, ctx))
       end
 
       break
     end
   end
 
-  return out
+  return out, ctx.selected_node
 end
 
 function M.create()
@@ -163,8 +186,10 @@ function M.create()
 
   P.build_tree = function(source_buf)
     P.source_buf = source_buf
-    P.tree:set_nodes(M.get(source_buf))
+    local nodes, selected = M.get(source_buf)
+    P.tree:set_nodes(nodes)
     P.tree:render()
+    return selected
   end
 
   P.refresh = function()
@@ -287,8 +312,13 @@ end
 function M.open(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local current = M.create()
-  current.build_tree(bufnr)
+  local selected = current.build_tree(bufnr)
   current.open()
+
+  local _, linenr = current.tree:get_node(selected)
+  if current.window.winid ~= nil and linenr ~= nil then
+    vim.api.nvim_win_set_cursor(current.window.winid, { linenr, 0 })
+  end
 end
 
 return M
