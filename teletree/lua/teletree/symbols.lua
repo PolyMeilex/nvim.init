@@ -212,6 +212,21 @@ function M.create()
     P.window.close()
   end
 
+  P.jump_to_parent = function()
+    local node = P.get_node()
+    if node == nil then
+      return
+    end
+
+    local parent_id = node:get_parent_id()
+    if parent_id ~= nil then
+      local _, linenr = P.get_node(parent_id)
+      if linenr ~= nil and P.window.winid ~= nil then
+        vim.api.nvim_win_set_cursor(P.window.winid, { linenr, 0 })
+      end
+    end
+  end
+
   P.jump_to_symbol = function()
     local node = P.get_node()
 
