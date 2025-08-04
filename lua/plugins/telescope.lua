@@ -109,6 +109,7 @@ return {
     vim.keymap.set("n", "<C-p>", telescope.extensions.omni_picker.omni_picker, {})
     vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
     vim.keymap.set("n", "tj", builtin.jumplist, {})
+    vim.keymap.set("n", "tw", builtin.lsp_dynamic_workspace_symbols, {})
 
     telescope.setup({
       pickers = {
