@@ -79,8 +79,16 @@ local function build_node(res)
   end
 
   i = i + 1
-  local node =
-    NuiTree.Node({ id = i, name = name, kind = res.kind, text = icons[res.kind] .. name, detail = detail }, children)
+
+  local node = NuiTree.Node({
+    id = i,
+    name = name,
+    kind = res.kind,
+    text = icons[res.kind] .. name,
+    detail = detail,
+    range = res.range,
+  }, children)
+
   if res.kind ~= 6 and res.kind ~= 12 then
     node:expand()
   end
@@ -204,6 +212,28 @@ function M.create()
     P.window.close()
   end
 
+  P.jump_to_symbol = function()
+    local node = P.get_node()
+
+    if not node or not node.range then
+      return
+    end
+
+    P.close()
+
+    -- Find the window ID of the original source buffer
+    local source_winid = vim.fn.bufwinid(P.source_buf)
+    if source_winid == -1 then
+      vim.notify("Original buffer window not found", vim.log.levels.WARN)
+      return
+    end
+
+    vim.api.nvim_set_current_win(source_winid)
+
+    local pos = node.range.start
+    vim.api.nvim_win_set_cursor(source_winid, { pos.line + 1, pos.character })
+  end
+
   P.open = function()
     if P.window.winid ~= nil then
       return
@@ -234,6 +264,7 @@ function M.create()
 
   P.map("n", "<Left>", P.collapse)
   P.map("n", "h", P.collapse)
+  P.map("n", "<CR>", P.jump_to_symbol)
 
   return P
 end
