@@ -108,6 +108,7 @@ return {
     end, {})
     vim.keymap.set("n", "<C-p>", telescope.extensions.omni_picker.omni_picker, {})
     vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
+    vim.keymap.set("n", "tj", builtin.jumplist, {})
 
     telescope.setup({
       pickers = {
@@ -130,6 +131,23 @@ return {
             end
             return prompt
           end,
+        },
+        jumplist = {
+          sort_lastused = true,
+          mappings = {
+            n = {
+              ["<c-c>"] = function(prompt_bufnr)
+                actions.close(prompt_bufnr)
+                vim.cmd("clearjumps")
+              end,
+            },
+            i = {
+              ["<c-c>"] = function(prompt_bufnr)
+                actions.close(prompt_bufnr)
+                vim.cmd("clearjumps")
+              end,
+            },
+          },
         },
       },
 
