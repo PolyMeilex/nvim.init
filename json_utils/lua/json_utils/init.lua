@@ -1,62 +1,38 @@
-local function get_keys(root)
-  local keys = {}
-  for node, name in root:iter_children() do
-    if name == "key" then
-      table.insert(keys, node)
-    end
-
-    if node:child_count() > 0 then
-      for _, child in pairs(get_keys(node)) do
-        table.insert(keys, child)
-      end
-    end
-  end
-  return keys
-end
-
-local function all_keys(bufnr)
-  local tree = vim.treesitter.get_parser(bufnr, "json"):parse()[1]
-  local root = tree:root()
-  return get_keys(root)
-end
+local treesitter = require("json_utils.treesitter")
+local bendec = require("json_utils.bendec")
 
 local M = {}
 
-M.is_json = function()
-  return vim.bo.filetype == "json"
+M.is_json = function(buf)
+  return vim.bo[buf or 0].filetype == "json"
 end
 
 M.setup = function()
   require("json_utils.lsp").register_bendec_lsp_autocmd()
 end
 
--- Get all values from keys called `name`
-M.values_for_key = function(name)
-  if not M.is_json() then
+M.bendec_symbols = function(bufnr)
+  bufnr = bufnr or 0
+
+  if M.is_json(bufnr) == false then
     return {}
   end
 
-  local bufnr = vim.api.nvim_get_current_buf()
+  local tree = vim.treesitter.get_parser(bufnr, "json"):parse()[1]
+  local document = tree:root()
+  assert(document:type() == "document")
 
-  local out = {}
-  for _, node in pairs(all_keys(bufnr)) do
-    local key_as_string = vim.treesitter.get_node_text(node:child(1), bufnr)
+  local root = document:child(0)
 
-    if key_as_string == name then
-      local line, col = node:start()
-
-      local parent = node:parent()
-      local value = parent:field("value")[1]:child(1)
-      local value_as_string = vim.treesitter.get_node_text(value, bufnr)
-      table.insert(out, { line = line + 1, col = col, name = value_as_string })
-    end
+  if root == nil then
+    return {}
   end
 
-  return out
+  return bendec.build_json_conteiner(bufnr, root)
 end
 
 M.find_key_value = function(bufnr, key, value)
-  for _, node in pairs(all_keys(bufnr)) do
+  for _, node in pairs(treesitter.all_keys(bufnr)) do
     local key_as_string = vim.treesitter.get_node_text(node:child(1), bufnr)
 
     if key_as_string == key then

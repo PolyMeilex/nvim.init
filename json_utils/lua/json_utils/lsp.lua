@@ -54,7 +54,7 @@ local function server(opts)
   end
 end
 
----@param method: string
+---@param method string
 ---@param params lsp.DefinitionParams
 ---@return lsp.Location | nil
 local function handle_goto_definition(method, params)
@@ -115,33 +115,8 @@ end
 ---@param params lsp.DocumentSymbolParams
 ---@return lsp.DocumentSymbol[]
 local function handle_document_symbols(method, params)
-  local uri = params.textDocument.uri
   local bufnr = vim.uri_to_bufnr(params.textDocument.uri)
-
-  ---@type lsp.DocumentSymbol[]
-  local out = {}
-  for _, entry in pairs(json_utils.values_for_key("name")) do
-    ---@type lsp.Range[]
-    local range = {
-      start = {
-        line = entry.line - 1,
-        character = entry.col,
-      },
-      ["end"] = {
-        line = entry.line - 1,
-        character = entry.col,
-      },
-    }
-
-    table.insert(out, {
-      name = entry.name,
-      kind = 8,
-      range = range,
-      selectionRange = range,
-    })
-  end
-
-  return out
+  return json_utils.bendec_symbols(bufnr)
 end
 
 local M = {}
