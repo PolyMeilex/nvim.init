@@ -7,8 +7,7 @@ return {
         on_save = true,
       },
       lua = {
-        -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
-        lsp_name = "stylua-lsp-rs", -- Prefer stylua over lua_ls
+        lsp_name = "stylua", -- Prefer stylua over lua_ls
         on_save = true,
       },
       -- lua = {

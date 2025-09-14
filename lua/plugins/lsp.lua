@@ -48,9 +48,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      -- TODO: Try to merge in https://github.com/JohnnyMorganz/StyLua/pull/970 and add this to nvim lspconfig
-      vim.lsp.config["stylua-lsp-rs"] = { cmd = { "stylua", "--lsp" }, filetypes = { "lua" } }
-
       vim.lsp.config("typos_lsp", { init_options = { diagnosticSeverity = "Hint" } })
 
       vim.lsp.config("rust_analyzer", {
@@ -76,7 +73,7 @@ return {
       })
 
       vim.lsp.enable({
-        "stylua-lsp-rs",
+        "stylua",
         "typos_lsp",
         "rust_analyzer",
         "yamlls",
@@ -87,6 +84,8 @@ return {
         "ts_ls",
         "taplo",
         "dartls",
+        "kotlin_lsp",
+        "gdscript",
       })
     end,
   },
