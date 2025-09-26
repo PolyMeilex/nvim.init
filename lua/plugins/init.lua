@@ -32,10 +32,6 @@ return {
     opts = {},
   },
   {
-    dir = "~/.config/nvim/black-hole",
-    opts = {},
-  },
-  {
     dir = "~/.config/nvim/venn",
     config = function()
       -- venn.nvim: enable or disable keymappings
