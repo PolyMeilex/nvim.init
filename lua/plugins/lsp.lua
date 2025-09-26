@@ -48,6 +48,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
+      vim.lsp.config["plantuml-lsp"] = { cmd = { "plantuml-lsp" }, filetypes = { "plantuml" } }
+
       vim.lsp.config("typos_lsp", { init_options = { diagnosticSeverity = "Hint" } })
 
       vim.lsp.config("rust_analyzer", {
@@ -73,6 +75,7 @@ return {
       })
 
       vim.lsp.enable({
+        "plantuml-lsp",
         "stylua",
         "typos_lsp",
         "rust_analyzer",
