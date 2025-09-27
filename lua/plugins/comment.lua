@@ -6,6 +6,8 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     if not cs or not cs:match("%%s") then
       if vim.bo.filetype == "dart" or vim.bo.filetype == "wgsl" then
         vim.bo.commentstring = "// %s"
+      elseif vim.bo.filetype == "plantuml" then
+        vim.bo.commentstring = "' %s"
       end
 
       return
