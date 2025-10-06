@@ -1,11 +1,11 @@
 local function try_typos_lsp_launch(buffer)
-  local has_lspconfig, lspconfig = pcall(require, "lspconfig")
+  local client = vim.lsp.get_clients({ name = "typos_lsp" })[1]
 
-  if not has_lspconfig or lspconfig.typos_lsp == nil or lspconfig.typos_lsp.launch == nil then
+  if client == nil then
     return
   end
 
-  lspconfig.typos_lsp.launch(buffer)
+  vim.lsp.buf_attach_client(buffer, client.id)
 end
 
 vim.ui.input = function(opts, on_confirm)
