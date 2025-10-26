@@ -15,7 +15,7 @@ _G.my_harpoon_click_handler = function(minwid, _, _, _)
 end
 
 local function my_navic()
-  local navic = require("lsp-code-context").get_location()
+  local navic = require("lsp-code-context").get_label()
 
   if #navic == 0 then
     return ""
