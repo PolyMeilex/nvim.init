@@ -78,9 +78,7 @@ M.run = function()
     vim.schedule(function()
       vim.api.nvim_buf_clear_namespace(bufnr, namespace_id, 0, -1)
       vim.api.nvim_buf_set_extmark(bufnr, namespace_id, line_num - 1, 0, {
-        -- TODO:
-        -- virt_text_pos = "eol_right_align",
-        virt_text_pos = "right_align",
+        virt_text_pos = "eol_right_align",
         virt_text = virt_text,
       })
     end)
