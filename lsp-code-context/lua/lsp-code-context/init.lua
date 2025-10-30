@@ -6,15 +6,15 @@ function M.setup()
   local breadcrumbs_augroup = vim.api.nvim_create_augroup("Breadcrumbs", { clear = true })
 
   vim.api.nvim_create_autocmd({ "CursorMoved" }, {
-      group = breadcrumbs_augroup,
-      callback = lib.update_label,
-      desc = "Update breadcrumbs label",
+    group = breadcrumbs_augroup,
+    callback = lib.update_label,
+    desc = "Update breadcrumbs label",
   })
 
   vim.api.nvim_create_autocmd({ "InsertLeave", "BufEnter", "CursorHold" }, {
-      group = breadcrumbs_augroup,
-      callback = lib.request_symbols,
-      desc = "Update breadcrumbs lsp symbols",
+    group = breadcrumbs_augroup,
+    callback = lib.request_symbols,
+    desc = "Update breadcrumbs lsp symbols",
   })
 end
 
