@@ -140,12 +140,8 @@ function M.request_symbols()
             uri = uri
         }
     }
-    vim.lsp.buf_request(
-        bufnr,
-        'textDocument/documentSymbol',
-        params,
-        lsp_callback
-    )
+
+    vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, lsp_callback, function() end)
 end
 
 return M
