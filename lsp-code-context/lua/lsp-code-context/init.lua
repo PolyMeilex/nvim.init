@@ -24,7 +24,7 @@ end
 
 function M.get_data(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local context_data = require("lsp-code-context.my").get_context_data(bufnr)
+  local context_data = lib.get_context_data(bufnr)
 
   if context_data == nil then
     return nil
