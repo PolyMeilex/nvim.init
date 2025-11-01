@@ -36,4 +36,9 @@ vim.keymap.set("i", "<CR>", function()
   return vim.fn.pumvisible() == 1 and "<C-c>a<CR>" or "<CR>"
 end, { expr = true, noremap = true })
 
+vim.keymap.set({ "i", "s" }, "<Esc>", function()
+  vim.snippet.stop()
+  return "<Esc>"
+end, { expr = true })
+
 return {}
