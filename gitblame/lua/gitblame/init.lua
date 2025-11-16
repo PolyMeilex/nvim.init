@@ -96,6 +96,8 @@ end
 
 M.setup = function()
   vim.o.updatetime = 500
+
+  vim.api.nvim_create_user_command("GitBlameToggle", M.toggle, { desc = "Toggle git blame" })
 end
 
 M.on = false
