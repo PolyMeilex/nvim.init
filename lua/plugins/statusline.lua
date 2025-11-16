@@ -14,14 +14,14 @@ _G.my_harpoon_click_handler = function(minwid, _, _, _)
   harpoon:list():select(minwid)
 end
 
-local function my_navic()
-  local navic = require("lsp-code-context").get_label()
+local function code_context()
+  local label = require("lsp-code-context").get_label()
 
-  if #navic == 0 then
+  if #label == 0 then
     return ""
   end
 
-  return navic
+  return label
 end
 
 local function hjkl_harpoon()
@@ -177,12 +177,7 @@ _G.my_winbar = function()
     return ""
   end
 
-  return my_navic() .. " " .. spinner.label() .. " " .. add_hl("Comment", vim.lsp.status()) .. "%=" .. hjkl_harpoon()
-end
-
-_G.my_git_blame_button = function()
-  require("gitblame").toggle()
-  vim.api.nvim_command("redrawstatus!")
+  return code_context() .. "%=" .. hjkl_harpoon()
 end
 
 _G.my_statusline = function()
@@ -199,15 +194,8 @@ _G.my_statusline = function()
     file_status = "[+] "
   end
 
-  local git_icon = add_on_click(1, "my_git_blame_button", "")
-
-  if require("gitblame").on then
-    git_icon = add_hl("GruvboxOrange", git_icon)
-  else
-    git_icon = add_hl("GruvboxFg0", git_icon)
-  end
-
-  return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) .. "%=" .. git_icon
+  local right = spinner.label() .. " " .. add_hl("Comment", vim.lsp.status())
+  return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) .. "%=" .. right
 end
 
 return {
@@ -216,13 +204,7 @@ return {
     "ThePrimeagen/harpoon",
   },
   config = function()
-    require("lsp-code-context").setup({
-      highlight = true,
-      click = true,
-      lsp = {
-        auto_attach = true,
-      },
-    })
+    require("lsp-code-context").setup()
 
     require("harpoon"):extend({
       ADD = function()
