@@ -104,7 +104,10 @@ local function build_popup()
     NuiTree.Node({ name = "PartialOrd", on = false }),
   })
 
-  local rs_tree = RustTree.get_derives_at_cursor() or {}
+  local rs_tree = RustTree.get_derives_at_cursor()
+  if not rs_tree then
+    return
+  end
 
   for _, v in pairs(rs_tree.derives or {}) do
     items:insert(NuiTree.Node({ name = v, on = true }))
@@ -265,6 +268,9 @@ end
 
 M.open = function()
   local derive_popup = build_popup()
+  if not derive_popup then
+    return
+  end
   local ops = { buffer = derive_popup.bufnr(), nowait = true }
 
   vim.keymap.set("n", "h", derive_popup.collapse, ops)

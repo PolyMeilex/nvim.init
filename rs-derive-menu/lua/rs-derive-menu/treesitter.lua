@@ -1,84 +1,9 @@
+local parser = require("rs-derive-menu.parser")
+
 --- @param s string
 --- @return boolean
 local function trim(s)
   return s:match("^%s*(.-)%s*$")
-end
-
---- @return TSNode | nil
-local function search_for_struct_or_enum(node)
-  while node:type() ~= "struct_item" and node:type() ~= "enum_item" do
-    node = node:parent()
-    if not node then
-      return nil
-    end
-  end
-
-  return node
-end
-
---- @return string | nil
-local function attribute_ident(bufnr, attribute)
-  local ident = attribute:child(0)
-  if not ident then
-    return nil
-  end
-  return vim.treesitter.get_node_text(ident, bufnr)
-end
-
---- @return string | nil
-local function attribute_item_ident(bufnr, attribute_item)
-  local attribute = attribute_item:child(2)
-  if not attribute then
-    return nil
-  end
-  return attribute_ident(bufnr, attribute)
-end
-
---- @return TSNode | nil
-local function search_for_attribute_item(bufnr, node)
-  while node:type() ~= "attribute_item" do
-    node = node:parent()
-    if not node then
-      return nil
-    end
-  end
-
-  if attribute_item_ident(bufnr, node) ~= "derive" then
-    return nil
-  end
-
-  return node
-end
-
---- @return TSNode[]
-local function attribute_items_for_node(node)
-  local siblings = {}
-  local sibling = node:prev_sibling()
-
-  while sibling:type() == "attribute_item" do
-    table.insert(siblings, sibling)
-    sibling = sibling:prev_sibling()
-    if sibling == nil then
-      break
-    end
-  end
-
-  return siblings
-end
-
---- @param attribute_items TSNode[]
---- @return TSNode | nil, boolean
-local function searach_for_derive(bufnr, attribute_items)
-  local last = nil
-
-  for _, node in pairs(attribute_items) do
-    last = node
-    if attribute_item_ident(bufnr, last) == "derive" then
-      return last, true
-    end
-  end
-
-  return last, false
 end
 
 local M = {}
@@ -90,52 +15,58 @@ local M = {}
 --- @field end_line integer
 --- @field replace boolean
 
----@return DeriveNodeInfo | nil
+--- @param ctx RustNodeContext
+--- @return TSNode | nil
+local function find_preexisting_derive(ctx)
+  for _, node in pairs(ctx.attribute_items) do
+    if parser.attribute_item_ident(ctx.bufnr, node) == "derive" then
+      return node
+    end
+  end
+  return nil
+end
+
+--- @return DeriveNodeInfo | nil
 M.get_derives_at_cursor = function()
   local bufnr = vim.api.nvim_get_current_buf()
 
-  local cursor_node = vim.treesitter.get_node()
-  if not cursor_node then
-    return
+  local ctx = parser.parse(bufnr)
+  if not ctx then
+    return nil
   end
 
-  local attribute_item = search_for_attribute_item(bufnr, cursor_node)
+  local preexisting_derive = find_preexisting_derive(ctx)
 
-  -- TODO: Make this smarter
+  local attribute_item = preexisting_derive
+
   if not attribute_item then
-    local struct = search_for_struct_or_enum(cursor_node)
+    local struct = ctx.root
 
     if not struct then
       return nil
     end
 
-    local attributes = attribute_items_for_node(struct)
-    local last, found = searach_for_derive(bufnr, attributes)
+    local last = ctx.attribute_items[#ctx.attribute_items] or struct
+    local start_line = last:start()
 
-    if found and last then
-      attribute_item = last
-    else
-      if not last then
-        last = struct
-      end
-      local start_line = last:start()
-
-      return {
-        bufnr = bufnr,
-        derives = {},
-        start_line = start_line,
-        end_line = start_line,
-        replace = false,
-      }
-    end
+    return {
+      bufnr = bufnr,
+      derives = {},
+      start_line = start_line,
+      end_line = start_line,
+      replace = false,
+    }
   end
 
-  local attribute = attribute_item:child(2)
+  local attribute = parser.attribute_from_attribute_item(attribute_item)
   if attribute == nil then
     return nil
   end
 
-  local arguments_node = attribute:field("arguments")[1]
+  local arguments_node = parser.attribute_arguments(attribute)
+  if arguments_node == nil then
+    return nil
+  end
 
   local body = vim.treesitter.get_node_text(arguments_node, bufnr)
 

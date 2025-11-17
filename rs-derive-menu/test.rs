@@ -9,3 +9,11 @@ struct Abc {}
 struct Abc {}
 
 struct Abc {}
+
+#[derive(Debug, Clone)]
+//
+#[repr(8)]
+//
+/* */
+///
+struct Abc {}
