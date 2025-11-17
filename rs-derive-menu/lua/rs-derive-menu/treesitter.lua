@@ -50,6 +50,37 @@ local function search_for_attribute_item(bufnr, node)
   return node
 end
 
+--- @return TSNode[]
+local function attribute_items_for_node(node)
+  local siblings = {}
+  local sibling = node:prev_sibling()
+
+  while sibling:type() == "attribute_item" do
+    table.insert(siblings, sibling)
+    sibling = sibling:prev_sibling()
+    if sibling == nil then
+      break
+    end
+  end
+
+  return siblings
+end
+
+--- @param attribute_items TSNode[]
+--- @return TSNode | nil, boolean
+local function searach_for_derive(bufnr, attribute_items)
+  local last = nil
+
+  for _, node in pairs(attribute_items) do
+    last = node
+    if attribute_item_ident(bufnr, last) == "derive" then
+      return last, true
+    end
+  end
+
+  return last, false
+end
+
 local M = {}
 
 --- @class DeriveNodeInfo
@@ -74,17 +105,21 @@ M.get_derives_at_cursor = function()
   if not attribute_item then
     local struct = search_for_struct_or_enum(cursor_node)
 
-    if struct == nil then
+    if not struct then
       return nil
     end
 
-    local sibling = struct:prev_sibling()
+    local attributes = attribute_items_for_node(struct)
+    local last, found = searach_for_derive(bufnr, attributes)
 
-    local start_line = struct:start()
-
-    if sibling ~= nil and sibling:type() == "attribute_item" then
-      attribute_item = sibling
+    if found and last then
+      attribute_item = last
     else
+      if not last then
+        last = struct
+      end
+      local start_line = last:start()
+
       return {
         bufnr = bufnr,
         derives = {},
@@ -94,8 +129,6 @@ M.get_derives_at_cursor = function()
       }
     end
   end
-
-  vim.print(attribute_item:type())
 
   local attribute = attribute_item:child(2)
   if attribute == nil then
