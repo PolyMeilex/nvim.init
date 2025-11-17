@@ -13,9 +13,9 @@ local function new_finder()
   local marklist = {}
 
   local project = railgun.db:get_project() or {}
-  local files = project.files or {}
+  local bookmarks = project.bookmarks or {}
 
-  for path, marks in pairs(files) do
+  for path, marks in pairs(bookmarks) do
     for _, entry in pairs(marks) do
       table.insert(marklist, {
         filename = path,

@@ -13,7 +13,9 @@ function M.setup(config)
     M.add(opts.args)
   end, { nargs = "?" })
 
-  vim.api.nvim_create_user_command("RailgunQMark", M.add_quick_mark, {})
+  vim.api.nvim_create_user_command("RailgunQMark", function(opts)
+    M.add_quick_mark(opts.args)
+  end, { nargs = "?" })
 end
 
 ---@param annotation? string
@@ -34,12 +36,22 @@ function M.add(annotation)
   M.db:add(project, file, pos[1], pos[2], annotation)
 end
 
-function M.add_quick_mark()
+---@param annotation? string
+function M.add_quick_mark(annotation)
+  if vim.trim(annotation or "") == "" then
+    annotation = nil
+  end
+
   local project = vim.loop.cwd()
   local buf = vim.api.nvim_get_current_buf()
+  local pos = vim.api.nvim_win_get_cursor(0)
   local file = vim.api.nvim_buf_get_name(buf)
 
-  M.db:add_quick_mark(project, file)
+  if annotation == nil then
+    annotation = vim.trim(vim.api.nvim_buf_get_text(buf, pos[1] - 1, 0, pos[1] - 1, -1, {})[1] or "Unknown")
+  end
+
+  M.db:add_quick_mark(project, file, pos[1], pos[2], annotation)
 end
 
 ---@param file_path string

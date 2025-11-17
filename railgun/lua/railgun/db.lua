@@ -1,11 +1,11 @@
 local Path = require("plenary.path")
 
 ---@class RailgunDbData
----@field projects table<string, RailgunDbProjectData>
+---@field project RailgunDbProjectData
 
 ---@class RailgunDbProjectData
----@field files table<string, RailgunDbTargetData[]>
----@field marks table<string>
+---@field bookmarks table<string, RailgunDbTargetData[]>
+---@field marks table<string, RailgunDbTargetData[]>
 
 ---@class RailgunDbTargetData
 ---@field annotation? string
@@ -22,11 +22,16 @@ M.__index = M
 ---@param config RailgunConfig
 ---@return RailgunDb
 function M:new(config)
+  local cwd = vim.loop.cwd()
+  local escaped_cwd = cwd:gsub("/", "@")
+
   local out = setmetatable({
     config = config,
-    path = Path:new(config.data_path .. "/default.json"),
+    path = Path:new(config.data_path .. "/" .. escaped_cwd .. ".json"),
+    dirty = false,
     data = {
-      projects = vim.empty_dict(),
+      cwd = cwd,
+      project = vim.empty_dict(),
     },
   }, self)
 
@@ -37,7 +42,6 @@ end
 
 function M:load()
   if not self.path:exists() then
-    self.path:touch({ parents = true })
     self:save()
   else
     local data = self.path:read()
@@ -46,14 +50,18 @@ function M:load()
 end
 
 function M:save()
-  self.path:write(vim.json.encode(self.data), "w")
+  if self.dirty then
+    self.path:touch({ parents = true })
+    self.path:write(vim.json.encode(self.data), "w")
+  end
+  self.dirty = false
 end
 
 ---@param project_path? string
 ---@return RailgunDbProjectData?
 function M:get_project(project_path)
   project_path = project_path or vim.loop.cwd()
-  return self.data.projects[project_path]
+  return self.data.project
 end
 
 ---@param project_path string
@@ -62,36 +70,43 @@ end
 ---@param col integer
 ---@param annotation string
 function M:add(project_path, file_path, line, col, annotation)
-  local project = self.data.projects[project_path] or {}
+  self.dirty = true
+  local project = self.data.project or {}
 
-  local files = project.files or {}
+  local bookmarks = project.bookmarks or {}
 
   local relative_file = Path:new(file_path):make_relative(project_path)
 
-  local file = files[relative_file] or {}
+  local file = bookmarks[relative_file] or {}
 
   table.insert(file, { line = line, col = col, annotation = annotation })
 
-  files[relative_file] = file
+  bookmarks[relative_file] = file
 
-  project.files = files
-  self.data.projects[project_path] = project
+  project.bookmarks = bookmarks
+  self.data.project = project
 
   self:save()
 end
 
 ---@param project_path string
 ---@param file_path string
-function M:add_quick_mark(project_path, file_path)
-  local project = self.data.projects[project_path] or {}
+function M:add_quick_mark(project_path, file_path, line, col, annotation)
+  self.dirty = true
+  local project = self.data.project or {}
 
   local marks = project.marks or {}
 
   local relative_file = Path:new(file_path):make_relative(project_path)
-  table.insert(marks, relative_file)
+
+  local file = marks[relative_file] or {}
+
+  table.insert(file, { line = line, col = col, annotation = annotation })
+
+  marks[relative_file] = file
 
   project.marks = marks
-  self.data.projects[project_path] = project
+  self.data.project = project
 
   self:save()
 end
@@ -101,9 +116,10 @@ end
 ---@param line integer
 ---@param col integer
 function M:remove(project_path, file_path, line, col)
-  local project = self.data.projects[project_path] or {}
-  local files = project.files or {}
-  local file = files[file_path] or {}
+  self.dirty = true
+  local project = self.data.project or {}
+  local bookmarks = project.bookmarks or {}
+  local file = bookmarks[file_path] or {}
 
   local pos = nil
 
