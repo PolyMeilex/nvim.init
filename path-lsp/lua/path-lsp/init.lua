@@ -12,6 +12,9 @@ local M = {}
 ---@class PathLspConfig
 ---@field filetypes string[] List of filetypes to enable path-lsp for. Use {'*'} for all filetypes
 ---@field scanner ScannerConfig Settings controlling file system scanning behavior
+---@field enabled boolean
+---@field autostart boolean
+---@field relative_to_curr_file boolean
 
 ---@type PathLspConfig
 local default_config = {
@@ -21,6 +24,9 @@ local default_config = {
     cache_duration_ms = 5000,
     throttle_delay_ms = 1000,
   },
+  enabled = false,
+  autostart = false,
+  relative_to_curr_file = true,
 }
 
 ---@type PathLspConfig
@@ -145,7 +151,9 @@ local function server_create()
         return
       end
 
-      dir_part = M.get_curr_file_dir() .. "/" .. dir_part
+      if M.config.relative_to_curr_file then
+        dir_part = M.get_curr_file_dir() .. "/" .. dir_part
+      end
       local expanded_path = vim.fs.normalize(vim.fs.abspath(dir_part))
       scan_dir_async(expanded_path, function(results)
         local items = {}
@@ -208,10 +216,53 @@ function M.get_curr_file_dir()
   return dir
 end
 
+function M.start()
+  vim.lsp.start({
+    name = "path-lsp",
+    cmd = server_create(),
+    root_dir = vim.uv.cwd(),
+    reuse_client = function()
+      return true
+    end,
+  })
+end
+
+function M.stop()
+  local client = vim.lsp.get_clients({ name = "path-lsp" })
+  for _, value in pairs(client) do
+    vim.lsp.stop_client(value.id)
+  end
+end
+
+function M.toggle()
+  if M.config.enabled then
+    M.config.enabled = false
+    M.stop()
+  else
+    M.config.enabled = true
+    M.start()
+  end
+end
+
+function M.relative_to_curr_file_toggle()
+  M.config.relative_to_curr_file = not M.config.relative_to_curr_file
+end
+
 ---@param config PathLspConfig
 function M.setup(config)
   M.config = vim.deepcopy(default_config)
   M.config = vim.tbl_deep_extend("force", M.config, config or {})
+
+  vim.api.nvim_create_user_command("PathLspToggle", M.toggle, { desc = "Toggle path lsp" })
+  vim.api.nvim_create_user_command(
+    "PathLspRelativeToggle",
+    M.relative_to_curr_file_toggle,
+    { desc = "Relative to curr file toggle" }
+  )
+
+  if not config.autostart then
+    return
+  end
 
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("path-lsp", { clear = true }),
@@ -222,14 +273,7 @@ function M.setup(config)
         return
       end
 
-      vim.lsp.start({
-        name = "path-lsp",
-        cmd = server_create(),
-        root_dir = vim.uv.cwd(),
-        reuse_client = function()
-          return true
-        end,
-      })
+      M.start()
     end,
     desc = "path-lsp autostart",
   })
