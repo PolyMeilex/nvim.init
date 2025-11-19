@@ -7,14 +7,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
       return
     end
 
-    vim.api.nvim_create_autocmd("InsertCharPre", {
-      buffer = args.buf,
-      -- TODO: Debounce?
-      callback = vim.schedule_wrap(vim.lsp.completion.get),
-    })
+    -- Trigger completion on every character
+    local chars = client.server_capabilities.completionProvider.triggerCharacters
+    if chars then
+      for i = string.byte("a"), string.byte("z") do
+        if not vim.list_contains(chars, string.char(i)) then
+          table.insert(chars, string.char(i))
+        end
+      end
+    end
 
     vim.lsp.completion.enable(true, client.id, args.buf, {
-      autotrigger = false,
+      autotrigger = true,
       convert = function(item)
         local kind = vim.lsp.protocol.CompletionItemKind[item.kind] or "Unknown"
         local icon = icons.lsp.item_type.icons[item.kind] or ""
