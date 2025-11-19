@@ -145,6 +145,7 @@ local function server_create()
         return
       end
 
+      dir_part = M.get_curr_file_dir() .. "/" .. dir_part
       local expanded_path = vim.fs.normalize(vim.fs.abspath(dir_part))
       scan_dir_async(expanded_path, function(results)
         local items = {}
@@ -198,6 +199,13 @@ local function server_create()
       terminate = function() end,
     }
   end
+end
+
+function M.get_curr_file_dir()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  local dir = vim.fs.dirname(path)
+  return dir
 end
 
 ---@param config PathLspConfig
