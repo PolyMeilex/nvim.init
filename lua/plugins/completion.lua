@@ -45,4 +45,9 @@ vim.keymap.set({ "i", "s" }, "<Esc>", function()
   return "<Esc>"
 end, { expr = true })
 
-return {}
+return {
+  {
+    dir = "~/.config/nvim/path-lsp",
+    config = {},
+  },
+}
