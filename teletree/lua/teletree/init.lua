@@ -427,6 +427,8 @@ function M.open()
   M.current.reveal_path(path)
 end
 
-function M.setup() end
+function M.setup()
+  require("teletree.call_hierarchy").setup()
+end
 
 return M
