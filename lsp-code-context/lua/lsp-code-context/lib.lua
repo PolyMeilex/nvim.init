@@ -72,7 +72,7 @@ local function find_symbol_path(symbol_list, line, char, path)
   end
 
   for _, symbol in ipairs(symbol_list) do
-    if range_contains_pos(symbol.range, line, char) then
+    if symbol.range and range_contains_pos(symbol.range, line, char) then
       table.insert(path, symbol)
       find_symbol_path(symbol.children, line, char, path)
       return true
