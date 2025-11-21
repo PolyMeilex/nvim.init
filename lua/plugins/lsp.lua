@@ -18,7 +18,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     vim.keymap.set("n", "gd", telescope.lsp_definitions, opts)
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-    vim.keymap.set("n", "gi", telescope.lsp_implementations, opts)
+    vim.keymap.set("n", "gi", telescope.lsp_incoming_calls, opts)
+    vim.keymap.set("n", "gI", telescope.lsp_implementations, opts)
     vim.keymap.set("n", "go", telescope.lsp_type_definitions, opts)
     vim.keymap.set("n", "gr", telescope.lsp_references, opts)
 
