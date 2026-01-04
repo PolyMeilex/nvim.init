@@ -217,6 +217,8 @@ function M.get_curr_file_dir()
 end
 
 function M.start()
+  M.config.enabled = true
+
   vim.lsp.start({
     name = "path-lsp",
     cmd = server_create(),
@@ -228,6 +230,8 @@ function M.start()
 end
 
 function M.stop()
+  M.config.enabled = false
+
   local client = vim.lsp.get_clients({ name = "path-lsp" })
   for _, value in pairs(client) do
     vim.lsp.stop_client(value.id)
@@ -236,16 +240,22 @@ end
 
 function M.toggle()
   if M.config.enabled then
-    M.config.enabled = false
     M.stop()
   else
-    M.config.enabled = true
     M.start()
   end
 end
 
 function M.relative_to_curr_file_toggle()
   M.config.relative_to_curr_file = not M.config.relative_to_curr_file
+end
+
+function M.set_relative_to_curr_file()
+  M.config.relative_to_curr_file = true
+end
+
+function M.set_relative_to_curr_cwd()
+  M.config.relative_to_curr_file = false
 end
 
 ---@param config PathLspConfig
@@ -258,6 +268,16 @@ function M.setup(config)
     "PathLspRelativeToggle",
     M.relative_to_curr_file_toggle,
     { desc = "Relative to curr file toggle" }
+  )
+  vim.api.nvim_create_user_command(
+    "PathLspRelativeToCwd",
+    M.set_relative_to_curr_cwd,
+    { desc = "Relative to current cwd" }
+  )
+  vim.api.nvim_create_user_command(
+    "PathLspRelativeToFile",
+    M.set_relative_to_curr_file,
+    { desc = "Relative to current file" }
   )
 
   if not config.autostart then

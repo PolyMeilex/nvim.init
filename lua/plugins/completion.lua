@@ -48,6 +48,8 @@ end, { expr = true })
 return {
   {
     dir = "~/.config/nvim/path-lsp",
-    config = {},
+    config = {
+      autostart = true,
+    },
   },
 }
