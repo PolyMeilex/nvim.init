@@ -32,6 +32,10 @@ return {
     opts = {},
   },
   {
+    dir = "~/.config/nvim/rust-targets",
+    opts = {},
+  },
+  {
     dir = "~/.config/nvim/venn",
     config = function()
       -- venn.nvim: enable or disable keymappings
