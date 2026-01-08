@@ -1,3 +1,7 @@
+vim.api.nvim_create_user_command("MiniDiffToggleOverlay", function()
+  require("mini.diff").toggle_overlay(0)
+end, {})
+
 return {
   {
     dir = "~/.config/nvim/gitblame",

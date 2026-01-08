@@ -74,7 +74,7 @@ return {
       dir = "~/.config/nvim/omni_picker",
     },
   },
-  keys = { "tpf", "<C-p>", "tc", "tf", "tF", "to", "tb", "tt", "tl", "td", "tD", "tg" },
+  keys = { "tpf", "<C-p>", "tc", "tf", "tF", "to", "tb", "tt", "tl", "td", "tD", "tg", "th" },
   config = function()
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")
@@ -110,6 +110,9 @@ return {
     vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
     vim.keymap.set("n", "tj", builtin.jumplist, {})
     vim.keymap.set("n", "tw", builtin.lsp_dynamic_workspace_symbols, {})
+    vim.keymap.set("n", "th", function()
+      require("git-hunks-picker").pick()
+    end, {})
 
     telescope.setup({
       pickers = {
