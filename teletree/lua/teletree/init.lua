@@ -123,6 +123,19 @@ local function create()
     P.path = path or vim.fn.getcwd()
 
     local nodes = scandir_sync(P.path, P.tree)
+
+    table.insert(
+      nodes,
+      1,
+      NuiTree.Node({
+        text = "./",
+        type = "directory",
+        path = vim.fn.getcwd(),
+        is_directory = true,
+        is_loaded = true,
+      })
+    )
+
     P.tree:set_nodes(nodes)
     P.tree:render()
 

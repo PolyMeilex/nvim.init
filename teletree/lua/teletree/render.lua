@@ -33,10 +33,12 @@ function M.prepare_node(node, _)
 
     if node.is_directory then
       line:append(" ")
-      if node:is_expanded() then
-        line:append(" ", "GruvboxGreenBold")
-      else
-        line:append(" ", "GruvboxGreenBold")
+      if text ~= "./" then
+        if node:is_expanded() then
+          line:append(" ", "GruvboxGreenBold")
+        else
+          line:append(" ", "GruvboxGreenBold")
+        end
       end
       line:append(text, hi or "GruvboxGreenBold")
     else
