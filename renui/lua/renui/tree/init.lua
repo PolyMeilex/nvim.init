@@ -137,7 +137,6 @@ end
 --luacheck: pop
 
 ---@class nui_tree_internal
----@field buf_options table<string, any>
 ---@field get_node_id nui_tree_get_node_id
 ---@field linenr { [1]?: integer, [2]?: integer }
 ---@field linenr_by_node_id table<string, { [1]: integer, [2]: integer }>
@@ -178,21 +177,26 @@ function Tree:new(options)
   this.ns_id = vim.api.nvim_create_namespace("renui")
 
   this._ = {
-    buf_options = vim.tbl_extend("force", {
-      bufhidden = "hide",
-      buflisted = false,
-      buftype = "nofile",
-      modifiable = false,
-      readonly = true,
-      swapfile = false,
-      undolevels = 0,
-    }, options.buf_options or {}),
     get_node_id = options.get_node_id or tree_util.default_get_node_id,
     prepare_node = options.prepare_node or tree_util.default_prepare_node,
     linenr = {},
+    linenr_by_node_id = {},
+    node_id_by_linenr = {},
   }
 
-  _.set_buf_options(this.bufnr, this._.buf_options)
+  local buf_options = {
+    bufhidden = "hide",
+    buflisted = false,
+    buftype = "nofile",
+    modifiable = false,
+    readonly = true,
+    swapfile = false,
+    undolevels = 0,
+  }
+
+  for name, value in pairs(buf_options) do
+    vim.api.nvim_set_option_value(name, value, { buf = this.bufnr })
+  end
 
   this:set_nodes(options.nodes or {})
 
@@ -431,7 +435,8 @@ function Tree:render(linenr_start)
   local line_idx = lines.len
   lines.len = nil
 
-  _.set_buf_options(self.bufnr, { modifiable = true, readonly = false })
+  vim.api.nvim_set_option_value("modifiable", true, { buf = self.bufnr })
+  vim.api.nvim_set_option_value("readonly", false, { buf = self.bufnr })
 
   vim.api.nvim_buf_clear_namespace(self.bufnr, self.ns_id, (prev_linenr[1] or 1) - 1, prev_linenr[2] or 0)
 
@@ -447,7 +452,8 @@ function Tree:render(linenr_start)
   -- for subsequent renders, replace the lines from previous render.
   _.render_lines(lines, self.bufnr, self.ns_id, linenr_start, prev_linenr[1] and prev_linenr[2] or linenr_start)
 
-  _.set_buf_options(self.bufnr, { modifiable = false, readonly = true })
+  vim.api.nvim_set_option_value("modifiable", false, { buf = self.bufnr })
+  vim.api.nvim_set_option_value("readonly", true, { buf = self.bufnr })
 
   self._.linenr[1], self._.linenr[2] = linenr_start, line_idx + linenr_start - 1
 end

@@ -2,14 +2,6 @@ local M = {}
 
 M._ = {}
 
----@param bufnr number
----@param buf_options table<string, any>
-function M._.set_buf_options(bufnr, buf_options)
-  for name, value in pairs(buf_options) do
-    vim.api.nvim_set_option_value(name, value, { buf = bufnr })
-  end
-end
-
 ---@param bufnr integer
 ---@param linenr_start integer (1-indexed)
 ---@param linenr_end integer (1-indexed,inclusive)
@@ -58,12 +50,6 @@ function M._.render_lines(lines, bufnr, ns_id, linenr_start, linenr_end, byte_st
       line:highlight(bufnr, ns_id, linenr + row_start, byte_start)
     end
   end
-end
-
----@param ns_id integer
----@return integer
-function M._.ensure_namespace_id(ns_id)
-  return ns_id == -1 and fallback_namespace_id or ns_id
 end
 
 return M
