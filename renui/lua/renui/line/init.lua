@@ -13,7 +13,7 @@ function Line:new(texts)
 end
 
 ---@param content string|RenuiText|RenuiLine
----@param highlight? string|nui_text_extmark data for highlight
+---@param highlight? string|vim.api.keyset.set_extmark data for highlight
 ---@return RenuiText|RenuiLine
 function Line:append(content, highlight)
   local block = content
@@ -74,8 +74,4 @@ function Line:render(bufnr, ns_id, linenr_start, linenr_end)
   self:highlight(bufnr, ns_id, linenr_start)
 end
 
----@alias NuiLine.constructor fun(texts?: RenuiText[]): RenuiLine
----@type RenuiLine|NuiLine.constructor
-local NuiLine = Line
-
-return NuiLine
+return Line
