@@ -1,11 +1,9 @@
 local M = {}
 
-M._ = {}
-
 ---@param bufnr integer
 ---@param linenr_start integer (1-indexed)
 ---@param linenr_end integer (1-indexed,inclusive)
-function M._.clear_lines(bufnr, linenr_start, linenr_end)
+function M.clear_lines(bufnr, linenr_start, linenr_end)
   local count = linenr_end - linenr_start + 1
   if count < 1 then
     return
@@ -26,7 +24,7 @@ end
 ---@param linenr_end? integer (1-indexed,inclusive)
 ---@param byte_start? integer (0-indexed)
 ---@param byte_end? integer (0-indexed,exclusive)
-function M._.render_lines(lines, bufnr, ns_id, linenr_start, linenr_end, byte_start, byte_end)
+function M.render_lines(lines, bufnr, ns_id, linenr_start, linenr_end, byte_start, byte_end)
   local row_start = linenr_start - 1
   local row_end = linenr_end or row_start + 1
 

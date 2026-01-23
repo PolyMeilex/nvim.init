@@ -1,4 +1,4 @@
-local _ = require("renui.utils")._
+local utils = require("renui.utils")
 local tree_util = require("renui.tree.util")
 
 -- returns id of the first window that contains the buffer
@@ -442,7 +442,7 @@ function Tree:render(linenr_start)
 
   -- if linenr_start was shifted downwards,
   -- clear the previously rendered lines above.
-  _.clear_lines(
+  utils.clear_lines(
     self.bufnr,
     math.min(linenr_start, prev_linenr[1] or linenr_start),
     prev_linenr[1] and linenr_start - 1 or 0
@@ -450,7 +450,7 @@ function Tree:render(linenr_start)
 
   -- for initial render, start inserting in a single line.
   -- for subsequent renders, replace the lines from previous render.
-  _.render_lines(lines, self.bufnr, self.ns_id, linenr_start, prev_linenr[1] and prev_linenr[2] or linenr_start)
+  utils.render_lines(lines, self.bufnr, self.ns_id, linenr_start, prev_linenr[1] and prev_linenr[2] or linenr_start)
 
   vim.api.nvim_set_option_value("modifiable", false, { buf = self.bufnr })
   vim.api.nvim_set_option_value("readonly", true, { buf = self.bufnr })
@@ -458,8 +458,4 @@ function Tree:render(linenr_start)
   self._.linenr[1], self._.linenr[2] = linenr_start, line_idx + linenr_start - 1
 end
 
----@alias NuiTree.constructor fun(options: nui_tree_options): NuiTree
----@type NuiTree|NuiTree.constructor
-local NuiTree = Tree
-
-return NuiTree
+return Tree
