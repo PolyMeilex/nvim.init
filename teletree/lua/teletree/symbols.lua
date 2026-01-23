@@ -98,7 +98,7 @@ local function build_node(res, ctx)
     range = res.range,
   }, children)
 
-  if (res.kind ~= 6 and res.kind ~= 12) or in_range_of_cursor then
+  if (res.kind == 19) or in_range_of_cursor then
     node:expand()
   end
 
