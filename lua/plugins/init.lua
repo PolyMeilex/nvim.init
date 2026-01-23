@@ -15,7 +15,7 @@ return {
   {
     dir = "~/.config/nvim/rs-derive-menu",
     ft = "rust",
-    dependencies = { "MunifTanjim/nui.nvim" },
+    dependencies = { { dir = "~/.config/nvim/renui" } },
     opts = {},
   },
   {

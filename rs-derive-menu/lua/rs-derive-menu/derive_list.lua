@@ -1,5 +1,5 @@
 --- @class DeriveList
---- @field list NuiTree.Node[]
+--- @field list RenuiTree.Node[]
 local DeriveList = {}
 DeriveList.__index = DeriveList
 

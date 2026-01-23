@@ -1,5 +1,5 @@
-local NuiTree = require("nui.tree")
-local NuiLine = require("nui.line")
+local NuiTree = require("renui.tree")
+local NuiLine = require("renui.line")
 local window = require("teletree.window")
 
 local M = {}
@@ -156,14 +156,14 @@ function M.create()
   local bufnr = vim.api.nvim_create_buf(false, true)
 
   local P = {}
-  P.tree = NuiTree({
+  P.tree = NuiTree:new({
     bufnr = bufnr,
     nodes = {},
     get_node_id = function(node)
       return node.id
     end,
     prepare_node = function(node)
-      local line = NuiLine()
+      local line = NuiLine:new()
 
       line:append(string.rep("│ ", node:get_depth() - 1), "GruvboxBg2")
 

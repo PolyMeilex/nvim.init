@@ -1,4 +1,4 @@
-local NuiTree = require("nui.tree")
+local NuiTree = require("renui.tree")
 local async = require("plenary.async")
 local Path = require("plenary.path")
 
@@ -16,7 +16,7 @@ local diagnostics = require("teletree.diagnostics")
 ---@field is_directory boolean
 ---@field is_loaded boolean
 ---
----@alias TeletreeNode TeletreeNodeData | NuiTree.Node
+---@alias TeletreeNode TeletreeNodeData | RenuiTree.Node
 
 ---@param directory string
 ---@param tree NuiTree
@@ -104,7 +104,7 @@ local function create()
   local bufnr = vim.api.nvim_create_buf(false, true)
 
   local P = {}
-  P.tree = NuiTree({
+  P.tree = NuiTree:new({
     bufnr = bufnr,
     nodes = {},
     prepare_node = render.prepare_node,

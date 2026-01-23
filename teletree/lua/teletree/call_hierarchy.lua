@@ -1,4 +1,4 @@
-local NuiTree = require("nui.tree")
+local NuiTree = require("renui.tree")
 
 local function init_window(bufnr)
   local P = {
@@ -151,7 +151,7 @@ function M.call()
 
   local window = init_window(bufnr)
 
-  local tree = NuiTree({
+  local tree = NuiTree:new({
     bufnr = bufnr,
     nodes = nodes,
     get_node_id = function(node)

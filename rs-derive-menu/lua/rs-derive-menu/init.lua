@@ -1,6 +1,6 @@
-local Line = require("nui.line")
-local Text = require("nui.text")
-local NuiTree = require("nui.tree")
+local Line = require("renui.line")
+local Text = require("renui.text")
+local NuiTree = require("renui.tree")
 local DeriveList = require("rs-derive-menu.derive_list")
 local RustTree = require("rs-derive-menu.treesitter")
 
@@ -136,7 +136,7 @@ local function build_popup()
     P.popup.close()
   end
 
-  P.tree = NuiTree({
+  P.tree = NuiTree:new({
     bufnr = P.bufnr(),
     nodes = items.list,
     prepare_node = function(node, _)
@@ -144,16 +144,16 @@ local function build_popup()
         error("missing node.name")
       end
 
-      local line = Line()
+      local line = Line:new()
 
       local indent = string.rep("  ", node._depth - 1)
       line:append(indent)
 
       if node.on then
-        local checkbox = Text(" ")
+        local checkbox = Text:new(" ")
         line:append(checkbox)
       else
-        local checkbox = Text(" ", "GruvboxGray")
+        local checkbox = Text:new(" ", "GruvboxGray")
         line:append(checkbox)
       end
 
@@ -169,7 +169,7 @@ local function build_popup()
         local pad = string.rep(" ", 30 - len)
 
         line:append(pad)
-        line:append(Text("[" .. node.keybind .. "]", "Comment"))
+        line:append(Text:new("[" .. node.keybind .. "]", "Comment"))
       end
 
       return { line }

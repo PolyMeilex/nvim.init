@@ -1,4 +1,4 @@
-local NuiLine = require("nui.line")
+local NuiLine = require("renui.line")
 
 local M = {}
 
@@ -17,7 +17,7 @@ function M.prepare_node(node, _)
   local lines = {}
 
   for _, text in pairs(texts) do
-    local line = NuiLine()
+    local line = NuiLine:new()
 
     line:append(string.rep("  ", node._depth - 1))
 

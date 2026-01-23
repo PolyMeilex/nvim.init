@@ -1,7 +1,7 @@
 return {
   dir = "~/.config/nvim/teletree",
   dependencies = {
-    "MunifTanjim/nui.nvim",
+    { dir = "~/.config/nvim/renui" },
   },
   opts = {},
   keys = {
