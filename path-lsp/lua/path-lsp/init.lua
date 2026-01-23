@@ -289,7 +289,10 @@ function M.setup(config)
     pattern = M.config.filetypes,
     callback = function(args)
       local buf = args.buf
-      if not vim.bo[buf].modifiable or vim.list_contains({ "terminal", "nofile", "quickfix" }, vim.bo[buf].buftype) then
+      if
+        not vim.bo[buf].modifiable
+        or vim.list_contains({ "terminal", "nofile", "quickfix", "prompt" }, vim.bo[buf].buftype)
+      then
         return
       end
 
