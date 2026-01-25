@@ -11,14 +11,17 @@ vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.o.foldtext = ""
 vim.o.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
-vim.opt.termguicolors = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.expandtab = true
+vim.o.termguicolors = true
+vim.o.number = true
+vim.o.rnu = true
+vim.o.tabstop = 4
+
 vim.g.mapleader = " "
-vim.opt.number = true
-vim.opt.rnu = true
-vim.opt.tabstop = 4
+vim.g.camelcasemotion_key = "<leader>"
+
 vim.opt.clipboard = vim.opt.clipboard + "unnamedplus"
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
@@ -91,30 +94,25 @@ vim.api.nvim_create_user_command("CodeLensRun", function()
 end, {})
 
 do
-  local icons = require("poly.icons")
-
   vim.diagnostic.config({
     virtual_text = {
       severity = vim.diagnostic.severity.ERROR,
     },
-    signs = { text = icons.diagnostic_signs },
+    signs = { text = require("poly.icons").diagnostic_signs },
   })
 
+  --- @param opts vim.diagnostic.JumpOpts
+  local function jump_cb(opts)
+    return function()
+      vim.diagnostic.jump(opts)
+    end
+  end
+
   vim.keymap.set("n", "gl", vim.diagnostic.open_float)
-
-  vim.keymap.set("n", "[d", function()
-    vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.WARN } })
-  end)
-  vim.keymap.set("n", "]d", function()
-    vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.WARN } })
-  end)
-
-  vim.keymap.set("n", "[D", function()
-    vim.diagnostic.jump({ count = -1, severity = { min = vim.diagnostic.severity.ERROR } })
-  end)
-  vim.keymap.set("n", "]D", function()
-    vim.diagnostic.jump({ count = 1, severity = { min = vim.diagnostic.severity.ERROR } })
-  end)
+  vim.keymap.set("n", "[d", jump_cb({ count = -1, severity = { min = vim.diagnostic.severity.WARN } }))
+  vim.keymap.set("n", "]d", jump_cb({ count = 1, severity = { min = vim.diagnostic.severity.WARN } }))
+  vim.keymap.set("n", "[D", jump_cb({ count = -1, severity = { min = vim.diagnostic.severity.ERROR } }))
+  vim.keymap.set("n", "]D", jump_cb({ count = 1, severity = { min = vim.diagnostic.severity.ERROR } }))
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -155,8 +153,67 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+-- harpoon
+do
+  local function select_cb(index)
+    return function()
+      require("harpoon"):list():select(index)
+    end
+  end
+
+  vim.keymap.set("n", "<leader>a", function()
+    require("harpoon"):list():add()
+  end)
+  vim.keymap.set("n", "<leader>h", function()
+    local harpoon = require("harpoon")
+    harpoon.ui:toggle_quick_menu(harpoon:list())
+  end)
+  vim.keymap.set("n", "<C-h>", select_cb(1))
+  vim.keymap.set("n", "<C-j>", select_cb(2))
+  vim.keymap.set("n", "<C-k>", select_cb(3))
+  vim.keymap.set("n", "<C-l>", select_cb(4))
+  vim.keymap.set("n", "<C-;>", select_cb(5))
+end
+
+vim.api.nvim_create_user_command("MiniDiffToggleOverlay", function()
+  require("mini.diff").toggle_overlay(0)
+end, {})
+
+vim.api.nvim_create_user_command("LspToggleInlayHints", function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
+end, {})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  desc = "LSP attach actions",
+  callback = function(event)
+    local bufnr = event.buf
+
+    ---@type vim.lsp.Client|nil
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client == nil then
+      return
+    end
+
+    local telescope = require("telescope.builtin")
+    local opts = { buffer = bufnr }
+
+    vim.keymap.set("n", "gd", telescope.lsp_definitions, opts)
+    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+    vim.keymap.set("n", "gi", telescope.lsp_incoming_calls, opts)
+    vim.keymap.set("n", "gI", telescope.lsp_implementations, opts)
+    vim.keymap.set("n", "go", telescope.lsp_type_definitions, opts)
+    vim.keymap.set("n", "gr", telescope.lsp_references, opts)
+
+    vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
+  end,
+})
+
 require("poly.lazy_init")
 require("poly.bracketed").setup()
 require("poly.black-hole").setup()
 require("poly.inside").setup()
 require("poly.ui_input")
+require("poly.completion").setup()
+require("poly.statusline").setup()
+require("poly.telescope").setup()

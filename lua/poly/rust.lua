@@ -1,4 +1,6 @@
-RustSnippets = {
+local M = {}
+
+M.rust_snippets = {
   rccell = {
     postfix = "rccell",
     body = "Rc::new(RefCell::new(${receiver}))",
@@ -53,38 +55,4 @@ vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
   require("kgx").in_new_tab("cargo " .. table.concat(args.cargoArgs, " "))
 end
 
-return {
-  {
-    "saecki/crates.nvim",
-    ft = "toml",
-    -- tag = 'stable',
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      local crates = require("crates")
-      crates.setup({
-        lsp = {
-          enabled = true,
-          completion = true,
-          hover = true,
-          actions = true,
-        },
-      })
-
-      vim.keymap.set("n", "<leader>cv", function()
-        crates.show_versions_popup()
-        crates.focus_popup()
-      end, {})
-      vim.keymap.set("n", "<leader>cf", function()
-        crates.show_features_popup()
-        crates.focus_popup()
-      end, {})
-    end,
-  },
-  {
-    dir = "~/.config/nvim/ferris",
-    ft = "rust",
-    opts = {
-      create_commands = true,
-    },
-  },
-}
+return M

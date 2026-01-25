@@ -32,24 +32,21 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-vim.keymap.set("i", "<c-n>", vim.lsp.completion.get)
-vim.o.completeopt = "menuone,noinsert"
+local M = {}
 
--- Prevent `<CR>` from accepting completion
-vim.keymap.set("i", "<CR>", function()
-  return vim.fn.pumvisible() == 1 and "<C-c>a<CR>" or "<CR>"
-end, { expr = true, noremap = true })
+function M.setup()
+  vim.keymap.set("i", "<c-n>", vim.lsp.completion.get)
+  vim.o.completeopt = "menuone,noinsert"
 
-vim.keymap.set({ "i", "s" }, "<Esc>", function()
-  vim.snippet.stop()
-  return "<Esc>"
-end, { expr = true })
+  -- Prevent `<CR>` from accepting completion
+  vim.keymap.set("i", "<CR>", function()
+    return vim.fn.pumvisible() == 1 and "<C-c>a<CR>" or "<CR>"
+  end, { expr = true, noremap = true })
 
-return {
-  {
-    dir = "~/.config/nvim/path-lsp",
-    config = {
-      autostart = true,
-    },
-  },
-}
+  vim.keymap.set({ "i", "s" }, "<Esc>", function()
+    vim.snippet.stop()
+    return "<Esc>"
+  end, { expr = true })
+end
+
+return M
