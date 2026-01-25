@@ -91,7 +91,7 @@ vim.api.nvim_create_user_command("CodeLensRun", function()
 end, {})
 
 do
-  local icons = require("icons")
+  local icons = require("poly.icons")
 
   vim.diagnostic.config({
     virtual_text = {
@@ -155,8 +155,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-require("lazy_init")
-require("bracketed").setup()
-require("black-hole").setup()
-require("inside").setup()
-require("ui_input")
+require("poly.lazy_init")
+require("poly.bracketed").setup()
+require("poly.black-hole").setup()
+require("poly.inside").setup()
+require("poly.ui_input")

@@ -1,4 +1,4 @@
-local icons = require("icons")
+local icons = require("poly.icons")
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)

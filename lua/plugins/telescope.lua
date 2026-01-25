@@ -110,7 +110,7 @@ return {
     vim.keymap.set("n", "tj", builtin.jumplist, {})
     vim.keymap.set("n", "tw", builtin.lsp_dynamic_workspace_symbols, {})
     vim.keymap.set("n", "th", function()
-      require("git-hunks-picker").pick()
+      require("poly.git-hunks-picker").pick()
     end, {})
 
     telescope.setup({

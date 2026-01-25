@@ -1,5 +1,5 @@
-local spinner = require("spinner")
-local icons = require("icons")
+local spinner = require("poly.spinner")
+local icons = require("poly.icons")
 
 local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
