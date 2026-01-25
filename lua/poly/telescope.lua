@@ -61,47 +61,18 @@ end
 
 local M = {}
 
+M.project_files = project_files
+
+-- TODO: It can be moved to require now
+function _G._symbols_in_selection()
+  symbols_in_selection()
+end
+
+M.lsp_document_symbols_in_selection = ":<C-u>lua _symbols_in_selection()<CR>"
+
 function M.setup()
   local telescope = require("telescope")
-  local builtin = require("telescope.builtin")
   local actions = require("telescope.actions")
-
-  vim.keymap.set("n", "tng", builtin.find_files, {})
-  vim.keymap.set("n", "tg", project_files, {})
-  vim.keymap.set("n", "tc", builtin.commands, {})
-  vim.keymap.set("n", "tf", builtin.current_buffer_fuzzy_find, {})
-  vim.keymap.set("n", "tF", builtin.live_grep, {})
-  vim.keymap.set("n", "to", function()
-    builtin.oldfiles({ only_cwd = true })
-  end, {})
-  vim.keymap.set("n", "tb", builtin.buffers, {})
-
-  function _G._symbols_in_selection()
-    symbols_in_selection()
-  end
-
-  vim.keymap.set("v", "tt", ":<C-u>lua _symbols_in_selection()<CR>", { silent = true })
-  vim.keymap.set("n", "tt", builtin.lsp_document_symbols, {})
-
-  vim.keymap.set("n", "tl", function()
-    builtin.builtin({ default_text = "lsp_", use_default_opts = true })
-  end, {})
-  vim.keymap.set("n", "td", function()
-    builtin.diagnostics({ severity_limit = "WARN", severity_bound = "ERROR" })
-  end, {})
-  vim.keymap.set("n", "tD", function()
-    builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
-  end, {})
-  vim.keymap.set("n", "<C-p>", telescope.extensions.omni_picker.omni_picker, {})
-  vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list, {})
-  vim.keymap.set("n", "tj", builtin.jumplist, {})
-  vim.keymap.set("n", "tw", builtin.lsp_dynamic_workspace_symbols, {})
-  vim.keymap.set("n", "th", function()
-    require("poly.git-hunks-picker").pick()
-  end, {})
-  vim.keymap.set("n", "tm", function()
-    require("telescope").extensions.railgun.list()
-  end, {})
 
   telescope.setup({
     pickers = {

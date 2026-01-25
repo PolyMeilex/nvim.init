@@ -49,17 +49,48 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 do
-  local telescope = require("telescope.builtin")
+  local telescope = require("telescope")
+  local builtin = require("telescope.builtin")
+  local my = require("poly.telescope")
 
-  vim.keymap.set("n", "gd", telescope.lsp_definitions)
+  vim.keymap.set("n", "gd", builtin.lsp_definitions)
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration)
-  vim.keymap.set("n", "gi", telescope.lsp_incoming_calls)
-  vim.keymap.set("n", "gI", telescope.lsp_implementations)
-  vim.keymap.set("n", "go", telescope.lsp_type_definitions)
-  vim.keymap.set("n", "gr", telescope.lsp_references)
+  vim.keymap.set("n", "gi", builtin.lsp_incoming_calls)
+  vim.keymap.set("n", "gI", builtin.lsp_implementations)
+  vim.keymap.set("n", "go", builtin.lsp_type_definitions)
+  vim.keymap.set("n", "gr", builtin.lsp_references)
 
   vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
   vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action)
+
+  vim.keymap.set("n", "tng", builtin.find_files)
+  vim.keymap.set("n", "tg", my.project_files)
+  vim.keymap.set("n", "tc", builtin.commands)
+  vim.keymap.set("n", "tf", builtin.current_buffer_fuzzy_find)
+  vim.keymap.set("n", "tF", builtin.live_grep)
+  vim.keymap.set("n", "to", function()
+    builtin.oldfiles({ only_cwd = true })
+  end)
+  vim.keymap.set("n", "tb", builtin.buffers)
+
+  vim.keymap.set("v", "tt", my.lsp_document_symbols_in_selection, { silent = true })
+  vim.keymap.set("n", "tt", builtin.lsp_document_symbols)
+
+  vim.keymap.set("n", "tl", function()
+    builtin.builtin({ default_text = "lsp_", use_default_opts = true })
+  end)
+  vim.keymap.set("n", "td", function()
+    builtin.diagnostics({ severity_limit = "WARN", severity_bound = "ERROR" })
+  end)
+  vim.keymap.set("n", "tD", function()
+    builtin.diagnostics({ severity_limit = "ERROR", severity_bound = "ERROR" })
+  end)
+  vim.keymap.set("n", "<C-p>", telescope.extensions.omni_picker.omni_picker)
+  vim.keymap.set("n", "tp", telescope.extensions.lsp_code_context.list)
+  vim.keymap.set("n", "tj", builtin.jumplist)
+  vim.keymap.set("n", "tw", builtin.lsp_dynamic_workspace_symbols)
+  vim.keymap.set("n", "th", require("poly.git-hunks-picker").pick)
+  vim.keymap.set("n", "tm", telescope.extensions.railgun.list)
 end
 
 do
