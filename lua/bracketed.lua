@@ -193,12 +193,16 @@ local goto_sibling = function(direction)
   end
 end
 
-vim.keymap.set("n", "]q", ":cn<CR>", { silent = true })
-vim.keymap.set("n", "[q", ":cp<CR>", { silent = true })
+local M = {}
 
-local dot_repeat = require("dot_repeat")
-vim.keymap.set("n", "[p", dot_repeat(goto_parent), { expr = true })
-vim.keymap.set("n", "[s", dot_repeat(goto_sibling, "prev"), { expr = true })
-vim.keymap.set("n", "]s", dot_repeat(goto_sibling, "next"), { expr = true })
+function M.setup()
+  vim.keymap.set("n", "]q", ":cn<CR>", { silent = true })
+  vim.keymap.set("n", "[q", ":cp<CR>", { silent = true })
 
-return {}
+  local dot_repeat = require("dot_repeat")
+  vim.keymap.set("n", "[p", dot_repeat(goto_parent), { expr = true })
+  vim.keymap.set("n", "[s", dot_repeat(goto_sibling, "prev"), { expr = true })
+  vim.keymap.set("n", "]s", dot_repeat(goto_sibling, "next"), { expr = true })
+end
+
+return M

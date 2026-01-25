@@ -50,4 +50,5 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 require("lazy_init")
+require("bracketed").setup()
 require("black-hole").setup()
