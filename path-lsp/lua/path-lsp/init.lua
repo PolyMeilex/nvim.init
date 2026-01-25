@@ -25,7 +25,7 @@ local default_config = {
     throttle_delay_ms = 1000,
   },
   enabled = false,
-  autostart = false,
+  autostart = true,
   relative_to_curr_file = true,
 }
 
@@ -280,7 +280,7 @@ function M.setup(config)
     { desc = "Relative to current file" }
   )
 
-  if not config.autostart then
+  if not M.config.autostart then
     return
   end
 

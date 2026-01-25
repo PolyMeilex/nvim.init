@@ -31,7 +31,7 @@ require("lazy").setup({
   { dir = "~/.config/nvim/rs-derive-menu", ft = "rust", opts = {} },
   { dir = "~/.config/nvim/railgun", opts = {} },
   { dir = "~/.config/nvim/rust-targets", opts = {} },
-  { dir = "~/.config/nvim/path-lsp", config = { autostart = true } },
+  { dir = "~/.config/nvim/path-lsp", opts = {} },
   { dir = "~/.config/nvim/gitblame", opts = {} },
   { dir = "~/.config/nvim/ferris", ft = "rust", opts = { create_commands = true } },
   { dir = "~/.config/nvim/omni_picker" },
