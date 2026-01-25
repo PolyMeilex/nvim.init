@@ -27,6 +27,10 @@ local function inside_motion()
   return "i" .. res
 end
 
-vim.keymap.set("o", "i", inside_motion, { expr = true, desc = "Augmented inside motion" })
+local M = {}
 
-return {}
+function M.setup()
+  vim.keymap.set("o", "i", inside_motion, { expr = true, desc = "Augmented inside motion" })
+end
+
+return M

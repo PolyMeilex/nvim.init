@@ -8,6 +8,7 @@ local function try_typos_lsp_launch(buffer)
   vim.lsp.buf_attach_client(buffer, client.id)
 end
 
+---@diagnostic disable-next-line: duplicate-set-field
 vim.ui.input = function(opts, on_confirm)
   vim.validate({
     opts = { opts, "table", true },
@@ -91,5 +92,3 @@ vim.ui.input = function(opts, on_confirm)
   vim.keymap.set("n", "<esc>", cancel, { buffer = buffer })
   vim.keymap.set("n", "q", cancel, { buffer = buffer })
 end
-
-return {}
