@@ -47,6 +47,24 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+vim.keymap.set("n", "<leader>cv", function()
+  local crates = require("crates")
+  crates.show_versions_popup()
+  crates.focus_popup()
+end)
+vim.keymap.set("n", "<leader>cf", function()
+  local crates = require("crates")
+  crates.show_features_popup()
+  crates.focus_popup()
+end)
+
+vim.keymap.set("n", "<C-e>", function()
+  require("teletree").open()
+end)
+vim.keymap.set("n", "<C-s>", function()
+  require("teletree.symbols").open()
+end)
+
 do
   local telescope = require("telescope")
   local builtin = require("telescope.builtin")

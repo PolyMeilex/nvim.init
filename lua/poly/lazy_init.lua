@@ -11,13 +11,6 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.keymap.set("n", "<C-e>", function()
-  require("teletree").open()
-end)
-vim.keymap.set("n", "<C-s>", function()
-  require("teletree.symbols").open()
-end)
-
 ---@param name string
 ---@return string
 local function custom_plugin(name)
@@ -135,26 +128,14 @@ require("lazy").setup({
   {
     "saecki/crates.nvim",
     ft = "toml",
-    config = function()
-      local crates = require("crates")
-      crates.setup({
-        lsp = {
-          enabled = true,
-          completion = true,
-          hover = true,
-          actions = true,
-        },
-      })
-
-      vim.keymap.set("n", "<leader>cv", function()
-        crates.show_versions_popup()
-        crates.focus_popup()
-      end, {})
-      vim.keymap.set("n", "<leader>cf", function()
-        crates.show_features_popup()
-        crates.focus_popup()
-      end, {})
-    end,
+    opts = {
+      lsp = {
+        enabled = true,
+        completion = true,
+        hover = true,
+        actions = true,
+      },
+    },
   },
   {
     "ellisonleao/gruvbox.nvim",
