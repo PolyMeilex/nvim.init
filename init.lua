@@ -24,6 +24,18 @@ vim.g.camelcasemotion_key = "<leader>"
 
 vim.opt.clipboard = vim.opt.clipboard + "unnamedplus"
 
+require("poly.lazy_init")
+require("poly.bracketed").setup()
+require("poly.black-hole").setup()
+require("poly.inside").setup()
+require("poly.ui_input")
+require("poly.completion").setup()
+require("poly.statusline").setup()
+require("poly.telescope").setup()
+require("poly.treesitter")
+require("poly.lsp")
+require("poly.code_lens")
+
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.cmd(":tnoremap <C-q> <C-\\><C-n>")
 
@@ -35,63 +47,19 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  desc = "Treesitter init",
-  pattern = { "*" },
-  callback = function()
-    local treesitter = require("nvim-treesitter")
+do
+  local telescope = require("telescope.builtin")
 
-    local installed = treesitter.get_installed("parsers")
-    local parser_name = vim.treesitter.language.get_lang(vim.bo.filetype)
+  vim.keymap.set("n", "gd", telescope.lsp_definitions)
+  vim.keymap.set("n", "gD", vim.lsp.buf.declaration)
+  vim.keymap.set("n", "gi", telescope.lsp_incoming_calls)
+  vim.keymap.set("n", "gI", telescope.lsp_implementations)
+  vim.keymap.set("n", "go", telescope.lsp_type_definitions)
+  vim.keymap.set("n", "gr", telescope.lsp_references)
 
-    if vim.list_contains(installed, parser_name) then
-      vim.treesitter.start(nil, parser_name)
-      return
-    end
-
-    local available = treesitter.get_available()
-
-    if not vim.list_contains(available, parser_name) then
-      return
-    end
-
-    treesitter.install(parser_name):await(function()
-      pcall(vim.treesitter.start, nil, parser_name)
-    end)
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  desc = "Force commentstring to include spaces",
-  callback = function()
-    local cs = vim.bo.commentstring
-
-    if not cs or not cs:match("%%s") then
-      if vim.bo.filetype == "dart" or vim.bo.filetype == "wgsl" then
-        vim.bo.commentstring = "// %s"
-      elseif vim.bo.filetype == "plantuml" then
-        vim.bo.commentstring = "' %s"
-      end
-
-      return
-    end
-
-    vim.bo.commentstring = cs:gsub("%s*%%s%s*", " %%s "):gsub("%s*$", "")
-  end,
-})
-
-vim.api.nvim_create_user_command("CodeLensRun", function()
-  local old = vim.lsp.codelens.on_codelens
-  ---@diagnostic disable-next-line: duplicate-set-field
-  vim.lsp.codelens.on_codelens = function(err, result, ctx)
-    local res = old(err, result, ctx)
-    vim.lsp.codelens.run()
-    vim.lsp.codelens.clear()
-    return res
-  end
-  vim.lsp.codelens.refresh()
-  vim.lsp.codelens.on_codelens = old
-end, {})
+  vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
+  vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action)
+end
 
 do
   vim.diagnostic.config({
@@ -182,39 +150,3 @@ end, {})
 vim.api.nvim_create_user_command("LspToggleInlayHints", function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
 end, {})
-
-vim.api.nvim_create_autocmd("LspAttach", {
-  desc = "LSP attach actions",
-  callback = function(event)
-    local bufnr = event.buf
-
-    ---@type vim.lsp.Client|nil
-    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client == nil then
-      return
-    end
-
-    local telescope = require("telescope.builtin")
-    local opts = { buffer = bufnr }
-
-    vim.keymap.set("n", "gd", telescope.lsp_definitions, opts)
-    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-    vim.keymap.set("n", "gi", telescope.lsp_incoming_calls, opts)
-    vim.keymap.set("n", "gI", telescope.lsp_implementations, opts)
-    vim.keymap.set("n", "go", telescope.lsp_type_definitions, opts)
-    vim.keymap.set("n", "gr", telescope.lsp_references, opts)
-
-    vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, opts)
-    vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
-  end,
-})
-
-require("poly.lazy_init")
-require("poly.bracketed").setup()
-require("poly.black-hole").setup()
-require("poly.inside").setup()
-require("poly.ui_input")
-require("poly.completion").setup()
-require("poly.statusline").setup()
-require("poly.telescope").setup()
-require("poly.lsp")

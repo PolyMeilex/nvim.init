@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -18,26 +18,32 @@ vim.keymap.set("n", "<C-s>", function()
   require("teletree.symbols").open()
 end)
 
+---@param name string
+---@return string
+local function custom_plugin(name)
+  return "~/.config/nvim/custom_plugins/" .. name
+end
+
 require("lazy").setup({
   -- Deps
-  { dir = "~/.config/nvim/renui" },
+  { dir = custom_plugin("renui") },
   "nvim-lua/plenary.nvim",
 
   -- Plugins
   "bkad/CamelCaseMotion",
-  { dir = "~/.config/nvim/yaml_utils", ft = "yaml", opts = {} },
-  { dir = "~/.config/nvim/json_utils", ft = "json", opts = {} },
-  { dir = "~/.config/nvim/lsp-code-context", opts = {} },
-  { dir = "~/.config/nvim/rs-derive-menu", ft = "rust", opts = {} },
-  { dir = "~/.config/nvim/railgun", opts = {} },
-  { dir = "~/.config/nvim/rust-targets", opts = {} },
-  { dir = "~/.config/nvim/path-lsp", opts = {} },
-  { dir = "~/.config/nvim/gitblame", opts = {} },
-  { dir = "~/.config/nvim/ferris", ft = "rust", opts = { create_commands = true } },
-  { dir = "~/.config/nvim/omni_picker" },
-  { dir = "~/.config/nvim/teletree", opts = {} },
+  { dir = custom_plugin("yaml_utils"), ft = "yaml", opts = {} },
+  { dir = custom_plugin("json_utils"), ft = "json", opts = {} },
+  { dir = custom_plugin("lsp-code-context"), opts = {} },
+  { dir = custom_plugin("rs-derive-menu"), ft = "rust", opts = {} },
+  { dir = custom_plugin("railgun"), opts = {} },
+  { dir = custom_plugin("rust-targets"), opts = {} },
+  { dir = custom_plugin("path-lsp"), opts = {} },
+  { dir = custom_plugin("gitblame"), opts = {} },
+  { dir = custom_plugin("ferris"), ft = "rust", opts = { create_commands = true } },
+  { dir = custom_plugin("omni_picker") },
+  { dir = custom_plugin("teletree"), opts = {} },
   {
-    dir = "~/.config/nvim/fmt",
+    dir = custom_plugin("fmt"),
     --- @type fmt.setup.Opts
     opts = {
       formatters = {
@@ -55,7 +61,7 @@ require("lazy").setup({
     },
   },
   {
-    dir = "~/.config/nvim/venn",
+    dir = custom_plugin("venn"),
     config = function()
       -- venn.nvim: enable or disable keymappings
       function _G.Toggle_venn()
