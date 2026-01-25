@@ -258,7 +258,7 @@ function M.set_relative_to_curr_cwd()
   M.config.relative_to_curr_file = false
 end
 
----@param config PathLspConfig
+---@param config PathLspConfig | nil
 function M.setup(config)
   M.config = vim.deepcopy(default_config)
   M.config = vim.tbl_deep_extend("force", M.config, config or {})

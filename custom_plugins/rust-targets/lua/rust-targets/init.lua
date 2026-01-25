@@ -22,17 +22,17 @@ M.config = default_config
 ---@type string[]|nil
 M.targets = nil
 
----@param config RustTargetsConfig
+---@param config RustTargetsConfig | nil
 function M.setup(config)
   M.config = vim.deepcopy(default_config)
   M.config = vim.tbl_deep_extend("force", M.config, config or {})
 
   vim.api.nvim_create_user_command("SelectRustTarget", M.select, {})
 
-  if config.rustup then
+  if M.config.rustup then
     M.targets = nil
   else
-    M.targets = config.targets
+    M.targets = M.config.targets
   end
 end
 
