@@ -24,15 +24,15 @@ require("lazy").setup({
 
   -- Plugins
   "bkad/CamelCaseMotion",
-  { dir = custom_plugin("yaml_utils"), ft = "yaml", opts = {} },
-  { dir = custom_plugin("json_utils"), ft = "json", opts = {} },
+  { dir = custom_plugin("yaml_utils"), opts = {} },
+  { dir = custom_plugin("json_utils"), opts = {} },
   { dir = custom_plugin("lsp-code-context"), opts = {} },
-  { dir = custom_plugin("rs-derive-menu"), ft = "rust", opts = {} },
+  { dir = custom_plugin("rs-derive-menu"), opts = {} },
   { dir = custom_plugin("railgun"), opts = {} },
   { dir = custom_plugin("rust-targets"), opts = {} },
   { dir = custom_plugin("path-lsp"), opts = {} },
   { dir = custom_plugin("gitblame"), opts = {} },
-  { dir = custom_plugin("ferris"), ft = "rust", opts = { create_commands = true } },
+  { dir = custom_plugin("ferris"), opts = { create_commands = true } },
   { dir = custom_plugin("omni_picker") },
   { dir = custom_plugin("teletree"), opts = {} },
   {
@@ -120,14 +120,12 @@ require("lazy").setup({
   },
   {
     "folke/lazydev.nvim",
-    ft = "lua",
     opts = {
       library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
     },
   },
   {
     "saecki/crates.nvim",
-    ft = "toml",
     opts = {
       lsp = {
         enabled = true,
