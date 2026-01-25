@@ -94,10 +94,60 @@ M.register_autocmd = function()
   })
 end
 
+---@param cmd string
+---@return string | nil
+local function run_cmd(cmd)
+  local output = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 or not output or #output == 0 then
+    return nil
+  end
+  return output[1]
+end
+
 M.setup = function()
   vim.o.updatetime = 500
 
   vim.api.nvim_create_user_command("GitBlameToggle", M.toggle, { desc = "Toggle git blame" })
+  vim.api.nvim_create_user_command("GitBlamePermalink", function(args)
+    local url = run_cmd("git remote get-url origin")
+    local sha = run_cmd("git rev-parse HEAD")
+
+    if not url or not sha then
+      return
+    end
+
+    local github = "git@github.com:"
+    local gitlab = "git@gitlab.com:"
+
+    local is_github = vim.startswith(url, github)
+    local is_gitlab = vim.startswith(url, gitlab)
+
+    if not (is_github or is_gitlab) then
+      return
+    end
+
+    url = url:sub(#github + 1)
+    url = url:sub(1, #url - 4)
+
+    local split = vim.split(url, "/")
+
+    local namespace = split[1]
+    local repo = split[2]
+
+    local filepath = vim.api.nvim_buf_get_name(0)
+    local cwd = vim.uv.cwd()
+    filepath = string.sub(filepath, #cwd + 2)
+
+    local template = ""
+    if is_github then
+      template = "https://github.com/%s/%s/blob/%s/%s#L%d-L%d"
+    else
+      template = "https://github.com/%s/%s/blob/%s/%s#L%d-L%d"
+    end
+
+    local formatted = string.format(template, namespace, repo, sha, filepath, args.line1, args.line2)
+    vim.print(formatted)
+  end, { range = true })
 end
 
 M.on = false
