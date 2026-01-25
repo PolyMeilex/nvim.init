@@ -195,14 +195,9 @@ end
 
 local M = {}
 
-function M.setup()
-  vim.keymap.set("n", "]q", ":cn<CR>", { silent = true })
-  vim.keymap.set("n", "[q", ":cp<CR>", { silent = true })
-
-  local dot_repeat = require("poly.dot_repeat")
-  vim.keymap.set("n", "[p", dot_repeat(goto_parent), { expr = true })
-  vim.keymap.set("n", "[s", dot_repeat(goto_sibling, "prev"), { expr = true })
-  vim.keymap.set("n", "]s", dot_repeat(goto_sibling, "next"), { expr = true })
-end
+local dot_repeat = require("poly.dot_repeat")
+M.goto_parent = dot_repeat(goto_parent)
+M.prev_sibling = dot_repeat(goto_sibling, "prev")
+M.next_sibling = dot_repeat(goto_sibling, "next")
 
 return M
