@@ -27,13 +27,25 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "*" },
   callback = function()
-    if vim.treesitter.get_parser(nil, nil, { error = false }) == nil then
-      require("nvim-treesitter").install(vim.treesitter.language.get_lang(vim.bo.filetype)):await(function()
-        pcall(vim.treesitter.start)
-      end)
-    else
-      vim.treesitter.start()
+    local treesitter = require("nvim-treesitter")
+
+    local installed = treesitter.get_installed("parsers")
+    local parser_name = vim.treesitter.language.get_lang(vim.bo.filetype)
+
+    if vim.list_contains(installed, parser_name) then
+      vim.treesitter.start(nil, parser_name)
+      return
     end
+
+    local available = treesitter.get_available()
+
+    if not vim.list_contains(available, parser_name) then
+      return
+    end
+
+    treesitter.install(parser_name):await(function()
+      pcall(vim.treesitter.start, nil, parser_name)
+    end)
   end,
 })
 
