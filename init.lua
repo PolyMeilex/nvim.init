@@ -24,5 +24,18 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "*" },
+  callback = function()
+    if vim.treesitter.get_parser(nil, nil, { error = false }) == nil then
+      require("nvim-treesitter").install(vim.treesitter.language.get_lang(vim.bo.filetype)):await(function()
+        pcall(vim.treesitter.start)
+      end)
+    else
+      vim.treesitter.start()
+    end
+  end,
+})
+
 require("lazy_init")
 require("black-hole").setup()

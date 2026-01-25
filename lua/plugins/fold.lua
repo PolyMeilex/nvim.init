@@ -4,5 +4,6 @@ vim.o.foldlevelstart = 99
 vim.o.foldmethod = "expr"
 vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.o.foldtext = ""
+vim.o.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
 return {}

@@ -76,23 +76,9 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    run = ":TSUpdate",
-    main = "nvim-treesitter.configs",
-    opts = {
-      ensure_installed = { "lua", "rust" },
-      ignore_install = {},
-      modules = {},
-      sync_install = false,
-      auto_install = true,
-
-      highlight = {
-        enable = true,
-        -- disable = function(lang, buf)
-        --   return lang == "rust" and vim.api.nvim_buf_line_count(buf) >= 10000
-        -- end,
-        additional_vim_regex_highlighting = { "yaml" },
-      },
-    },
+    lazy = false,
+    build = ":TSUpdate",
+    branch = "main",
   },
   {
     "wakatime/vim-wakatime",
