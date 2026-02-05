@@ -86,7 +86,7 @@ require("lazy").setup({
     end,
   },
   { "wakatime/vim-wakatime", lazy = false },
-  { "ThePrimeagen/harpoon", branch = "harpoon2", lazy = true },
+  { "ThePrimeagen/harpoon", branch = "harpoon2", lazy = true, opts = {} },
   { "williamboman/mason.nvim", opts = {} },
   { "nvim-treesitter/nvim-treesitter", lazy = false, build = ":TSUpdate", branch = "main" },
   { "echasnovski/mini.surround", opts = { n_lines = 1000 } },
