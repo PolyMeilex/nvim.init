@@ -18,6 +18,7 @@ vim.o.termguicolors = true
 vim.o.number = true
 vim.o.rnu = true
 vim.o.tabstop = 4
+vim.o.gdefault = true
 
 vim.g.mapleader = " "
 vim.g.camelcasemotion_key = "<leader>"
