@@ -142,7 +142,7 @@ M.setup = function()
     if is_github then
       template = "https://github.com/%s/%s/blob/%s/%s#L%d-L%d"
     else
-      template = "https://github.com/%s/%s/blob/%s/%s#L%d-L%d"
+      template = "https://gitlab.com/%s/%s/blob/%s/%s#L%d-%d"
     end
 
     local formatted = string.format(template, namespace, repo, sha, filepath, args.line1, args.line2)
