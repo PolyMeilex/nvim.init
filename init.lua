@@ -34,7 +34,6 @@ require("poly.statusline").setup()
 require("poly.telescope").setup()
 require("poly.treesitter")
 require("poly.lsp")
-require("poly.code_lens")
 require("poly.word_highlight")
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
