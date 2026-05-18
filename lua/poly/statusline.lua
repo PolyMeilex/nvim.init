@@ -1,4 +1,3 @@
-local spinner = require("poly.spinner")
 local icons = require("poly.icons")
 
 local function add_hl(hl, label)
@@ -194,7 +193,7 @@ _G.my_statusline = function()
     file_status = "[+] "
   end
 
-  local right = spinner.label() .. " " .. add_hl("Comment", vim.lsp.status())
+  local right = add_hl("Comment", vim.lsp.status())
   return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) .. "%=" .. right
 end
 
