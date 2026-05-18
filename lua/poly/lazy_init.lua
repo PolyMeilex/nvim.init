@@ -50,7 +50,6 @@ vim.pack.add({
   gh("nvim-lua/plenary.nvim"),
   -- Plugins
   gh("bkad/CamelCaseMotion"),
-  gh("wakatime/vim-wakatime"),
   gh("neovim/nvim-lspconfig"),
   gh("nvim-telescope/telescope.nvim"),
   gh("nvim-telescope/telescope-ui-select.nvim"),
