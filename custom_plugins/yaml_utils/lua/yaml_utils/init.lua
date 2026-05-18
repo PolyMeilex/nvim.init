@@ -102,20 +102,19 @@ M.setup = function()
     M.seq_ids(nil, true)
   end, { desc = "Mark seq ids" })
 
-  vim.api.nvim_create_augroup("yaml_utils", { clear = true })
-  vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
-    group = "yaml_utils",
-    pattern = "*.yaml,*.yml",
+  local group = vim.api.nvim_create_augroup("yaml_utils", { clear = true })
+  vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave", "FileType" }, {
+    group = group,
+    pattern = { "*.yaml", "*.yml", "yaml" },
     callback = function()
       M.seq_ids("messages", true)
     end,
   })
 
-  vim.api.nvim_create_autocmd("FileType", {
-    group = "yaml_utils",
-    pattern = "yaml",
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = group,
     callback = function()
-      M.seq_ids("messages", true)
+      M.clear()
     end,
   })
 end
