@@ -96,7 +96,29 @@ M.all_keys = function(bufnr, key_filter)
   end
 end
 
-M.setup = function() end
+M.setup = function()
+  vim.api.nvim_create_user_command("YAMLClear", M.clear, { desc = "Clear marks" })
+  vim.api.nvim_create_user_command("YAMLSeqIds", function()
+    M.seq_ids(nil, true)
+  end, { desc = "Mark seq ids" })
+
+  vim.api.nvim_create_augroup("yaml_utils", { clear = true })
+  vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+    group = "yaml_utils",
+    pattern = "*.yaml,*.yml",
+    callback = function()
+      M.seq_ids("messages", true)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = "yaml_utils",
+    pattern = "yaml",
+    callback = function()
+      M.seq_ids("messages", true)
+    end,
+  })
+end
 
 M.clear = function()
   local bufnr = vim.api.nvim_get_current_buf()
@@ -156,21 +178,5 @@ M.seq_ids = function(key_filter, count_nested_flow_seq)
     ::continue::
   end
 end
-
--- Commands
-
-vim.api.nvim_create_user_command("YAMLClear", M.clear, { desc = "Clear marks" })
-vim.api.nvim_create_user_command("YAMLSeqIds", function()
-  M.seq_ids(nil, true)
-end, { desc = "Mark seq ids" })
-
-vim.api.nvim_create_augroup("yaml_utils", { clear = true })
-vim.api.nvim_create_autocmd({ "BufReadPost", "TextChanged", "TextChangedI" }, {
-  group = "yaml_utils",
-  pattern = "*.yaml,*.yml",
-  callback = function()
-    M.seq_ids("messages", true)
-  end,
-})
 
 return M
