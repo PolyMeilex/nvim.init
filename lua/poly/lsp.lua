@@ -7,7 +7,6 @@ vim.lsp.config("rust_analyzer", {
     ["rust-analyzer"] = {
       checkOnSave = true,
       check = { command = "clippy" },
-      completion = { snippets = { custom = require("poly.rust").rust_snippets } },
     },
   },
   capabilities = {
