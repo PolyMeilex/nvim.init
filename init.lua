@@ -126,8 +126,6 @@ do
     end
   end
 
-  local bracketed = require("poly.bracketed")
-
   vim.keymap.set("n", "gl", vim.diagnostic.open_float)
   vim.keymap.set("n", "[d", jump_cb({ count = -1, severity = { min = vim.diagnostic.severity.WARN } }))
   vim.keymap.set("n", "]d", jump_cb({ count = 1, severity = { min = vim.diagnostic.severity.WARN } }))
@@ -136,10 +134,6 @@ do
 
   vim.keymap.set("n", "]q", ":cn<CR>", { silent = true })
   vim.keymap.set("n", "[q", ":cp<CR>", { silent = true })
-
-  vim.keymap.set("n", "[p", bracketed.goto_parent, { expr = true })
-  vim.keymap.set("n", "[s", bracketed.prev_sibling, { expr = true })
-  vim.keymap.set("n", "]s", bracketed.next_sibling, { expr = true })
 end
 
 -- harpoon
