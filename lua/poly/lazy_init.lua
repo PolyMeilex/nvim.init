@@ -62,6 +62,7 @@ vim.pack.add({
   gh("nvim-tree/nvim-web-devicons"),
 
   { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" },
+  gh("nvim-treesitter/nvim-treesitter-textobjects"),
 
   gh("folke/lazydev.nvim"),
   gh("saecki/crates.nvim"),
@@ -80,6 +81,7 @@ require("ferris").setup()
 require("teletree").setup()
 require("mason").setup({})
 require("harpoon").setup({})
+require("nvim-treesitter-textobjects").setup({})
 
 require("mini.surround").setup({ n_lines = 1000 })
 

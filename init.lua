@@ -135,6 +135,16 @@ do
   vim.keymap.set("n", "[q", ":cp<CR>", { silent = true })
 end
 
+-- treesitter
+do
+  vim.keymap.set({ "x", "o" }, "am", function()
+    require("nvim-treesitter-textobjects.select").select_textobject("@parameter.outer", "textobjects")
+  end)
+  vim.keymap.set({ "x", "o" }, "im", function()
+    require("nvim-treesitter-textobjects.select").select_textobject("@parameter.inner", "textobjects")
+  end)
+end
+
 -- harpoon
 do
   local function select_cb(index)
