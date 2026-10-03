@@ -1,5 +1,19 @@
 local icons = require("poly.icons")
 
+local harpoon_keys = { "h", "j", "k", "l", ";" }
+
+local diagnostic_hls = {
+  [vim.diagnostic.severity.ERROR] = "DiagnosticError",
+  [vim.diagnostic.severity.WARN] = "DiagnosticWarn",
+  [vim.diagnostic.severity.INFO] = "DiagnosticInfo",
+  [vim.diagnostic.severity.HINT] = "DiagnosticHint",
+}
+
+local hidden_filetypes = {
+  ["neo-tree"] = true,
+  ["DiffviewFiles"] = true,
+}
+
 local function add_hl(hl, label)
   return "%#" .. hl .. "#" .. label .. "%*"
 end
@@ -8,191 +22,73 @@ local function add_on_click(level, fn, component)
   return "%" .. level .. "@v:lua." .. fn .. "@" .. component .. "%X"
 end
 
-_G.my_harpoon_click_handler = function(minwid, _, _, _)
-  local harpoon = require("harpoon")
-  harpoon:list():select(minwid)
+_G.my_harpoon_click_handler = function(minwid)
+  require("harpoon"):list():select(minwid)
 end
 
-local function code_context()
-  local label = require("lsp-code-context").get_label()
-
-  if #label == 0 then
-    return ""
+-- "a/b/c/d.lua" -> "b/c/d.lua"
+local function short_path(path)
+  local parts = {}
+  for part in path:gmatch("[^/]+") do
+    table.insert(parts, part)
   end
-
-  return label
+  return table.concat(parts, "/", math.max(1, #parts - 2))
 end
 
 local function hjkl_harpoon()
-  local harpoon = require("harpoon")
-
-  local function filter_empty_string(list)
-    local next = {}
-    for idx = 1, #list do
-      if list[idx].value ~= "" then
-        table.insert(next, list[idx].value)
-      end
+  local paths = {}
+  for _, item in ipairs(require("harpoon"):list().items) do
+    if item.value ~= "" then
+      table.insert(paths, item.value)
     end
-
-    return next
   end
 
-  local function split(source, delimiters)
-    local elements = {}
-    local pattern = "([^" .. delimiters .. "]+)"
-    string.gsub(source, pattern, function(value)
-      elements[#elements + 1] = value
-    end)
-    return elements
-  end
-
-  local function add_fg_hl(label)
-    return add_hl("GruvboxFg0", label)
-  end
-
-  local function add_key_hl(label)
-    return add_hl("GruvboxFg4", label)
-  end
-
-  local function add_orange_hl(label)
-    return add_hl("GruvboxGreenBold", label)
-  end
-
-  local function add_green_hl(label)
-    return add_hl("GruvboxGreenBold", label)
-  end
-
-  local function add_click(level, component)
-    return add_on_click(level, "my_harpoon_click_handler", component)
-  end
-
-  local list = filter_empty_string(harpoon:list().items)
   local current_filepath = vim.fn.expand("%:.")
-
-  local function nth_item(id)
-    local item = list[id]
-
-    if item == nil then
-      return ""
-    end
-
-    local path = split(item, "/")
-    local label = ""
-
-    if #path >= 3 then
-      label = path[#path - 2] .. "/" .. path[#path - 1] .. "/" .. path[#path]
-    elseif #path == 2 then
-      label = path[#path - 1] .. "/" .. path[#path]
-    elseif #path == 1 then
-      label = path[#path]
-    end
-
-    label = " " .. label .. " "
-
-    local key = "[_]"
-    if id == 1 then
-      key = "[h]"
-    elseif id == 2 then
-      key = "[j]"
-    elseif id == 3 then
-      key = "[k]"
-    elseif id == 4 then
-      key = "[l]"
-    elseif id == 5 then
-      key = "[;]"
-    end
-
-    if item == current_filepath then
-      return add_key_hl(key) .. add_orange_hl(label)
-    else
-      return add_key_hl(key) .. add_fg_hl(label)
-    end
-  end
-
   local tabs = {}
 
-  if #list >= 1 then
-    table.insert(tabs, add_click(1, nth_item(1)))
+  for id = 1, math.min(#paths, #harpoon_keys) do
+    local path = paths[id]
+    local label_hl = path == current_filepath and "GruvboxGreenBold" or "GruvboxFg0"
+    local tab = add_hl("GruvboxFg4", "[" .. harpoon_keys[id] .. "]") .. add_hl(label_hl, " " .. short_path(path) .. " ")
+    table.insert(tabs, add_on_click(id, "my_harpoon_click_handler", tab))
   end
 
-  if #list >= 2 then
-    table.insert(tabs, add_click(2, nth_item(2)))
-  end
-
-  if #list >= 3 then
-    table.insert(tabs, add_click(3, nth_item(3)))
-  end
-
-  if #list >= 4 then
-    table.insert(tabs, add_click(4, nth_item(4)))
-  end
-
-  if #list >= 5 then
-    table.insert(tabs, add_click(5, nth_item(5)))
-  end
-
-  return table.concat(tabs, "")
+  return table.concat(tabs)
 end
 
 local function diagnostics_status()
   local count = vim.diagnostic.count(0)
-  local error_count = count[vim.diagnostic.severity.ERROR] or 0
-  local warning_count = count[vim.diagnostic.severity.WARN] or 0
-  local info_count = count[vim.diagnostic.severity.INFO] or 0
-  local hint_count = count[vim.diagnostic.severity.HINT] or 0
-
   local list = {}
 
-  if error_count > 0 then
-    table.insert(list, add_hl("DiagnosticError", icons.diagnostic_signs[vim.diagnostic.severity.ERROR] .. error_count))
+  for severity, hl in ipairs(diagnostic_hls) do
+    local n = count[severity] or 0
+    if n > 0 then
+      table.insert(list, add_hl(hl, icons.diagnostic_signs[severity] .. n))
+    end
   end
 
-  if warning_count > 0 then
-    table.insert(list, add_hl("DiagnosticWarn", icons.diagnostic_signs[vim.diagnostic.severity.WARN] .. warning_count))
+  if #list == 0 then
+    return ""
   end
 
-  if info_count > 0 then
-    table.insert(list, add_hl("DiagnosticInfo", icons.diagnostic_signs[vim.diagnostic.severity.INFO] .. info_count))
-  end
-
-  if hint_count > 0 then
-    table.insert(list, add_hl("DiagnosticHint", icons.diagnostic_signs[vim.diagnostic.severity.HINT] .. hint_count))
-  end
-
-  if #list > 0 then
-    local empty = add_hl("GruvboxFg0", " ")
-    return empty .. table.concat(list, empty) .. empty
-  end
-
-  return ""
+  local empty = add_hl("GruvboxFg0", " ")
+  return empty .. table.concat(list, empty) .. empty
 end
 
 _G.my_winbar = function()
-  if vim.bo.filetype == "neo-tree" then
+  if hidden_filetypes[vim.bo.filetype] then
     return ""
   end
 
-  if vim.bo.filetype == "DiffviewFiles" then
-    return ""
-  end
-
-  return code_context() .. "%=" .. hjkl_harpoon()
+  return require("lsp-code-context").get_label() .. "%=" .. hjkl_harpoon()
 end
 
 _G.my_statusline = function()
-  if vim.bo.filetype == "neo-tree" then
+  if hidden_filetypes[vim.bo.filetype] then
     return ""
   end
 
-  if vim.bo.filetype == "DiffviewFiles" then
-    return ""
-  end
-
-  local file_status = ""
-  if vim.bo.modified then
-    file_status = "[+] "
-  end
-
+  local file_status = vim.bo.modified and "[+] " or ""
   local right = add_hl("Comment", vim.lsp.status())
   return diagnostics_status() .. add_hl("GruvboxFg0", "%f " .. file_status) .. "%=" .. right
 end
@@ -204,20 +100,20 @@ function M.setup()
 
   require("harpoon"):extend({
     ADD = function()
-      vim.api.nvim_command("redrawstatus!")
+      vim.cmd("redrawstatus!")
     end,
   })
 
   vim.api.nvim_create_autocmd("DiagnosticChanged", {
-    callback = function(_)
-      vim.api.nvim_command("redrawstatus!")
-    end,
+    command = "redrawstatus!",
+  })
+
+  vim.api.nvim_create_autocmd("LspProgress", {
+    command = "redrawstatus",
   })
 
   vim.o.winbar = "%{%v:lua.my_winbar()%}"
   vim.o.statusline = "%{%v:lua.my_statusline()%}"
-
-  vim.cmd("autocmd LspProgress * redrawstatus")
 end
 
 return M
